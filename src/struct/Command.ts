@@ -1,4 +1,5 @@
 import { basename, extname } from 'node:path';
+import type { Interaction, RESTPostAPIApplicationCommandsJSONBody } from 'discord.js';
 
 export interface CommandInfo {
 	name: string;
@@ -7,7 +8,8 @@ export interface CommandInfo {
 // TODO(DD): Generics and stuff for various interaction types
 export interface Command {
 	readonly name?: string;
-	handle: () => unknown;
+	readonly interactionOptions: RESTPostAPIApplicationCommandsJSONBody;
+	handle: (interaction: Interaction) => unknown;
 }
 
 export type CommandConstructor = new (...args: any[]) => Command;
