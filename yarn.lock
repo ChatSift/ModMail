@@ -1281,7 +1281,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.8.4":
+"@babel/runtime@npm:^7.17.2, @babel/runtime@npm:^7.8.4":
   version: 7.18.3
   resolution: "@babel/runtime@npm:7.18.3"
   dependencies:
@@ -2204,6 +2204,15 @@ __metadata:
   dependencies:
     "@types/node": "*"
   checksum: d076bb61f45d0fc42dee496ef8b1c2f8742e15d5e47e90e20d0243386e426c04d4efd408a48875ab432f7960b4ce3414db20ed0fbbfc7bcc89d84e574f6e045a
+  languageName: node
+  linkType: hard
+
+"@types/i18next-fs-backend@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "@types/i18next-fs-backend@npm:1.1.2"
+  dependencies:
+    i18next: ^21.0.1
+  checksum: 567ab61f65231490b272d15311e7eb127cb069743284d3e0527e7cc75671038dcb70feb5da9964b218a3bb28435365179c18bab721c94ed765f28263662e6de0
   languageName: node
   linkType: hard
 
@@ -4440,6 +4449,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"i18next-fs-backend@npm:^1.1.4":
+  version: 1.1.4
+  resolution: "i18next-fs-backend@npm:1.1.4"
+  checksum: 7da252aa618f82555a99709b0f8afed997b7b20aeb5e66c92fe13f5b676c80b8a3cad24a1e38c599c6ab6e9169c4be87268c30e48cf1965cbcc8a69ff76bd0a4
+  languageName: node
+  linkType: hard
+
+"i18next@npm:^21.0.1, i18next@npm:^21.8.5":
+  version: 21.8.5
+  resolution: "i18next@npm:21.8.5"
+  dependencies:
+    "@babel/runtime": ^7.17.2
+  checksum: 2652935c3bc0ff376f46bb7a777432d1a5ead2941302248abc3f4f51008dcbbb2459bf37c481095d1e81b83fb226ecacc6acb3a18cf4342a685f9acb498bf948
+  languageName: node
+  linkType: hard
+
 "iconv-lite@npm:^0.6.2":
   version: 0.6.3
   resolution: "iconv-lite@npm:0.6.3"
@@ -5758,6 +5783,7 @@ __metadata:
     "@discordjs/builders": ^0.13.0
     "@discordjs/rest": ^0.4.1
     "@prisma/client": ^3.14.0
+    "@types/i18next-fs-backend": ^1.1.2
     "@types/jest": ^27.5.1
     "@types/node": ^16.10.3
     "@typescript-eslint/eslint-plugin": ^5.27.0
@@ -5772,6 +5798,8 @@ __metadata:
     eslint-config-prettier: ^8.5.0
     eslint-plugin-import: ^2.26.0
     husky: ^8.0.1
+    i18next: ^21.8.5
+    i18next-fs-backend: ^1.1.4
     jest: ^28.1.0
     prettier: ^2.6.2
     prettier-eslint: ^15.0.1
