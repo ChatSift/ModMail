@@ -18,6 +18,9 @@ jobs:
       - name: Install dependencies
         run: yarn --immutable
 
+      - name: Ensure prisma schema is up to date
+        run: yarn prisma generate
+
       - name: ESLint
         run: yarn lint
 
