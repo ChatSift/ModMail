@@ -1,0 +1,30 @@
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { readdirRecurse } from '@chatsift/readdir';
+import { Client, ClientEvents } from 'discord.js';
+import { container, singleton } from 'tsyringe';
+import { EventConstructor, getEventInfo } from './Event';
+
+@singleton()
+export class EventHandler {
+	public constructor(private readonly client: Client) {}
+
+	public async init(): Promise<void> {
+		const path = join(dirname(fileURLToPath(import.meta.url)), '..', 'events');
+		const files = readdirRecurse(path, { fileExtensions: ['js'] });
+
+		for await (const file of files) {
+			const info = getEventInfo(file);
+			if (!info) {
+				continue;
+			}
+
+			const mod = (await import(file)) as { default: EventConstructor };
+			const event = container.resolve(mod.default);
+			const name = event.name ?? (info.name as keyof ClientEvents);
+
+			// @ts-expect-error - TS doesn't deal with unions here as I'd expect it to
+			this.client.on(name, (...data) => event.handle(...data));
+		}
+	}
+}

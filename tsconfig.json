@@ -13,8 +13,6 @@
 		"skipLibCheck": true,
 		"noEmitHelpers": true,
 		"importHelpers": true,
-		"declaration": true,
-		"declarationMap": true,
 		"esModuleInterop": true,
 		"noUncheckedIndexedAccess": true,
 		"emitDecoratorMetadata": true,
