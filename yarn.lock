@@ -1551,20 +1551,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@discordjs/builders@npm:^0.13.0":
-  version: 0.13.0
-  resolution: "@discordjs/builders@npm:0.13.0"
-  dependencies:
-    "@sapphire/shapeshift": ^2.0.0
-    "@sindresorhus/is": ^4.6.0
-    discord-api-types: ^0.31.1
-    fast-deep-equal: ^3.1.3
-    ts-mixer: ^6.0.1
-    tslib: ^2.3.1
-  checksum: 1bce798b8f36b5abb09d8d42a660a5da6a9352ada03e0819d08ae6c98d4d8a556ed86485e252e53c448a40d17bf0d685e7f88f333db76f5b6b3bd562b9759d7c
-  languageName: node
-  linkType: hard
-
 "@discordjs/builders@npm:^0.14.0-dev":
   version: 0.14.0-dev.1653480270-68d5169
   resolution: "@discordjs/builders@npm:0.14.0-dev.1653480270-68d5169"
@@ -2049,13 +2035,6 @@ __metadata:
   version: 1.3.1
   resolution: "@sapphire/async-queue@npm:1.3.1"
   checksum: 4016010a8b6f2896ce7694eb04c1839b613387cbfb104028a4a1bea471afb1dc4d569b66d3c9770319c47be55035dc786c072c32656d467fc2cded4347055d92
-  languageName: node
-  linkType: hard
-
-"@sapphire/shapeshift@npm:^2.0.0":
-  version: 2.2.0
-  resolution: "@sapphire/shapeshift@npm:2.2.0"
-  checksum: f6cdc706548b3c5acbcb24878bacfd5cc28629d72900bb53cf54911da3a42199a479c6875486824b17106360b7dc3c156f509ef9b04190fefa42d241ddec2696
   languageName: node
   linkType: hard
 
@@ -3420,13 +3399,6 @@ __metadata:
   version: 0.29.0
   resolution: "discord-api-types@npm:0.29.0"
   checksum: 1ca74693b4e9c611c3de17f604714425d81d537ee81669d040a8c37fb23fb634a6918dd7d21056ccb90a3f4741bc2750509f6c8dd922bf2b3ed544d18bd0f32a
-  languageName: node
-  linkType: hard
-
-"discord-api-types@npm:^0.31.1":
-  version: 0.31.2
-  resolution: "discord-api-types@npm:0.31.2"
-  checksum: 928d4f57f4c1ace0baf1d3b2c3ab4a4a5107f100217ce889a6e00ad365115fd328a0b922dbc62af6b6ccac9552ffd7ec3d07f4c8820502c5b55d9f2e5382dfba
   languageName: node
   linkType: hard
 
@@ -5780,7 +5752,6 @@ __metadata:
     "@chatsift/readdir": ^0.1.0
     "@commitlint/cli": ^17.0.2
     "@commitlint/config-angular": ^17.0.0
-    "@discordjs/builders": ^0.13.0
     "@discordjs/rest": ^0.4.1
     "@prisma/client": ^3.14.0
     "@types/i18next-fs-backend": ^1.1.2

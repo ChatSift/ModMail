@@ -1,6 +1,6 @@
 import { Client, Events } from 'discord.js';
 import { singleton } from 'tsyringe';
-import type { Event } from '../struct/Event';
+import type { Event } from '#struct/Event';
 
 @singleton()
 export default class implements Event<typeof Events.ClientReady> {

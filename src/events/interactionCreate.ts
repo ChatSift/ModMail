@@ -1,7 +1,7 @@
 import { Events, Interaction } from 'discord.js';
 import { singleton } from 'tsyringe';
 import { CommandHandler } from '../struct/CommandHandler';
-import type { Event } from '../struct/Event';
+import type { Event } from '#struct/Event';
 
 @singleton()
 export default class implements Event<typeof Events.InteractionCreate> {

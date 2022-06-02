@@ -1,1 +1,38 @@
-{}
+{
+	"commands": {
+		"snippets": {
+			"name": "snippets",
+			"description": "Manage your ModMail snippets",
+			"subcommands": {
+				"add": {
+					"name": "add",
+					"description": "Add a snippet",
+					"options": {
+						"name": {
+							"name": "name",
+							"description": "The name of the snippet"
+						},
+						"content": {
+							"name": "content",
+							"description": "The content of the snippet"
+						}
+					}
+				},
+				"remove": {
+					"name": "remove",
+					"description": "Remove a snippet",
+					"options": {
+						"name": {
+							"name": "name",
+							"description": "The name of the snippet"
+						}
+					}
+				},
+				"list": {
+					"name": "list",
+					"description": "List all snippets"
+				}
+			}
+		}
+	}
+}

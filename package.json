@@ -64,7 +64,6 @@
 	},
 	"dependencies": {
 		"@chatsift/readdir": "^0.1.0",
-		"@discordjs/builders": "^0.13.0",
 		"@discordjs/rest": "^0.4.1",
 		"@prisma/client": "^3.14.0",
 		"discord.js": "dev",
