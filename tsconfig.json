@@ -19,7 +19,10 @@
 		"experimentalDecorators": true,
 		"noImplicitOverride": true,
 		"importsNotUsedAsValues": "error",
-		"outDir": "./dist"
+		"outDir": "./dist",
+		"paths": {
+			"#struct/*": ["./src/struct/*.ts"]
+		}
 	},
 	"include": ["./src/**/*.ts"],
 	"exclude": ["./**/__tests__"]

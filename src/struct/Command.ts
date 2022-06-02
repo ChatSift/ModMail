@@ -1,24 +1,28 @@
-import { basename, extname } from 'node:path';
-import type { CommandInteraction, RESTPostAPIApplicationCommandsJSONBody } from 'discord.js';
+import {
+	ApplicationCommandOptionChoiceData,
+	ApplicationCommandType,
+	AutocompleteInteraction,
+	Awaitable,
+	ChatInputCommandInteraction,
+	MessageContextMenuCommandInteraction,
+	RESTPostAPIApplicationCommandsJSONBody,
+	UserContextMenuCommandInteraction,
+} from 'discord.js';
 
-export interface CommandInfo {
-	name: string;
+interface InteractionTypeMapping {
+	[ApplicationCommandType.ChatInput]: ChatInputCommandInteraction;
+	[ApplicationCommandType.User]: UserContextMenuCommandInteraction;
+	[ApplicationCommandType.Message]: MessageContextMenuCommandInteraction;
 }
 
-export interface Command {
-	readonly name?: string;
-	readonly interactionOptions: RESTPostAPIApplicationCommandsJSONBody;
-	handle: (interaction: CommandInteraction) => unknown;
+export type CommandBody<Type extends ApplicationCommandType> = RESTPostAPIApplicationCommandsJSONBody & {
+	type: Type;
+};
+
+export interface Command<Type extends ApplicationCommandType = ApplicationCommandType> {
+	readonly interactionOptions: CommandBody<Type>;
+	handleAutocomplete?: (interaction: AutocompleteInteraction) => Awaitable<ApplicationCommandOptionChoiceData[]>;
+	handle: (interaction: InteractionTypeMapping[Type]) => unknown;
 }
 
 export type CommandConstructor = new (...args: any[]) => Command;
-
-export function getCommandInfo(path: string): CommandInfo | null {
-	if (extname(path) !== '.js') {
-		return null;
-	}
-
-	return {
-		name: basename(path, '.js'),
-	};
-}

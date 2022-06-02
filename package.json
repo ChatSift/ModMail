@@ -16,6 +16,9 @@
 		"url": "https://github.com/chatsift/modmail/issues"
 	},
 	"homepage": "https://github.com/chatsift/modmail",
+	"imports": {
+		"#struct/*": "./dist/struct/*.js"
+	},
 	"scripts": {
 		"lint": "eslint src --ext .ts",
 		"build": "tsc",
