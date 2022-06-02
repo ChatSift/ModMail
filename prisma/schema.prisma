@@ -10,11 +10,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model ModmailThread {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  userId    String
-  channelId String
-  messageId String
+model SnippetUpdates {
+  snippetUpdateId Int      @id @default(autoincrement())
+  snippetId       Int
+  snippet         Snippet  @relation(fields: [snippetId], references: [snippetId], onDelete: Cascade)
+  updatedAt       DateTime @default(now())
+  updatedBy       String
+  oldContent      String
+}
+
+model Snippet {
+  snippetId     Int              @id @default(autoincrement())
+  guildId       String
+  createdById   String
+  name          String
+  content       String
+  createdAt     DateTime         @default(now()) @db.Timestamptz()
+  lastUpdatedAt DateTime         @updatedAt
+  updates       SnippetUpdates[]
+
+  @@unique([guildId, name])
 }
