@@ -23,6 +23,8 @@ services:
       dockerfile: ./Dockerfile
     env_file:
       - ./.env
+    environment:
+      DATABASE_URL: 'postgresql://modmail:admin@postgres:5432/modmail'
     restart: unless-stopped
     depends_on:
       - postgres

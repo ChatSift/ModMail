@@ -18,7 +18,8 @@
 	},
 	"homepage": "https://github.com/chatsift/modmail",
 	"imports": {
-		"#struct/*": "./dist/struct/*.js"
+		"#struct/*": "./dist/struct/*.js",
+		"#util/*": "./dist/util/*.js"
 	},
 	"scripts": {
 		"lint": "eslint src --ext .ts",
@@ -70,6 +71,7 @@
 		"discord.js": "dev",
 		"i18next": "^21.8.5",
 		"i18next-fs-backend": "^1.1.4",
+		"prisma-error-enum": "^0.1.2",
 		"reflect-metadata": "^0.1.13",
 		"tslib": "^2.4.0",
 		"tsyringe": "^4.7.0"

@@ -6,9 +6,9 @@ import i18next from 'i18next';
 import FsBackend from 'i18next-fs-backend';
 import { container } from 'tsyringe';
 import { deploySlashCommands } from './deploy';
-import { CommandHandler } from './struct/CommandHandler';
-import { Env } from './struct/Env';
-import { EventHandler } from './struct/EventHandler';
+import { CommandHandler } from '#struct/CommandHandler';
+import { Env } from '#struct/Env';
+import { EventHandler } from '#struct/EventHandler';
 
 await i18next.use(FsBackend).init({
 	backend: {

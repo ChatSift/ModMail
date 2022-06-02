@@ -1,4 +1,15 @@
 {
+	"common": {
+		"success": {
+			"resource_creation": "Successfully created {{ resource }}",
+			"resource_deletion": "Successfully deleted the given {{ resource }}"
+		},
+		"errors": {
+			"resource_exists": "A {{ resource }} with that name already exists",
+			"resource_not_found": "The {{ resource }} you are looking for could not be found",
+			"no_resources": "There are no {{ resource }} available"
+		}
+	},
 	"commands": {
 		"snippets": {
 			"name": "snippets",
@@ -30,7 +41,14 @@
 				},
 				"list": {
 					"name": "list",
-					"description": "List all snippets"
+					"description": "List all snippets",
+					"responses": {
+						"success": {
+							"embed": {
+								"title": "Available snippets"
+							}
+						}
+					}
 				}
 			}
 		}

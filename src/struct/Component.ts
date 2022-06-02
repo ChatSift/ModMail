@@ -5,7 +5,7 @@ export interface ComponentInfo {
 	name: string;
 }
 
-export interface Component<Type extends MessageComponentInteraction = MessageComponentInteraction> {
+export interface Component<Type extends MessageComponentInteraction<'cached'> = MessageComponentInteraction<'cached'>> {
 	readonly name?: string;
 	handle: (interaction: Type, ...args: any[]) => unknown;
 }

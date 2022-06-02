@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { readdirRecurse } from '@chatsift/readdir';
 import { Client, ClientEvents } from 'discord.js';
 import { container, singleton } from 'tsyringe';
-import { EventConstructor, getEventInfo } from './Event';
+import { EventConstructor, getEventInfo } from '#struct/Event';
 
 @singleton()
 export class EventHandler {

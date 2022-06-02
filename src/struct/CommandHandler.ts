@@ -4,9 +4,9 @@ import { readdirRecurse } from '@chatsift/readdir';
 import { REST } from '@discordjs/rest';
 import { AutocompleteInteraction, CommandInteraction, MessageComponentInteraction, Routes } from 'discord.js';
 import { container, singleton } from 'tsyringe';
-import type { Command, CommandConstructor } from './Command';
-import { Component, ComponentConstructor, getComponentInfo } from './Component';
-import { Env } from './Env';
+import type { Command, CommandConstructor } from '#struct/Command';
+import { Component, ComponentConstructor, getComponentInfo } from '#struct/Component';
+import { Env } from '#struct/Env';
 
 @singleton()
 export class CommandHandler {
@@ -15,7 +15,8 @@ export class CommandHandler {
 
 	public constructor(private readonly env: Env) {}
 
-	public async handleAutocomplete(interaction: AutocompleteInteraction) {
+	// TODO(DD): Error handling
+	public async handleAutocomplete(interaction: AutocompleteInteraction<'cached'>) {
 		const command = this.commands.get(interaction.commandName);
 		if (!command?.handleAutocomplete) {
 			return interaction.respond([]);
@@ -25,13 +26,13 @@ export class CommandHandler {
 		return interaction.respond(options);
 	}
 
-	public handleMessageComponent(interaction: MessageComponentInteraction) {
+	public handleMessageComponent(interaction: MessageComponentInteraction<'cached'>) {
 		const [name, ...args] = interaction.customId.split('|') as [string, ...string[]];
 		const component = this.components.get(name);
 		return component?.handle(interaction, ...args);
 	}
 
-	public handleCommand(interaction: CommandInteraction) {
+	public handleCommand(interaction: CommandInteraction<'cached'>) {
 		const command = this.commands.get(interaction.commandName);
 		if (!command) {
 			return;

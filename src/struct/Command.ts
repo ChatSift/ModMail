@@ -12,9 +12,9 @@ import {
 import i18next from 'i18next';
 
 interface InteractionTypeMapping {
-	[ApplicationCommandType.ChatInput]: ChatInputCommandInteraction;
-	[ApplicationCommandType.User]: UserContextMenuCommandInteraction;
-	[ApplicationCommandType.Message]: MessageContextMenuCommandInteraction;
+	[ApplicationCommandType.ChatInput]: ChatInputCommandInteraction<'cached'>;
+	[ApplicationCommandType.User]: UserContextMenuCommandInteraction<'cached'>;
+	[ApplicationCommandType.Message]: MessageContextMenuCommandInteraction<'cached'>;
 }
 
 export type CommandBody<Type extends ApplicationCommandType> = RESTPostAPIApplicationCommandsJSONBody & {

@@ -21,7 +21,8 @@
 		"importsNotUsedAsValues": "error",
 		"outDir": "./dist",
 		"paths": {
-			"#struct/*": ["./src/struct/*.ts"]
+			"#struct/*": ["./src/struct/*.ts"],
+			"#util/*": ["./src/util/*.ts"]
 		}
 	},
 	"include": ["./src/**/*.ts"],

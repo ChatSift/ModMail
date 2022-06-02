@@ -1,6 +1,6 @@
 import { Events, Interaction } from 'discord.js';
 import { singleton } from 'tsyringe';
-import { CommandHandler } from '../struct/CommandHandler';
+import { CommandHandler } from '#struct/CommandHandler';
 import type { Event } from '#struct/Event';
 
 @singleton()
@@ -10,6 +10,10 @@ export default class implements Event<typeof Events.InteractionCreate> {
 	public constructor(private readonly commandHandler: CommandHandler) {}
 
 	public handle(interaction: Interaction) {
+		if (!interaction.inCachedGuild()) {
+			return;
+		}
+
 		if (interaction.isAutocomplete()) {
 			return this.commandHandler.handleAutocomplete(interaction);
 		}
