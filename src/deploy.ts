@@ -5,6 +5,7 @@ import { Env } from './struct/Env';
 export async function deploySlashCommands(): Promise<void> {
 	const env = container.resolve(Env);
 	const commandHandler = container.resolve(CommandHandler);
+	await commandHandler.init();
 
 	if (env.isProd) {
 		await commandHandler.registerProdInteractions();

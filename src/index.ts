@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { fileURLToPath, URL } from 'node:url';
+import { join } from 'node:path';
 import { PrismaClient } from '@prisma/client';
 import { Client, IntentsBitField } from 'discord.js';
 import i18next from 'i18next';
@@ -9,6 +9,17 @@ import { deploySlashCommands } from './deploy';
 import { CommandHandler } from './struct/CommandHandler';
 import { Env } from './struct/Env';
 import { EventHandler } from './struct/EventHandler';
+
+await i18next.use(FsBackend).init({
+	backend: {
+		loadPath: join(process.cwd(), 'locales', '{{lng}}', '{{ns}}.json'),
+	},
+	cleanCode: true,
+	fallbackLng: ['en-US'],
+	defaultNS: 'translation',
+	lng: 'en-US',
+	ns: ['translation'],
+});
 
 const env = container.resolve(Env);
 if (env.deploySlashCommands) {
@@ -28,17 +39,6 @@ const client = new Client({
 
 container.register(PrismaClient, { useValue: prisma });
 container.register(Client, { useValue: client });
-
-await i18next.use(FsBackend).init({
-	backend: {
-		loadPath: fileURLToPath(new URL('./locales/{{lng}}/{{ns}}.json', import.meta.url)),
-	},
-	cleanCode: true,
-	fallbackLng: ['en-US'],
-	defaultNS: 'translation',
-	lng: 'en-US',
-	ns: ['translation'],
-});
 
 await container.resolve(CommandHandler).init();
 await container.resolve(EventHandler).init();

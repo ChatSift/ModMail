@@ -28,6 +28,8 @@
 		"test:ci": "jest --ci --no-stack-trace --verbose",
 		"test:debug": "jest --runInBand",
 		"prisma": "dotenv -e .env prisma",
+		"deploy-commands": "yarn build && dotenv -e .env -v DEPLOY=true -- node --es-module-specifier-resolution=node --enable-source-maps ./dist/index.js",
+		"start": "yarn build && dotenv -e .env -- node --es-module-specifier-resolution=node --enable-source-maps ./dist/index.js",
 		"prepare": "is-ci || husky install"
 	},
 	"engines": {
