@@ -1,0 +1,32 @@
+version: '3.7'
+
+services:
+  postgres:
+    image: postgres:12-alpine
+    environment:
+      POSTGRES_USER: 'modmail'
+      POSTGRES_PASSWORD: 'admin'
+      POSTGRES_DB: 'modmail'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:${DATABASE_PORT}:5432
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U modmail']
+      interval: 10s
+      timeout: 5s
+
+  bot:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    env_file:
+      - ./.env
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+volumes:
+  postgres-data:
+    name: 'modmail-postgres-data'

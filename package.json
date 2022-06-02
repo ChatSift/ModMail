@@ -4,6 +4,7 @@
 	"packageManager": "yarn@3.2.1",
 	"main": "./dist/index.js",
 	"version": "0.1.0-dev",
+	"type": "module",
 	"author": {
 		"name": "DD",
 		"email": "didinele.dev@gmail.com"
@@ -26,9 +27,8 @@
 		"test": "jest",
 		"test:ci": "jest --ci --no-stack-trace --verbose",
 		"test:debug": "jest --runInBand",
-		"prisma": "dotenv -e .env -e .env.dev prisma",
-		"prisma:prod": "dotenv -e .env -e .env.prod prisma",
-		"postinstall": "is-ci || husky install"
+		"prisma": "dotenv -e .env prisma",
+		"prepare": "is-ci || husky install"
 	},
 	"engines": {
 		"node": ">=16.9.0"
@@ -59,7 +59,6 @@
 		"prettier": "^2.6.2",
 		"prettier-eslint": "^15.0.1",
 		"prisma": "^3.14.0",
-		"reflect-metadata": "^0.1.13",
 		"typescript": "^4.7.2"
 	},
 	"dependencies": {
@@ -69,6 +68,7 @@
 		"discord.js": "dev",
 		"i18next": "^21.8.5",
 		"i18next-fs-backend": "^1.1.4",
+		"reflect-metadata": "^0.1.13",
 		"tslib": "^2.4.0",
 		"tsyringe": "^4.7.0"
 	}
