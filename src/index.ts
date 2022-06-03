@@ -10,6 +10,17 @@ import { CommandHandler } from '#struct/CommandHandler';
 import { Env } from '#struct/Env';
 import { EventHandler } from '#struct/EventHandler';
 
+const client = new Client({
+	intents: [
+		IntentsBitField.Flags.Guilds,
+		IntentsBitField.Flags.DirectMessages,
+		IntentsBitField.Flags.GuildMembers,
+		IntentsBitField.Flags.DirectMessageTyping,
+	],
+});
+container.register(Client, { useValue: client });
+container.register(PrismaClient, { useValue: new PrismaClient() });
+
 await i18next.use(FsBackend).init({
 	backend: {
 		loadPath: join(process.cwd(), 'locales', '{{lng}}', '{{ns}}.json'),
@@ -26,19 +37,6 @@ if (env.deploySlashCommands) {
 	await deploySlashCommands();
 	process.exit(0);
 }
-
-const prisma = new PrismaClient();
-const client = new Client({
-	intents: [
-		IntentsBitField.Flags.Guilds,
-		IntentsBitField.Flags.DirectMessages,
-		IntentsBitField.Flags.GuildMembers,
-		IntentsBitField.Flags.DirectMessageTyping,
-	],
-});
-
-container.register(PrismaClient, { useValue: prisma });
-container.register(Client, { useValue: client });
 
 await container.resolve(CommandHandler).init();
 await container.resolve(EventHandler).init();

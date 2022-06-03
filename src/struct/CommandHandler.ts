@@ -23,7 +23,7 @@ export class CommandHandler {
 		}
 
 		const options = await command.handleAutocomplete(interaction);
-		return interaction.respond(options);
+		return interaction.respond(options.slice(0, 25));
 	}
 
 	public handleMessageComponent(interaction: MessageComponentInteraction<'cached'>) {

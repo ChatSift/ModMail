@@ -2,7 +2,8 @@
 	"common": {
 		"success": {
 			"resource_creation": "Successfully created {{ resource }}",
-			"resource_deletion": "Successfully deleted the given {{ resource }}"
+			"resource_deletion": "Successfully deleted the given {{ resource }}",
+			"resource_update": "Successfully updated the given {{ resource }}"
 		},
 		"errors": {
 			"resource_exists": "A {{ resource }} with that name already exists",
@@ -14,41 +15,72 @@
 		"snippets": {
 			"name": "snippets",
 			"description": "Manage your ModMail snippets",
-			"subcommands": {
-				"add": {
-					"name": "add",
-					"description": "Add a snippet",
-					"options": {
-						"name": {
-							"name": "name",
-							"description": "The name of the snippet"
-						},
-						"content": {
-							"name": "content",
-							"description": "The content of the snippet"
-						}
+			"add": {
+				"name": "add",
+				"description": "Add a snippet",
+				"options": {
+					"name": {
+						"name": "name",
+						"description": "The name of the snippet"
+					},
+					"content": {
+						"name": "content",
+						"description": "The content of the snippet"
+					}
+				}
+			},
+			"remove": {
+				"name": "remove",
+				"description": "Remove a snippet",
+				"options": {
+					"name": {
+						"name": "name",
+						"description": "The name of the snippet"
+					}
+				}
+			},
+			"edit": {
+				"name": "edit",
+				"description": "Edit a snippet",
+				"options": {
+					"name": {
+						"name": "name",
+						"description": "The name of the snippet"
+					},
+					"content": {
+						"name": "content",
+						"description": "The new content of the snippet"
+					}
+				}
+			},
+			"show": {
+				"name": "show",
+				"description": "Show information about a specific tag",
+				"options": {
+					"name": {
+						"name": "name",
+						"description": "The name of the snippet"
 					}
 				},
-				"remove": {
-					"name": "remove",
-					"description": "Remove a snippet",
-					"options": {
-						"name": {
-							"name": "name",
-							"description": "The name of the snippet"
-						}
+				"embed": {
+					"title": "Snippet {{ name }}",
+					"fields": {
+						"created_by": "Created by",
+						"created_at": "Created at",
+						"last_updated_at": "Last updated at",
+						"uses": "Uses",
+						"last_used_at": "Last used at"
 					}
 				},
-				"list": {
-					"name": "list",
-					"description": "List all snippets",
-					"responses": {
-						"success": {
-							"embed": {
-								"title": "Available snippets"
-							}
-						}
-					}
+				"buttons": {
+					"view_history": "View history"
+				}
+			},
+			"list": {
+				"name": "list",
+				"description": "List all snippets",
+				"embed": {
+					"title": "Available snippets"
 				}
 			}
 		}

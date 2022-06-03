@@ -16,8 +16,10 @@ CREATE TABLE "Snippet" (
     "createdById" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "content" TEXT NOT NULL,
+    "timesUsed" INTEGER NOT NULL DEFAULT 0,
+    "lastUsedAt" TIMESTAMPTZ,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "lastUpdatedAt" TIMESTAMP(3) NOT NULL,
+    "lastUpdatedAt" TIMESTAMPTZ NOT NULL,
 
     CONSTRAINT "Snippet_pkey" PRIMARY KEY ("snippetId")
 );
