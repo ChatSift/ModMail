@@ -1,4 +1,4 @@
-import { Events, Interaction } from 'discord.js';
+import { AnyInteraction, Events, InteractionType } from 'discord.js';
 import { singleton } from 'tsyringe';
 import { CommandHandler } from '#struct/CommandHandler';
 import type { Event } from '#struct/Event';
@@ -9,20 +9,20 @@ export default class implements Event<typeof Events.InteractionCreate> {
 
 	public constructor(private readonly commandHandler: CommandHandler) {}
 
-	public handle(interaction: Interaction) {
+	public handle(interaction: AnyInteraction) {
 		if (!interaction.inCachedGuild()) {
 			return;
 		}
 
-		if (interaction.isAutocomplete()) {
+		if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
 			return this.commandHandler.handleAutocomplete(interaction);
 		}
 
-		if (interaction.isMessageComponent()) {
+		if (interaction.type === InteractionType.MessageComponent) {
 			return this.commandHandler.handleMessageComponent(interaction);
 		}
 
-		if (interaction.isCommand()) {
+		if (interaction.type === InteractionType.ApplicationCommand) {
 			return this.commandHandler.handleCommand(interaction);
 		}
 
