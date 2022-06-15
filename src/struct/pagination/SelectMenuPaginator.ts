@@ -1,13 +1,38 @@
 import { ButtonBuilder, SelectMenuBuilder } from '@discordjs/builders';
-import type { SelectMenuPaginatorConsumers, SelectMenuPaginatorOptions, SelectMenuPaginatorState } from './common';
-import type { ISelectMenuPaginatorStore } from './store/ISelectMenuPaginatorStore';
+import { ButtonStyle, If } from 'discord.js';
 
-type If<T extends boolean, A, B = null> = T extends true ? A : T extends false ? B : A | B;
+export interface SelectMenuPaginatorOptions {
+	key: string;
+	data?: unknown[];
+	store?: Map<string, SelectMenuPaginatorState>;
+	maxElementsPerPage?: number;
+}
+
+export interface SelectMenuPaginatorState {
+	currentPage: number;
+	readonly data: unknown[];
+}
+
+interface BaseSelectMenuPaginatorData extends SelectMenuPaginatorState {
+	selectMenu: SelectMenuBuilder;
+}
+
+interface SelectMenuOptionsSelectMenuPaginatorData extends BaseSelectMenuPaginatorData {}
+
+interface ButtonsSelectMenuPaginatorData extends BaseSelectMenuPaginatorData {
+	pageLeftButton: ButtonBuilder;
+	pageRightButton: ButtonBuilder;
+}
+
+export interface SelectMenuPaginatorConsumers {
+	asSelectMenu: () => SelectMenuOptionsSelectMenuPaginatorData;
+	asButtons: () => ButtonsSelectMenuPaginatorData;
+}
 
 export class SelectMenuPaginator<Data = unknown, Asserted extends boolean = Data extends any[] ? true : false> {
 	private readonly key: string;
 	private state!: If<Asserted, SelectMenuPaginatorState>;
-	private readonly store?: ISelectMenuPaginatorStore;
+	private readonly store?: Map<string, SelectMenuPaginatorState>;
 	private readonly maxElementsPerPage: number;
 
 	public constructor(options: SelectMenuPaginatorOptions & { data?: Data }) {
@@ -41,9 +66,12 @@ export class SelectMenuPaginator<Data = unknown, Asserted extends boolean = Data
 
 				return {
 					...this.state,
-					selectMenu: new SelectMenuBuilder().setCustomId('').toJSON(),
-					pageLeftButton: new ButtonBuilder().toJSON(),
-					pageRightButton: new ButtonBuilder().toJSON(),
+					selectMenu: new SelectMenuBuilder(),
+					pageLeftButton: new ButtonBuilder()
+						.setStyle(ButtonStyle.Secondary)
+						.setEmoji({ name: '▶️' })
+						.setDisabled(true),
+					pageRightButton: new ButtonBuilder().setStyle(ButtonStyle.Secondary).setEmoji({ name: '⬅️' }),
 				};
 			},
 			asSelectMenu: () => {
@@ -53,22 +81,24 @@ export class SelectMenuPaginator<Data = unknown, Asserted extends boolean = Data
 
 				return {
 					...this.state,
-					selectMenu: new SelectMenuBuilder().toJSON(),
+					selectMenu: new SelectMenuBuilder(),
 				};
 			},
 		};
 	}
 
-	public async assertState(): Promise<SelectMenuPaginator<Data, true>> {
+	// eslint-disable-next-line @typescript-eslint/prefer-return-this-type
+	public assertState(): SelectMenuPaginator<Data, true> {
 		if (this.isAsserted()) {
+			this.store?.set(this.key, this.state);
 			return this;
 		}
 
-		if (this.store == null) {
+		if (!this.store) {
 			throw new Error('Either store or data are required');
 		}
 
-		const state = await this.store.get(this.key);
+		const state = this.store.get(this.key);
 		if (!state) {
 			throw new Error('Could not find state');
 		}
@@ -78,7 +108,7 @@ export class SelectMenuPaginator<Data = unknown, Asserted extends boolean = Data
 		return newThis;
 	}
 
-	public async nextPage(): Promise<SelectMenuPaginatorConsumers> {
+	public nextPage(): SelectMenuPaginatorConsumers {
 		if (!this.isAsserted()) {
 			throw new Error('State not asserted');
 		}
@@ -88,14 +118,12 @@ export class SelectMenuPaginator<Data = unknown, Asserted extends boolean = Data
 		}
 
 		this.state.currentPage++;
-		if (this.store) {
-			await this.store.setPage(this.key, this.state.currentPage);
-		}
+		this.store?.set(this.key, this.state);
 
 		return this.makeConsumers();
 	}
 
-	public async previousPage(): Promise<SelectMenuPaginatorConsumers> {
+	public previousPage(): SelectMenuPaginatorConsumers {
 		if (!this.isAsserted()) {
 			throw new Error('State not asserted');
 		}
@@ -105,14 +133,12 @@ export class SelectMenuPaginator<Data = unknown, Asserted extends boolean = Data
 		}
 
 		this.state.currentPage--;
-		if (this.store) {
-			await this.store.setPage(this.key, this.state.currentPage);
-		}
+		this.store?.set(this.key, this.state);
 
 		return this.makeConsumers();
 	}
 
-	public async setPage(page: number): Promise<SelectMenuPaginatorConsumers> {
+	public setPage(page: number): SelectMenuPaginatorConsumers {
 		if (!this.isAsserted()) {
 			throw new Error('State not asserted');
 		}
@@ -122,9 +148,7 @@ export class SelectMenuPaginator<Data = unknown, Asserted extends boolean = Data
 		}
 
 		this.state.currentPage = page;
-		if (this.store) {
-			await this.store.setPage(this.key, this.state.currentPage);
-		}
+		this.store?.set(this.key, this.state);
 
 		return this.makeConsumers();
 	}
@@ -137,9 +161,9 @@ export class SelectMenuPaginator<Data = unknown, Asserted extends boolean = Data
 		return this.makeConsumers();
 	}
 
-	public async destroy(): Promise<void> {
+	public destroy(): void {
 		const newThis = this as SelectMenuPaginator<Data, false>;
 		newThis.state = null;
-		await this.store?.delete(this.key);
+		this.store?.delete(this.key);
 	}
 }
