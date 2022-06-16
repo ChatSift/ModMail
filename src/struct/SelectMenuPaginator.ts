@@ -50,14 +50,6 @@ export class SelectMenuPaginator<Data extends unknown[], Asserted extends boolea
 		return this.state != null;
 	}
 
-	private get pageCount(): number {
-		if (!this.isAsserted()) {
-			throw new Error('State not asserted');
-		}
-
-		return Math.ceil(this.state.data.length / this.maxPageLength);
-	}
-
 	private makeConsumers(): SelectMenuPaginatorConsumers<Data> {
 		if (!this.isAsserted()) {
 			throw new Error('State not asserted');
@@ -109,6 +101,14 @@ export class SelectMenuPaginator<Data extends unknown[], Asserted extends boolea
 				};
 			},
 		};
+	}
+
+	public get pageCount(): number {
+		if (!this.isAsserted()) {
+			throw new Error('State not asserted');
+		}
+
+		return Math.ceil(this.state.data.length / this.maxPageLength);
 	}
 
 	// eslint-disable-next-line @typescript-eslint/prefer-return-this-type
