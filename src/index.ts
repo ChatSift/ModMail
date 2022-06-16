@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { join } from 'node:path';
 import { PrismaClient } from '@prisma/client';
-import { Client, IntentsBitField } from 'discord.js';
+import { Client, IntentsBitField, Partials } from 'discord.js';
 import i18next from 'i18next';
 import FsBackend from 'i18next-fs-backend';
 import { container } from 'tsyringe';
@@ -17,6 +17,7 @@ const client = new Client({
 		IntentsBitField.Flags.GuildMembers,
 		IntentsBitField.Flags.DirectMessageTyping,
 	],
+	partials: [Partials.Channel, Partials.Message],
 });
 container.register(Client, { useValue: client });
 container.register(PrismaClient, { useValue: new PrismaClient() });

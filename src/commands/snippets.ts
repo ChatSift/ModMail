@@ -22,8 +22,8 @@ import {
 import i18next from 'i18next';
 import { PrismaError } from 'prisma-error-enum';
 import { singleton } from 'tsyringe';
-import { Command, CommandBody, getLocalizedProp } from '#struct/Command';
-import { SelectMenuPaginator, SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
+import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
+import { SelectMenuPaginator, type SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
 import { diff } from '#util/diff';
 import { ellipsis } from '#util/ellipsis';
 
