@@ -1,20 +1,19 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma, Snippet } from '@prisma/client';
 import {
 	ActionRowBuilder,
-	APIEmbedField,
-	ApplicationCommandOptionChoiceData,
+	type APIEmbedField,
+	type ApplicationCommandOptionChoiceData,
 	ApplicationCommandOptionType,
 	ApplicationCommandType,
-	AutocompleteInteraction,
+	type AutocompleteInteraction,
 	blockQuote,
 	ButtonBuilder,
 	ButtonStyle,
-	ChatInputCommandInteraction,
+	type ChatInputCommandInteraction,
 	Client,
 	Colors,
 	EmbedBuilder,
 	inlineCode,
-	MessageActionRowComponentBuilder,
 	PermissionsBitField,
 	time,
 	TimestampStyles,
@@ -23,6 +22,7 @@ import i18next from 'i18next';
 import { PrismaError } from 'prisma-error-enum';
 import { singleton } from 'tsyringe';
 import { Command, CommandBody, getLocalizedProp } from '#struct/Command';
+import { SelectMenuPaginator, SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
 import { ellipsis } from '#util/ellipsis';
 
 @singleton()
@@ -263,7 +263,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 							.addFields(fields),
 					],
 					components: [
-						new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents([
+						new ActionRowBuilder<ButtonBuilder>().addComponents([
 							new ButtonBuilder()
 								.setStyle(ButtonStyle.Secondary)
 								.setLabel(i18next.t('commands.snippets.show.buttons.view_history', { lng: interaction.locale }))
@@ -281,25 +281,50 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 					});
 				}
 
-				const snippetText = snippets.map(
-					(snippet) =>
-						`• ${inlineCode(snippet.name)}: ${inlineCode(ellipsis(snippet.content.replace('`', '\\`'), 100))}`,
-				);
-
-				return interaction.reply({
-					embeds: [
-						new EmbedBuilder()
-							.setTitle(
-								i18next.t('commands.snippets.list.embed.title', {
-									lng: interaction.locale,
-								}),
-							)
-							.setColor(Colors.Blurple)
-							.setDescription(
-								snippetText.length > 40 ? `${snippetText.slice(0, 40).join('\n')}\n...` : snippetText.join('\n'),
-							),
-					],
+				const paginator = new SelectMenuPaginator({
+					key: 'snippet-list',
+					data: snippets,
+					maxPageLength: 40,
 				});
+
+				const embed = new EmbedBuilder()
+					.setTitle(
+						i18next.t('commands.snippets.list.embed.title', {
+							lng: interaction.locale,
+						}),
+					)
+					.setColor(Colors.Blurple);
+
+				const actionRow = new ActionRowBuilder<ButtonBuilder>();
+
+				const updateMessage = (consumers: SelectMenuPaginatorConsumers<Snippet[]>) => {
+					const { data, pageLeftButton, pageRightButton } = consumers.asButtons();
+					embed.setDescription(
+						data
+							.map(
+								(snippet) =>
+									`• ${inlineCode(snippet.name)}: ${inlineCode(ellipsis(snippet.content.replace('`', '\\`'), 100))}`,
+							)
+							.join('\n'),
+					);
+					actionRow.setComponents([pageLeftButton, pageRightButton]);
+				};
+
+				updateMessage(paginator.getCurrentPage());
+
+				const reply = await interaction.reply({
+					embeds: [embed],
+					components: [actionRow],
+					fetchReply: true,
+				});
+
+				for await (const [component] of reply.createMessageComponentCollector({ idle: 30_000 })) {
+					const isLeft = component.customId === 'page-left';
+					updateMessage(isLeft ? paginator.previousPage() : paginator.nextPage());
+					await component.update({ embeds: [embed], components: [actionRow] });
+				}
+
+				return reply.edit({ components: [] });
 			}
 
 			default: {

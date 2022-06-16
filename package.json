@@ -72,6 +72,7 @@
 		"discord.js": "dev",
 		"i18next": "^21.8.9",
 		"i18next-fs-backend": "^1.1.4",
+		"nanoid": "^4.0.0",
 		"prisma-error-enum": "^0.1.2",
 		"reflect-metadata": "^0.1.13",
 		"tslib": "^2.4.0",
