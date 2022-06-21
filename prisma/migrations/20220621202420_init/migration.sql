@@ -1,4 +1,12 @@
 -- CreateTable
+CREATE TABLE "GuildSettings" (
+    "guildId" TEXT NOT NULL,
+    "modmailChannelId" TEXT,
+
+    CONSTRAINT "GuildSettings_pkey" PRIMARY KEY ("guildId")
+);
+
+-- CreateTable
 CREATE TABLE "SnippetUpdates" (
     "snippetUpdateId" SERIAL NOT NULL,
     "snippetId" INTEGER NOT NULL,
@@ -36,9 +44,11 @@ CREATE TABLE "ScheduledThreadClose" (
 CREATE TABLE "ThreadMessage" (
     "threadMessageId" SERIAL NOT NULL,
     "localThreadMessageId" INTEGER NOT NULL,
+    "guildId" TEXT NOT NULL,
     "threadId" INTEGER NOT NULL,
     "authorId" TEXT NOT NULL,
     "messageId" TEXT NOT NULL,
+    "deleted" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "ThreadMessage_pkey" PRIMARY KEY ("threadMessageId")
 );
@@ -59,6 +69,12 @@ CREATE TABLE "Thread" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Snippet_guildId_name_key" ON "Snippet"("guildId", "name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ThreadMessage_guildId_localThreadMessageId_key" ON "ThreadMessage"("guildId", "localThreadMessageId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Thread_guildId_localThreadId_key" ON "Thread"("guildId", "localThreadId");
 
 -- AddForeignKey
 ALTER TABLE "SnippetUpdates" ADD CONSTRAINT "SnippetUpdates_snippetId_fkey" FOREIGN KEY ("snippetId") REFERENCES "Snippet"("snippetId") ON DELETE CASCADE ON UPDATE CASCADE;

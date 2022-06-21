@@ -9,7 +9,22 @@
 			"resource_exists": "A {{ resource }} with that name already exists",
 			"resource_not_found": "The {{ resource }} you are looking for could not be found",
 			"no_resources": "There are no {{ resource }} available",
-			"resource_too_long": "The given {{ snippet }} needs to be {{ length }} characters or less"
+			"resource_too_long": "The given {{ snippet }} needs to be {{ length }} characters or less",
+			"no_guilds": "Could not find your mutual guilds with the bot. This is most likely a bug",
+			"no_thread": "Could not find the channel associated with this thread. This is most likely because an Admin deleted it, opening a new thread with your message.",
+			"thread_creation": "Could not create the needed thread channel. This is likely a miss-configuration caused by an Admin"
+		}
+	},
+	"thread": {
+		"start": {
+			"embed": {
+				"fields": {
+					"pronouns": "Pronouns",
+					"account_created": "📆 Account Created",
+					"joined_server": "📥 Joined Server",
+					"past_modmails": "🗂️ Past Modmails"
+				}
+			}
 		}
 	},
 	"commands": {
