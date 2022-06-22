@@ -3,7 +3,6 @@ import { PrismaClient } from '@prisma/client';
 import {
 	ApplicationCommandOptionType,
 	ApplicationCommandType,
-	Client,
 	PermissionsBitField,
 	ThreadChannel,
 	type ApplicationCommandOptionChoiceData,
@@ -12,8 +11,8 @@ import {
 } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
-import { closeThread } from '../util/closeThread';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
+import { closeThread } from '#util/closeThread';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
@@ -38,7 +37,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		],
 	};
 
-	public constructor(private readonly prisma: PrismaClient, private readonly client: Client<true>) {}
+	public constructor(private readonly prisma: PrismaClient) {}
 
 	public handleAutocomplete(interaction: AutocompleteInteraction<'cached'>): ApplicationCommandOptionChoiceData[] {
 		const commonOptions = ['1min', '5min', '30min', '1h', '1d', '7d'].map((time) => {
@@ -73,7 +72,9 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 	}
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
-		const thread = await this.prisma.thread.findFirst({ where: { channelId: interaction.channelId } });
+		const thread = await this.prisma.thread.findFirst({
+			where: { channelId: interaction.channelId, closedById: null },
+		});
 		if (!thread) {
 			return interaction.reply(i18next.t('commands.errors.no_thread'));
 		}

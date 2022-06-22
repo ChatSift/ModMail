@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { on } from 'node:events';
 import { parentPort } from 'node:worker_threads';
 import { PrismaClient, ScheduledThreadClose, Thread } from '@prisma/client';
-import { Payload, PayloadOpCode } from '../struct/JobManager';
+import { Payload, PayloadOpCode } from '#struct/JobManager';
 import type { InferArrayT } from '#util/InferArrayT';
 import { i18nInit } from '#util/i18nInit';
 
@@ -34,6 +34,19 @@ async function closeThread(thread: InferArrayT<typeof threads>) {
 			break;
 		}
 	}
+
+	await prisma.thread.update({
+		data: {
+			closedById: thread.scheduledClose.scheduledById,
+			closedAt: new Date(),
+			scheduledClose: {
+				delete: true,
+			},
+		},
+		where: {
+			threadId: thread.threadId,
+		},
+	});
 }
 
 await Promise.all(

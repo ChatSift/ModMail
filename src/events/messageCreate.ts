@@ -18,10 +18,10 @@ import {
 } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
-import { sendThreadMessage } from '../util/sendThreadMessage';
 import type { Event } from '#struct/Event';
 import { SelectMenuPaginator, SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
 import { getUserGuilds } from '#util/getUserGuilds';
+import { sendThreadMessage } from '#util/sendThreadMessage';
 
 @singleton()
 export default class implements Event<typeof Events.MessageCreate> {
@@ -106,7 +106,14 @@ export default class implements Event<typeof Events.MessageCreate> {
 		if (existingThread) {
 			const channel = guild.channels.cache.get(existingThread.channelId) as ThreadChannel | undefined;
 			if (channel) {
-				return sendThreadMessage({ message, member, channel, staff: false });
+				return sendThreadMessage({
+					content: message.content,
+					stickers: message.stickers,
+					attachment: message.attachments.first(),
+					member,
+					channel,
+					staff: false,
+				});
 			}
 
 			await message.channel.send(i18next.t('common.errors.no_thread', { lng: guild.preferredLocale }));
@@ -156,7 +163,14 @@ export default class implements Event<typeof Events.MessageCreate> {
 			},
 		});
 
-		await sendThreadMessage({ message, member, channel: threadChannel, staff: false });
+		await sendThreadMessage({
+			content: message.content,
+			stickers: message.stickers,
+			attachment: message.attachments.first(),
+			member,
+			channel: threadChannel,
+			staff: false,
+		});
 
 		if (settings.greetingMessage) {
 			const greetingEmbed = new EmbedBuilder()

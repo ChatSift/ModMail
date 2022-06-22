@@ -3,7 +3,7 @@ import { PrismaClient, ScheduledThreadClose, Thread } from '@prisma/client';
 import Bree from 'bree';
 import { Client, ThreadChannel } from 'discord.js';
 import { singleton } from 'tsyringe';
-import { closeThread } from '../util/closeThread';
+import { closeThread } from '#util/closeThread';
 
 export enum PayloadOpCode {
 	CloseThread,
@@ -56,20 +56,6 @@ export class JobManager {
 						if (channel) {
 							await closeThread({ thread: message.data, channel, silent: message.data.scheduledClose.silent });
 						}
-
-						await this.prisma.thread.update({
-							data: {
-								closedById: message.data.scheduledClose.scheduledById,
-								closedAt: new Date(),
-							},
-							where: {
-								threadId: message.data.threadId,
-							},
-						});
-
-						await this.prisma.scheduledThreadClose
-							.delete({ where: { threadId: message.data.threadId } })
-							.catch(() => null);
 
 						const payload: Payload = { op: PayloadOpCode.Done };
 						worker.postMessage(payload);
