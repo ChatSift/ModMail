@@ -124,14 +124,13 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 				data: {
 					closedById: interaction.user.id,
 					closedAt: new Date(),
-					scheduledClose: {
-						delete: true,
-					},
 				},
 				where: {
 					threadId: thread.threadId,
 				},
 			});
+
+			await this.prisma.scheduledThreadClose.delete({ where: { threadId: thread.threadId } }).catch(() => null);
 		}
 	}
 }

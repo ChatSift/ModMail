@@ -32,7 +32,7 @@ export class JobManager {
 	public async register() {
 		await this.bree.add({
 			name: 'autoCloseThreads',
-			interval: '3s',
+			interval: '5s',
 			path: fileURLToPath(new URL('../jobs/autoCloseThreads.js', import.meta.url)),
 		});
 	}
@@ -61,14 +61,15 @@ export class JobManager {
 							data: {
 								closedById: message.data.scheduledClose.scheduledById,
 								closedAt: new Date(),
-								scheduledClose: {
-									delete: true,
-								},
 							},
 							where: {
 								threadId: message.data.threadId,
 							},
 						});
+
+						await this.prisma.scheduledThreadClose
+							.delete({ where: { threadId: message.data.threadId } })
+							.catch(() => null);
 
 						const payload: Payload = { op: PayloadOpCode.Done };
 						worker.postMessage(payload);

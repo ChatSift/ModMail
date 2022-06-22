@@ -9,6 +9,8 @@ import { Env } from '#struct/Env';
 import { EventHandler } from '#struct/EventHandler';
 import { i18nInit } from '#util/i18nInit';
 
+const env = container.resolve(Env);
+
 const client = new Client({
 	intents: [
 		IntentsBitField.Flags.Guilds,
@@ -23,11 +25,10 @@ const client = new Client({
 }).setMaxListeners(20);
 container.register(Client, { useValue: client });
 container.register(PrismaClient, { useValue: new PrismaClient() });
-container.register(Bree, { useValue: new Bree({ root: false, logger: false }) });
+container.register(Bree, { useValue: new Bree({ root: false, logger: env.debugJobs ? false : undefined }) });
 
 await i18nInit();
 
-const env = container.resolve(Env);
 if (env.deploySlashCommands) {
 	await deploySlashCommands();
 	process.exit(0);

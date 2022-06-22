@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { on } from 'node:events';
 import { parentPort } from 'node:worker_threads';
 import { PrismaClient, ScheduledThreadClose, Thread } from '@prisma/client';
@@ -28,7 +29,7 @@ async function closeThread(thread: InferArrayT<typeof threads>) {
 	};
 
 	parentPort!.postMessage(payload);
-	for await (const message of on(parentPort!, 'message') as AsyncIterableIterator<string | Payload>) {
+	for await (const [message] of on(parentPort!, 'message') as AsyncIterableIterator<[string | Payload]>) {
 		if (typeof message !== 'string' && message.op === PayloadOpCode.Done) {
 			break;
 		}

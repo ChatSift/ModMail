@@ -47,6 +47,6 @@ export async function closeThread({ thread, channel, silent }: CloseThreadOption
 		}
 	}
 
-	await channel.setArchived(true);
 	await channel.send({ content: i18next.t('commands.success.archived') });
+	await channel.setArchived(true);
 }
