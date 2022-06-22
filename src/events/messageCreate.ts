@@ -18,6 +18,7 @@ import {
 } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
+import { sendThreadMessage } from '../util/sendThreadMessage';
 import type { Event } from '#struct/Event';
 import { SelectMenuPaginator, SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
 import { getUserGuilds } from '#util/getUserGuilds';
@@ -77,7 +78,6 @@ export default class implements Event<typeof Events.MessageCreate> {
 		return null;
 	}
 
-	// TODO(DD): Embed building
 	public async handle(message: Message) {
 		if (message.inGuild() || message.author.bot) {
 			return;
@@ -85,7 +85,6 @@ export default class implements Event<typeof Events.MessageCreate> {
 
 		const guilds = await getUserGuilds(message.author.id);
 		if (!guilds.size) {
-			// TODO(DD): Read a locale... somehow
 			return message.channel.send(i18next.t('common.errors.no_guilds'));
 		}
 
@@ -107,16 +106,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 		if (existingThread) {
 			const channel = guild.channels.cache.get(existingThread.channelId) as ThreadChannel | undefined;
 			if (channel) {
-				return channel.send({
-					embeds: [
-						// TODO(DD): Image/media parsing
-						new EmbedBuilder()
-							.setAuthor({ name: member.displayName, iconURL: member.displayAvatarURL() })
-							.setFooter({ text: `${member.user.tag} (${member.user.id})`, iconURL: member.user.displayAvatarURL() })
-							.setColor(Colors.Green)
-							.setDescription(message.content),
-					],
-				});
+				return sendThreadMessage({ message, member, channel, staff: false });
 			}
 
 			await message.channel.send(i18next.t('common.errors.no_thread', { lng: guild.preferredLocale }));
@@ -126,19 +116,15 @@ export default class implements Event<typeof Events.MessageCreate> {
 		const pastModmails = await this.prisma.thread.findMany({
 			where: { guildId: guild.id, createdById: message.author.id },
 		});
+
 		const startMessage = await modmail.send({
+			content: member.toString(),
 			embeds: [
 				new EmbedBuilder()
 					.setAuthor({ name: member.displayName, iconURL: member.displayAvatarURL() })
 					.setFooter({ text: `${member.user.tag} (${member.user.id})`, iconURL: member.user.displayAvatarURL() })
 					.setColor(Colors.NotQuiteBlack)
 					.setFields(
-						{
-							name: i18next.t('thread.start.embed.fields.pronouns'),
-							// TODO(DD): ????
-							value: 'Noop',
-							inline: true,
-						},
 						{
 							name: i18next.t('thread.start.embed.fields.account_created'),
 							value: time(member.user.createdAt, TimestampStyles.LongDate),
@@ -169,6 +155,8 @@ export default class implements Event<typeof Events.MessageCreate> {
 				createdById: message.author.id,
 			},
 		});
+
+		await sendThreadMessage({ message, member, channel: threadChannel, staff: false });
 
 		if (settings.greetingMessage) {
 			const greetingEmbed = new EmbedBuilder()

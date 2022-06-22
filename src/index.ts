@@ -25,7 +25,14 @@ const client = new Client({
 }).setMaxListeners(20);
 container.register(Client, { useValue: client });
 container.register(PrismaClient, { useValue: new PrismaClient() });
-container.register(Bree, { useValue: new Bree({ root: false, logger: env.debugJobs ? false : undefined }) });
+// Because apparently bree can't deal with me doing logger: undefiend
+const breeOptions: Bree.BreeOptions = {
+	root: false,
+};
+if (!env.debugJobs) {
+	breeOptions.logger = false;
+}
+container.register(Bree, { useValue: new Bree(breeOptions) });
 
 await i18nInit();
 

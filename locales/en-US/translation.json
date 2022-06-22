@@ -19,7 +19,6 @@
 		"start": {
 			"embed": {
 				"fields": {
-					"pronouns": "Pronouns",
 					"account_created": "📆 Account Created",
 					"joined_server": "📥 Joined Server",
 					"past_modmails": "🗂️ Past Modmails"
