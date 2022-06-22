@@ -120,7 +120,11 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			where: { guildId: interaction.guild.id },
 		});
 
-		return snippets.map((snippet) => ({ name: snippet.name, value: snippet.name }));
+		const input = interaction.options.getFocused();
+		return snippets
+			.filter((snippet) => snippet.name.includes(input) || snippet.content.includes(input))
+			.map((snippet) => ({ name: snippet.name, value: snippet.name }))
+			.slice(0, 5);
 	}
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {

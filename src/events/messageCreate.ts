@@ -1,7 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import {
 	ActionRowBuilder,
+	Client,
 	Collection,
+	Colors,
 	ComponentType,
 	EmbedBuilder,
 	Events,
@@ -24,17 +26,17 @@ import { getUserGuilds } from '#util/getUserGuilds';
 export default class implements Event<typeof Events.MessageCreate> {
 	public readonly name = Events.MessageCreate;
 
-	public constructor(private readonly prisma: PrismaClient) {}
+	public constructor(private readonly prisma: PrismaClient, private readonly client: Client<true>) {}
 
 	private async promptUser(message: Message, guilds: Collection<string, Guild>): Promise<Guild | null> {
 		const paginator = new SelectMenuPaginator({ key: 'user-guild-selector', data: [...guilds.values()] });
 
-		let content;
 		const actionRow = new ActionRowBuilder<SelectMenuBuilder>();
+		const embed = new EmbedBuilder().setTitle(i18next.t('thread.prompt.embed.title'));
 
 		const updateMessagePayload = (consumers: SelectMenuPaginatorConsumers<Guild[]>) => {
 			const { data, currentPage, selectMenu, pageLeftOption, pageRightOption } = consumers.asSelectMenu();
-			content = `Page ${currentPage}/${paginator.pageCount}`;
+			embed.setDescription(`Page ${currentPage}/${paginator.pageCount}`);
 			const options: SelectMenuOptionBuilder[] = [];
 			if (pageLeftOption) {
 				options.push(pageLeftOption);
@@ -52,7 +54,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 
 		updateMessagePayload(paginator.getCurrentPage());
 
-		const prompt = await message.channel.send({ content, components: [actionRow] });
+		const prompt = await message.channel.send({ embeds: [embed], components: [actionRow] });
 
 		for await (const [selectMenu] of message.createMessageComponentCollector<ComponentType.SelectMenu>({
 			idle: 30_000,
@@ -63,7 +65,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 
 			if (isPageBack || isPageRight) {
 				updateMessagePayload(isPageBack ? paginator.previousPage() : paginator.nextPage());
-				await message.edit({ content, components: [actionRow] });
+				await message.edit({ embeds: [embed], components: [actionRow] });
 				continue;
 			}
 
@@ -71,7 +73,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 			return guilds.get(value)!;
 		}
 
-		await prompt.edit('Timed out...');
+		await prompt.edit({ content: 'Timed out...', embeds: [], components: [] });
 		return null;
 	}
 
@@ -92,8 +94,9 @@ export default class implements Event<typeof Events.MessageCreate> {
 			return;
 		}
 
+		const member = await guild.members.fetch(message.author.id);
 		const existingThread = await this.prisma.thread.findFirst({
-			where: { guildId: guild.id, createdById: message.author.id, closedById: null },
+			where: { guildId: guild.id, recipientId: message.author.id, closedById: null },
 		});
 
 		const settings = await this.prisma.guildSettings.findFirst({ where: { guildId: guild.id } });
@@ -104,13 +107,21 @@ export default class implements Event<typeof Events.MessageCreate> {
 		if (existingThread) {
 			const channel = guild.channels.cache.get(existingThread.channelId) as ThreadChannel | undefined;
 			if (channel) {
-				return channel.send(message.content);
+				return channel.send({
+					embeds: [
+						// TODO(DD): Image/media parsing
+						new EmbedBuilder()
+							.setAuthor({ name: member.displayName, iconURL: member.displayAvatarURL() })
+							.setFooter({ text: `${member.user.tag} (${member.user.id})`, iconURL: member.user.displayAvatarURL() })
+							.setColor(Colors.Green)
+							.setDescription(message.content),
+					],
+				});
 			}
 
 			await message.channel.send(i18next.t('common.errors.no_thread', { lng: guild.preferredLocale }));
 		}
 
-		const member = await guild.members.fetch(message.author.id);
 		const modmail = guild.channels.cache.get(settings.modmailChannelId) as TextChannel;
 		const pastModmails = await this.prisma.thread.findMany({
 			where: { guildId: guild.id, createdById: message.author.id },
@@ -120,6 +131,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 				new EmbedBuilder()
 					.setAuthor({ name: member.displayName, iconURL: member.displayAvatarURL() })
 					.setFooter({ text: `${member.user.tag} (${member.user.id})`, iconURL: member.user.displayAvatarURL() })
+					.setColor(Colors.NotQuiteBlack)
 					.setFields(
 						{
 							name: i18next.t('thread.start.embed.fields.pronouns'),
@@ -149,13 +161,26 @@ export default class implements Event<typeof Events.MessageCreate> {
 			name: `${message.author.username}-${message.author.discriminator}`,
 		});
 
-		return this.prisma.thread.create({
+		await this.prisma.thread.create({
 			data: {
 				guildId: guild.id,
-				localThreadId: 0, // TODO(DD)
 				channelId: threadChannel.id,
+				recipientId: message.author.id,
 				createdById: message.author.id,
 			},
 		});
+
+		if (settings.greetingMessage) {
+			const greetingEmbed = new EmbedBuilder()
+				.setAuthor({
+					name: i18next.t('thread.greeting.embed.author'),
+					iconURL: this.client.user.displayAvatarURL(),
+				})
+				.setDescription(settings.greetingMessage)
+				.setColor(Colors.NotQuiteBlack);
+
+			await message.channel.send({ embeds: [greetingEmbed] });
+			await threadChannel.send({ embeds: [greetingEmbed] });
+		}
 	}
 }

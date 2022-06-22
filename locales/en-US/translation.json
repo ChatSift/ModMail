@@ -25,6 +25,16 @@
 					"past_modmails": "🗂️ Past Modmails"
 				}
 			}
+		},
+		"greeting": {
+			"embed": {
+				"author": "ModMail - Greeting"
+			}
+		},
+		"farewell": {
+			"embed": {
+				"author": "ModMail - Farewell"
+			}
 		}
 	},
 	"commands": {
@@ -103,6 +113,20 @@
 				"description": "List all snippets",
 				"embed": {
 					"title": "Available snippets"
+				}
+			}
+		},
+		"close": {
+			"name": "close",
+			"description": "Close a thread",
+			"options": {
+				"time": {
+					"name": "time",
+					"description": "The amount of time to wait before closing the thread"
+				},
+				"silent": {
+					"name": "silent",
+					"description": "Whether or not to send the farewell message to the user - defaults to true"
 				}
 			}
 		}

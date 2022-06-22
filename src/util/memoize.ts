@@ -2,7 +2,7 @@ type MemoizableFunction = (arg: any) => unknown;
 
 const CACHE = new WeakMap<MemoizableFunction, Map<any, unknown>>();
 
-export function memoize<T extends (arg: any) => unknown>(fn: T, ttl: number): T {
+export function memoize<T extends MemoizableFunction>(fn: T, ttl: number): T {
 	return ((arg) => {
 		let memoized = CACHE.get(fn);
 		if (!memoized) {

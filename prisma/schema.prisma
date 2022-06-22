@@ -10,6 +10,8 @@ datasource db {
 model GuildSettings {
   guildId          String  @id
   modmailChannelId String?
+  greetingMessage  String?
+  farewellMessage  String?
 }
 
 model SnippetUpdates {
@@ -37,9 +39,11 @@ model Snippet {
 }
 
 model ScheduledThreadClose {
-  threadId Int      @id
-  thread   Thread   @relation(fields: [threadId], references: [threadId], onDelete: Cascade)
-  closeAt  DateTime
+  threadId      Int      @id
+  thread        Thread   @relation(fields: [threadId], references: [threadId], onDelete: Cascade)
+  scheduledById String
+  silent        Boolean  @default(false)
+  closeAt       DateTime
 }
 
 model ThreadMessage {
@@ -58,14 +62,12 @@ model ThreadMessage {
 model Thread {
   threadId       Int                   @id @default(autoincrement())
   guildId        String
-  localThreadId  Int
   channelId      String
+  recipientId    String
   createdById    String
   createdAt      DateTime              @default(now()) @db.Timestamptz()
   closedById     String?
   closedAt       DateTime?             @db.Timestamptz()
   scheduledClose ScheduledThreadClose?
   messages       ThreadMessage[]
-
-  @@unique([guildId, localThreadId])
 }
