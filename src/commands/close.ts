@@ -34,6 +34,11 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 				...getLocalizedProp('description', 'commands.close.options.silent.description'),
 				type: ApplicationCommandOptionType.Boolean,
 			},
+			{
+				...getLocalizedProp('name', 'commands.close.options.cancel.name'),
+				...getLocalizedProp('description', 'commands.close.options.cancel.description'),
+				type: ApplicationCommandOptionType.Boolean,
+			},
 		],
 	};
 
@@ -74,9 +79,27 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		const thread = await this.prisma.thread.findFirst({
 			where: { channelId: interaction.channelId, closedById: null },
+			include: {
+				scheduledClose: true,
+			},
 		});
 		if (!thread) {
 			return interaction.reply(i18next.t('commands.errors.no_thread'));
+		}
+
+		const cancel = interaction.options.getBoolean('cancel') ?? false;
+		if (cancel) {
+			if (!thread.scheduledClose) {
+				return interaction.reply(i18next.t('commands.close.no_scheduled_close', { lng: interaction.locale }));
+			}
+
+			await this.prisma.scheduledThreadClose.delete({
+				where: {
+					threadId: thread.threadId,
+				},
+			});
+
+			return interaction.reply(i18next.t('commands.close.successfully_canceled', { lng: interaction.locale }));
 		}
 
 		const rawTime = interaction.options.getString('time');

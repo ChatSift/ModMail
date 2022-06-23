@@ -135,8 +135,14 @@
 				"silent": {
 					"name": "silent",
 					"description": "Whether or not to send the farewell message to the user - defaults to true"
+				},
+				"cancel": {
+					"name": "cancel",
+					"description": "Cancels a scheduled thread close"
 				}
-			}
+			},
+			"no_scheduled_close": "This thread wasn't scheduled to close",
+			"successfully_canceled": "Successfully canceled the given thread"
 		},
 		"reply": {
 			"name": "reply",
