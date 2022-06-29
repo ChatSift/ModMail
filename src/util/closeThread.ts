@@ -36,7 +36,7 @@ export async function closeThread({ thread, channel, silent }: CloseThreadOption
 		await channel.send({ embeds: [farewellEmbed] });
 
 		if (settings?.farewellMessage) {
-			const member = await channel.guild.members.fetch(thread.recipientId).catch(() => null);
+			const member = await channel.guild.members.fetch(thread.userId).catch(() => null);
 			if (member) {
 				try {
 					await member.send({ embeds: [farewellEmbed] });

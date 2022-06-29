@@ -95,7 +95,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 
 		const member = await guild.members.fetch(message.author.id);
 		const existingThread = await this.prisma.thread.findFirst({
-			where: { guildId: guild.id, recipientId: message.author.id, closedById: null },
+			where: { guildId: guild.id, userId: message.author.id, closedById: null },
 		});
 
 		const settings = await this.prisma.guildSettings.findFirst({ where: { guildId: guild.id } });
@@ -111,8 +111,9 @@ export default class implements Event<typeof Events.MessageCreate> {
 					stickers: message.stickers,
 					attachment: message.attachments.first(),
 					member,
+					userMessage: message,
 					channel,
-					staff: false,
+					threadId: existingThread.threadId,
 				});
 			}
 
@@ -154,22 +155,23 @@ export default class implements Event<typeof Events.MessageCreate> {
 			name: `${message.author.username}-${message.author.discriminator}`,
 		});
 
-		await this.prisma.thread.create({
+		const thread = await this.prisma.thread.create({
 			data: {
 				guildId: guild.id,
 				channelId: threadChannel.id,
-				recipientId: message.author.id,
+				userId: message.author.id,
 				createdById: message.author.id,
 			},
 		});
 
 		await sendThreadMessage({
+			threadId: thread.threadId,
 			content: message.content,
 			stickers: message.stickers,
 			attachment: message.attachments.first(),
 			member,
+			userMessage: message,
 			channel: threadChannel,
-			staff: false,
 		});
 
 		if (settings.greetingMessage) {

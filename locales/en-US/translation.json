@@ -16,7 +16,8 @@
 			"thread_creation": "Could not create the needed thread channel. This is likely a miss-configuration caused by an Admin",
 			"invalid_time": "The given time is invalid",
 			"dm_fail": "Failed to send a DM to the user. This is most likely because they have closed their DMs",
-			"no_member": "Member is not currently in the server"
+			"no_member": "Member is not currently in the server",
+			"not_own_message": "You are not the author of that message"
 		}
 	},
 	"thread": {
@@ -155,6 +156,24 @@
 				"attachment": {
 					"name": "attachment",
 					"description": "Optional attachment to send"
+				}
+			}
+		},
+		"edit": {
+			"name": "edit",
+			"description": "Edit a reply to a thread",
+			"options": {
+				"id": {
+					"name": "id",
+					"description": "ID of the reply you wish to edit"
+				},
+				"content": {
+					"name": "content",
+					"description": "The new content of the reply"
+				},
+				"attachment": {
+					"name": "attachment",
+					"description": "Optional attachment to edit in"
 				}
 			}
 		}

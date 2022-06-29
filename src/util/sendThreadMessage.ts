@@ -1,23 +1,28 @@
 import { EmbedBuilder } from '@discordjs/builders';
+import { PrismaClient } from '@prisma/client';
 import {
 	Attachment,
 	ChatInputCommandInteraction,
 	Collection,
 	Colors,
 	GuildMember,
+	Message,
 	Sticker,
 	ThreadChannel,
 } from 'discord.js';
 import i18next from 'i18next';
+import { container } from 'tsyringe';
 
 export interface SendThreadMessageOptions {
 	content: string;
 	stickers?: Collection<string, Sticker> | null;
 	attachment?: Attachment | null;
 	member: GuildMember;
+	userMessage?: Message;
 	channel: ThreadChannel;
-	staff: boolean;
+	staffId?: string | null;
 	interaction?: ChatInputCommandInteraction<'cached'>;
+	threadId: number;
 }
 
 export async function sendThreadMessage({
@@ -25,10 +30,14 @@ export async function sendThreadMessage({
 	stickers,
 	attachment,
 	member,
+	userMessage,
 	channel,
-	staff,
+	staffId,
 	interaction,
+	threadId,
 }: SendThreadMessageOptions) {
+	const prisma = container.resolve(PrismaClient);
+
 	const noteable = [];
 
 	if (stickers?.size) {
@@ -38,13 +47,13 @@ export async function sendThreadMessage({
 	const embed = new EmbedBuilder()
 		.setAuthor({ name: member.displayName, iconURL: member.displayAvatarURL() })
 		.setFooter({ text: `${member.user.tag} (${member.user.id})`, iconURL: member.user.displayAvatarURL() })
-		.setColor(staff ? Colors.Blurple : Colors.Green)
+		.setColor(staffId ? Colors.Blurple : Colors.Green)
 		.setDescription(content)
 		.setImage(attachment?.url ?? null);
 
-	if (staff) {
+	if (staffId) {
 		try {
-			await member.send({ embeds: [embed] });
+			userMessage = await member.send({ embeds: [embed] });
 		} catch {
 			return channel.send(i18next.t('common.errors.dm_fail'));
 		}
@@ -55,9 +64,30 @@ export async function sendThreadMessage({
 		embeds: [embed],
 	};
 
-	if (interaction) {
-		return interaction.reply(options);
-	}
+	const message = interaction ? await interaction.reply({ ...options, fetchReply: true }) : await channel.send(options);
 
-	return channel.send(options);
+	const threadMessage = await prisma.threadMessage.create({
+		data: {
+			guildId: member.guild.id,
+			threadId,
+			userId: member.user.id,
+			userMessageId: userMessage!.id,
+			staffId,
+			guildMessageId: message.id,
+		},
+	});
+
+	if (staffId) {
+		await message.edit({
+			embeds: [
+				{
+					...embed.toJSON(),
+					footer: {
+						...embed.toJSON().footer,
+						text: `${member.user.tag} (${member.user.id}) | Response id: ${threadMessage.threadMessageId}`,
+					},
+				},
+			],
+		});
+	}
 }

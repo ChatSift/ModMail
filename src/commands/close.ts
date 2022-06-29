@@ -3,7 +3,6 @@ import { PrismaClient } from '@prisma/client';
 import {
 	ApplicationCommandOptionType,
 	ApplicationCommandType,
-	PermissionsBitField,
 	ThreadChannel,
 	type ApplicationCommandOptionChoiceData,
 	type AutocompleteInteraction,
@@ -21,7 +20,6 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		...getLocalizedProp('description', 'commands.close.description'),
 		type: ApplicationCommandType.ChatInput,
 		dm_permission: false,
-		default_member_permissions: new PermissionsBitField(PermissionsBitField.Flags.ManageGuild).toJSON(),
 		options: [
 			{
 				...getLocalizedProp('name', 'commands.close.options.time.name'),

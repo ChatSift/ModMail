@@ -2,7 +2,6 @@ import { PrismaClient } from '@prisma/client';
 import {
 	ApplicationCommandOptionType,
 	ApplicationCommandType,
-	PermissionsBitField,
 	ThreadChannel,
 	type ApplicationCommandOptionChoiceData,
 	type AutocompleteInteraction,
@@ -20,7 +19,6 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		...getLocalizedProp('description', 'commands.reply.description'),
 		type: ApplicationCommandType.ChatInput,
 		dm_permission: false,
-		default_member_permissions: new PermissionsBitField(PermissionsBitField.Flags.ManageGuild).toJSON(),
 		options: [
 			{
 				...getLocalizedProp('name', 'commands.reply.options.content.name'),
@@ -63,17 +61,18 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 		const attachment = interaction.options.getAttachment('attachment');
 
-		const member = await interaction.guild.members.fetch(thread.recipientId).catch(() => null);
+		const member = await interaction.guild.members.fetch(thread.userId).catch(() => null);
 		if (!member) {
 			return i18next.t('commands.errors.no_member', { lng: interaction.locale });
 		}
 
 		await sendThreadMessage({
+			threadId: thread.threadId,
 			content: interaction.options.getString('content', true),
 			attachment,
 			member,
 			channel: interaction.channel as ThreadChannel,
-			staff: true,
+			staffId: interaction.user.id,
 			interaction,
 		});
 	}

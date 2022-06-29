@@ -47,23 +47,21 @@ model ScheduledThreadClose {
 }
 
 model ThreadMessage {
-  threadMessageId      Int     @id @default(autoincrement())
-  localThreadMessageId Int
-  guildId              String
-  threadId             Int
-  thread               Thread  @relation(fields: [threadId], references: [threadId], onDelete: Cascade)
-  authorId             String
-  messageId            String
-  deleted              Boolean @default(false)
-
-  @@unique([guildId, localThreadMessageId])
+  threadMessageId Int     @id @default(autoincrement())
+  guildId         String
+  threadId        Int
+  thread          Thread  @relation(fields: [threadId], references: [threadId], onDelete: Cascade)
+  userId          String
+  userMessageId   String
+  staffId         String?
+  guildMessageId  String
 }
 
 model Thread {
   threadId       Int                   @id @default(autoincrement())
   guildId        String
   channelId      String
-  recipientId    String
+  userId         String
   createdById    String
   createdAt      DateTime              @default(now()) @db.Timestamptz()
   closedById     String?
