@@ -77,17 +77,15 @@ export async function sendThreadMessage({
 		},
 	});
 
-	if (staffId) {
-		await message.edit({
-			embeds: [
-				{
-					...embed.toJSON(),
-					footer: {
-						...embed.toJSON().footer,
-						text: `${member.user.tag} (${member.user.id}) | Response id: ${threadMessage.threadMessageId}`,
-					},
+	await message.edit({
+		embeds: [
+			{
+				...embed.toJSON(),
+				footer: {
+					...embed.toJSON().footer,
+					text: `${member.user.tag} (${member.user.id}) | Response id: ${threadMessage.threadMessageId}`,
 				},
-			],
-		});
-	}
+			},
+		],
+	});
 }

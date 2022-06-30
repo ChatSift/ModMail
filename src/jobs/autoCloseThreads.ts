@@ -7,7 +7,7 @@ import type { InferArrayT } from '#util/InferArrayT';
 import { i18nInit } from '#util/i18nInit';
 
 if (!parentPort) {
-	console.warn('Something went wrong. This script should only be run in a worker thread.');
+	console.warn('Something went wrong. This script should only be ran in a worker thread.');
 	process.exit(0);
 }
 

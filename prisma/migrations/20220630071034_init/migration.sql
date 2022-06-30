@@ -71,6 +71,15 @@ CREATE TABLE "Thread" (
     CONSTRAINT "Thread_pkey" PRIMARY KEY ("threadId")
 );
 
+-- CreateTable
+CREATE TABLE "Block" (
+    "userId" TEXT NOT NULL,
+    "guildId" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3),
+
+    CONSTRAINT "Block_pkey" PRIMARY KEY ("userId","guildId")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Snippet_guildId_name_key" ON "Snippet"("guildId", "name");
 

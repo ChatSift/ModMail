@@ -69,3 +69,11 @@ model Thread {
   scheduledClose ScheduledThreadClose?
   messages       ThreadMessage[]
 }
+
+model Block {
+  userId    String
+  guildId   String
+  expiresAt DateTime?
+
+  @@id([userId, guildId])
+}

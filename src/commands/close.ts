@@ -4,14 +4,13 @@ import {
 	ApplicationCommandOptionType,
 	ApplicationCommandType,
 	ThreadChannel,
-	type ApplicationCommandOptionChoiceData,
-	type AutocompleteInteraction,
 	type ChatInputCommandInteraction,
 } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
 import { closeThread } from '#util/closeThread';
+import { durationAutoComplete } from '#util/durationAutoComplete';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
@@ -42,37 +41,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 	public constructor(private readonly prisma: PrismaClient) {}
 
-	public handleAutocomplete(interaction: AutocompleteInteraction<'cached'>): ApplicationCommandOptionChoiceData[] {
-		const commonOptions = ['1min', '5min', '30min', '1h', '1d', '7d'].map((time) => {
-			const parsed = ms(ms(time), true);
-			return {
-				name: parsed,
-				value: parsed,
-			};
-		});
-
-		const input = interaction.options.getFocused();
-		const raw = commonOptions.filter((option) => option.name.includes(input));
-
-		let parsedMs: number;
-		if (isNaN(Number(input))) {
-			try {
-				parsedMs = ms(input);
-			} catch {
-				return raw;
-			}
-		} else {
-			// Treat the number as minutes
-			parsedMs = ms(`${input}m`);
-		}
-
-		if (parsedMs <= 0) {
-			return raw;
-		}
-
-		const parsed = ms(parsedMs, true);
-		return commonOptions.filter((option) => option.name.includes(parsed));
-	}
+	public handleAutocomplete = durationAutoComplete;
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		const thread = await this.prisma.thread.findFirst({

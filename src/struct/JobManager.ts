@@ -35,6 +35,12 @@ export class JobManager {
 			interval: '5s',
 			path: fileURLToPath(new URL('../jobs/autoCloseThreads.js', import.meta.url)),
 		});
+
+		await this.bree.add({
+			name: 'autoUnblock',
+			interval: '1m',
+			path: fileURLToPath(new URL('../jobs/autoUnblock.js', import.meta.url)),
+		});
 	}
 
 	public async start() {

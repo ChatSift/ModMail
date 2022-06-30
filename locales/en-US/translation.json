@@ -4,7 +4,9 @@
 			"resource_creation": "Successfully created {{ resource }}",
 			"resource_deletion": "Successfully deleted the given {{ resource }}",
 			"resource_update": "Successfully updated the given {{ resource }}",
-			"archived": "Thread successfully archived"
+			"archived": "Thread successfully archived",
+			"blocked": "User successfully blocked",
+			"unblocked": "User successfully unblocked"
 		},
 		"errors": {
 			"resource_exists": "A {{ resource }} with that name already exists",
@@ -17,7 +19,9 @@
 			"invalid_time": "The given time is invalid",
 			"dm_fail": "Failed to send a DM to the user. This is most likely because they have closed their DMs",
 			"no_member": "Member is not currently in the server",
-			"not_own_message": "You are not the author of that message"
+			"not_own_message": "You are not the author of that message",
+			"user_deleted": "The user appears to have deleted their account",
+			"not_blocked": "User is not blocked"
 		}
 	},
 	"thread": {
@@ -174,6 +178,26 @@
 				"attachment": {
 					"name": "attachment",
 					"description": "Optional attachment to edit in"
+				}
+			}
+		},
+		"block": {
+			"name": "block",
+			"description": "Block the user from using ModMail",
+			"options": {
+				"duration": {
+					"name": "duration",
+					"description": "How long this user should be blocked for"
+				}
+			}
+		},
+		"unblock": {
+			"name": "unblock",
+			"description": "Unblock a user",
+			"options": {
+				"user": {
+					"name": "user",
+					"description": "The user to unblock"
 				}
 			}
 		}

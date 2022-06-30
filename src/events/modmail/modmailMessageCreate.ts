@@ -93,6 +93,11 @@ export default class implements Event<typeof Events.MessageCreate> {
 			return;
 		}
 
+		const block = await this.prisma.block.findFirst({ where: { guildId: guild.id, userId: message.author.id } });
+		if (block) {
+			return;
+		}
+
 		const member = await guild.members.fetch(message.author.id);
 		const existingThread = await this.prisma.thread.findFirst({
 			where: { guildId: guild.id, userId: message.author.id, closedById: null },
