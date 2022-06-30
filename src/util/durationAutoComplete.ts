@@ -1,9 +1,7 @@
 import { ms } from '@naval-base/ms';
 import type { ApplicationCommandOptionChoiceData, AutocompleteInteraction } from 'discord.js';
 
-export function durationAutoComplete(
-	interaction: AutocompleteInteraction<'cached'>,
-): ApplicationCommandOptionChoiceData[] {
+export function durationAutoComplete(interaction: AutocompleteInteraction): ApplicationCommandOptionChoiceData[] {
 	const commonOptions = ['1min', '5min', '30min', '1h', '1d', '7d'].map((time) => {
 		const parsed = ms(ms(time), true);
 		return {

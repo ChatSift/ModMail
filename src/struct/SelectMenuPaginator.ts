@@ -108,12 +108,12 @@ export class SelectMenuPaginator<Data extends unknown[], Asserted extends boolea
 					currentPage,
 					data: slice,
 					pageLeftOption:
-						currentPage === 0
-							? new SelectMenuOptionBuilder().setEmoji({ name: '◀️' }).setValue('page-left')
+						currentPage === 0 && this.pageCount > 1
+							? new SelectMenuOptionBuilder().setEmoji({ name: '◀️' }).setLabel('Page left').setValue('page-left')
 							: undefined,
 					pageRightOption:
-						currentPage === this.pageCount - 1
-							? new SelectMenuOptionBuilder().setEmoji({ name: '▶️' }).setValue('page-right')
+						currentPage === this.pageCount - 1 && this.pageCount > 1
+							? new SelectMenuOptionBuilder().setEmoji({ name: '▶️' }).setLabel('Page right').setValue('page-right')
 							: undefined,
 					selectMenu: new SelectMenuBuilder().setCustomId('select-menu').setMinValues(1).setMaxValues(slice.length),
 				};

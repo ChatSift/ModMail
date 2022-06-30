@@ -10,15 +10,15 @@ export default class implements Event<typeof Events.InteractionCreate> {
 	public constructor(private readonly commandHandler: CommandHandler) {}
 
 	public handle(interaction: AnyInteraction) {
-		if (!interaction.inCachedGuild()) {
-			return;
-		}
-
 		if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
 			return this.commandHandler.handleAutocomplete(interaction);
 		}
 
 		if (interaction.type === InteractionType.MessageComponent) {
+			if (!interaction.inCachedGuild()) {
+				return;
+			}
+
 			return this.commandHandler.handleMessageComponent(interaction);
 		}
 

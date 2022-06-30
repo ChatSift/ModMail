@@ -25,19 +25,42 @@ import { sendThreadMessage } from '#util/sendThreadMessage';
 
 @singleton()
 export default class implements Event<typeof Events.MessageCreate> {
+	private readonly userSelectionCache = new Collection<string, string>();
+	private readonly recentlyInCache = new Set<string>();
+
 	public readonly name = Events.MessageCreate;
 
 	public constructor(private readonly prisma: PrismaClient, private readonly client: Client<true>) {}
 
+	public overwriteUserSelection(userId: string, guildId: string) {
+		this.userSelectionCache.set(userId, guildId);
+		setTimeout(() => {
+			this.userSelectionCache.delete(userId);
+			this.recentlyInCache.add(userId);
+		}, 180_000).unref();
+	}
+
 	private async promptUser(message: Message, guilds: Collection<string, Guild>): Promise<Guild | null> {
+		if (this.userSelectionCache.has(message.author.id)) {
+			const guildId = this.userSelectionCache.get(message.author.id)!;
+			const guild = guilds.get(guildId);
+			if (guild) {
+				return guild;
+			}
+
+			this.userSelectionCache.delete(message.author.id);
+		}
+
 		const paginator = new SelectMenuPaginator({ key: 'user-guild-selector', data: [...guilds.values()] });
 
 		const actionRow = new ActionRowBuilder<SelectMenuBuilder>();
-		const embed = new EmbedBuilder().setTitle(i18next.t('thread.prompt.embed.title'));
+		let content = '';
 
 		const updateMessagePayload = (consumers: SelectMenuPaginatorConsumers<Guild[]>) => {
 			const { data, currentPage, selectMenu, pageLeftOption, pageRightOption } = consumers.asSelectMenu();
-			embed.setDescription(`Page ${currentPage}/${paginator.pageCount}`);
+			content = `${i18next.t(
+				this.recentlyInCache.has(message.author.id) ? 'thread.reprompt' : 'thread.prompt',
+			)} - Page ${currentPage}/${paginator.pageCount}`;
 			const options: SelectMenuOptionBuilder[] = [];
 			if (pageLeftOption) {
 				options.push(pageLeftOption);
@@ -49,15 +72,16 @@ export default class implements Event<typeof Events.MessageCreate> {
 				options.push(pageRightOption);
 			}
 
-			selectMenu.setMaxValues(1).setOptions(options);
+			// Shouldn't need to map - waiting for upstream fix https://github.com/discordjs/discord.js/pull/8174
+			selectMenu.setMaxValues(1).setOptions(options.map((o) => o.toJSON()));
 			actionRow.setComponents([selectMenu]);
 		};
 
 		updateMessagePayload(paginator.getCurrentPage());
 
-		const prompt = await message.channel.send({ embeds: [embed], components: [actionRow] });
+		const prompt = await message.channel.send({ content, components: [actionRow] });
 
-		for await (const [selectMenu] of message.createMessageComponentCollector<ComponentType.SelectMenu>({
+		for await (const [selectMenu] of prompt.createMessageComponentCollector<ComponentType.SelectMenu>({
 			idle: 30_000,
 		})) {
 			const [value] = selectMenu.values as [string];
@@ -66,11 +90,12 @@ export default class implements Event<typeof Events.MessageCreate> {
 
 			if (isPageBack || isPageRight) {
 				updateMessagePayload(isPageBack ? paginator.previousPage() : paginator.nextPage());
-				await message.edit({ embeds: [embed], components: [actionRow] });
+				await selectMenu.update({ content, components: [actionRow] });
 				continue;
 			}
 
 			await prompt.delete();
+			this.overwriteUserSelection(message.author.id, value);
 			return guilds.get(value)!;
 		}
 

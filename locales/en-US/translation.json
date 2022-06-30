@@ -19,6 +19,7 @@
 			"no_resources": "There are no {{ resource }} available",
 			"resource_too_long": "The given {{ snippet }} needs to be {{ length }} characters or less",
 			"no_guilds": "Could not find your mutual guilds with the bot. This is most likely a bug",
+			"no_guild": "Could not find that guild. Are you sure you're still in it?",
 			"no_thread": "Could not find the channel associated with this thread. This is most likely because an Admin deleted it, opening a new thread with your message.",
 			"thread_creation": "Could not create the needed thread channel. This is likely a miss-configuration caused by an Admin",
 			"thread_exists": "A thread already exists with this user",
@@ -28,15 +29,13 @@
 			"not_own_message": "You are not the author of that message",
 			"user_deleted": "The user appears to have deleted their account",
 			"not_blocked": "User is not blocked",
-			"message_deleted": "Could not expose message, it was likely deleted"
+			"message_deleted": "Could not expose message, it was likely deleted",
+			"dm_only": "This command is meant to only be used in DMs"
 		}
 	},
 	"thread": {
-		"prompt": {
-			"embed": {
-				"title": "Please select a guild"
-			}
-		},
+		"prompt": "Please select a guild",
+		"reprompt": "Just to make sure you don't get it wrong, please select the guild this message is meant to go to once more",
 		"start": {
 			"embed": {
 				"fields": {
@@ -232,6 +231,17 @@
 					"description": "The user to open a thread with"
 				}
 			}
+		},
+		"switch": {
+			"name": "switch",
+			"description": "Switch the guild your messages are intended for",
+			"options": {
+				"guild": {
+					"name": "guild",
+					"description": "The guild to switch to"
+				}
+			},
+			"success": "Succesfully switched to the given guild"
 		}
 	}
 }

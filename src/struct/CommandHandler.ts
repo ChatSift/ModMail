@@ -16,10 +16,14 @@ export class CommandHandler {
 	public constructor(private readonly env: Env) {}
 
 	// TODO(DD): Error handling
-	public async handleAutocomplete(interaction: AutocompleteInteraction<'cached'>) {
+	public async handleAutocomplete(interaction: AutocompleteInteraction) {
 		const command = this.commands.get(interaction.commandName);
 		if (!command?.handleAutocomplete) {
 			return interaction.respond([]);
+		}
+
+		if (command.interactionOptions.dm_permission && interaction.inCachedGuild()) {
+			return;
 		}
 
 		const options = await command.handleAutocomplete(interaction);
@@ -32,9 +36,13 @@ export class CommandHandler {
 		return component?.handle(interaction, ...args);
 	}
 
-	public handleCommand(interaction: CommandInteraction<'cached'>) {
+	public handleCommand(interaction: CommandInteraction) {
 		const command = this.commands.get(interaction.commandName);
 		if (!command) {
+			return;
+		}
+
+		if (!command.interactionOptions.dm_permission && !interaction.inCachedGuild()) {
 			return;
 		}
 
@@ -46,23 +54,7 @@ export class CommandHandler {
 		return Promise.all([this.registerCommands(), this.registerComponents()]);
 	}
 
-	public async registerDevInteractions(): Promise<void> {
-		const api = new REST().setToken(this.env.discordToken);
-		const options = [...this.commands.values()].map((command) => command.interactionOptions);
-
-		const promises: Promise<unknown>[] = [];
-		for (const guildId of this.env.testGuildIds ?? []) {
-			promises.push(
-				api.put(Routes.applicationGuildCommands(this.env.discordClientId, guildId), {
-					body: options,
-				}),
-			);
-		}
-
-		await Promise.all(promises);
-	}
-
-	public async registerProdInteractions(): Promise<void> {
+	public async registerInteractions(): Promise<void> {
 		const api = new REST().setToken(this.env.discordToken);
 		const options = [...this.commands.values()].map((command) => command.interactionOptions);
 		await api.put(Routes.applicationCommands(this.env.discordClientId), { body: options });
