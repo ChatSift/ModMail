@@ -22,8 +22,8 @@ import {
 import i18next from 'i18next';
 import { PrismaError } from 'prisma-error-enum';
 import { singleton } from 'tsyringe';
-import { Command, CommandBody, getLocalizedProp } from '#struct/Command';
-import { SelectMenuPaginator, SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
+import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
+import { SelectMenuPaginator, type SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
 import { diff } from '#util/diff';
 import { ellipsis } from '#util/ellipsis';
 
@@ -120,7 +120,11 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			where: { guildId: interaction.guild.id },
 		});
 
-		return snippets.map((snippet) => ({ name: snippet.name, value: snippet.name }));
+		const input = interaction.options.getFocused();
+		return snippets
+			.filter((snippet) => snippet.name.includes(input) || snippet.content.includes(input))
+			.map((snippet) => ({ name: snippet.name, value: snippet.name }))
+			.slice(0, 5);
 	}
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
@@ -310,7 +314,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 						.setLabel(i18next.t('commands.snippets.show.buttons.restore', { lng: interaction.locale }))
 						.setStyle(ButtonStyle.Danger);
 
-					const updateMessage = async (consumers: SelectMenuPaginatorConsumers<SnippetUpdates[]>) => {
+					const updateMessagePayload = async (consumers: SelectMenuPaginatorConsumers<SnippetUpdates[]>) => {
 						const { data, currentPage, pageLeftButton, pageRightButton } = consumers.asButtons();
 						const [before] = data as [SnippetUpdates];
 						// We go one update further to try to find the next content
@@ -331,7 +335,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 						actionRow.setComponents([pageLeftButton, restoreButton, pageRightButton]);
 					};
 
-					await updateMessage(paginator.getCurrentPage());
+					await updateMessagePayload(paginator.getCurrentPage());
 
 					const reply = await component.reply({
 						embeds: [embed],
@@ -362,7 +366,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 						}
 
 						const isLeft = pageComponent.customId === 'page-left';
-						await updateMessage(isLeft ? paginator.previousPage() : paginator.nextPage());
+						await updateMessagePayload(isLeft ? paginator.previousPage() : paginator.nextPage());
 						await pageComponent.update({ embeds: [embed], components: [actionRow] });
 					}
 
@@ -396,7 +400,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 				const actionRow = new ActionRowBuilder<ButtonBuilder>();
 
-				const updateMessage = (consumers: SelectMenuPaginatorConsumers<Snippet[]>) => {
+				const updateMessagePayload = (consumers: SelectMenuPaginatorConsumers<Snippet[]>) => {
 					const { data, pageLeftButton, pageRightButton } = consumers.asButtons();
 					embed.setDescription(
 						data
@@ -409,7 +413,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 					actionRow.setComponents([pageLeftButton, pageRightButton]);
 				};
 
-				updateMessage(paginator.getCurrentPage());
+				updateMessagePayload(paginator.getCurrentPage());
 
 				const reply = await interaction.reply({
 					embeds: [embed],
@@ -419,7 +423,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 				for await (const [component] of reply.createMessageComponentCollector({ idle: 30_000 })) {
 					const isLeft = component.customId === 'page-left';
-					updateMessage(isLeft ? paginator.previousPage() : paginator.nextPage());
+					updateMessagePayload(isLeft ? paginator.previousPage() : paginator.nextPage());
 					await component.update({ embeds: [embed], components: [actionRow] });
 				}
 

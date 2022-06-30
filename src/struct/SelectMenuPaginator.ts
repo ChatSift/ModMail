@@ -1,5 +1,5 @@
 import { ButtonBuilder, SelectMenuBuilder } from '@discordjs/builders';
-import { ButtonStyle, If } from 'discord.js';
+import { ButtonStyle, If, SelectMenuOptionBuilder } from 'discord.js';
 
 export interface SelectMenuPaginatorOptions<T = unknown> {
 	key: string;
@@ -17,7 +17,10 @@ interface BaseSelectMenuPaginatorData<T = unknown> extends SelectMenuPaginatorSt
 	selectMenu: SelectMenuBuilder;
 }
 
-interface SelectMenuOptionsSelectMenuPaginatorData<T = unknown> extends BaseSelectMenuPaginatorData<T> {}
+interface SelectMenuOptionsSelectMenuPaginatorData<T = unknown> extends BaseSelectMenuPaginatorData<T> {
+	pageLeftOption?: SelectMenuOptionBuilder;
+	pageRightOption?: SelectMenuOptionBuilder;
+}
 
 interface ButtonsSelectMenuPaginatorData<T = unknown> extends BaseSelectMenuPaginatorData<T> {
 	pageLeftButton: ButtonBuilder;
@@ -70,7 +73,7 @@ export class SelectMenuPaginator<Data extends unknown[], Asserted extends boolea
 				return {
 					currentPage,
 					data: slice,
-					selectMenu: new SelectMenuBuilder().setMaxValues(slice.length),
+					selectMenu: new SelectMenuBuilder().setCustomId('select-menu').setMaxValues(slice.length),
 					pageLeftButton: new ButtonBuilder()
 						.setCustomId('page-left')
 						.setStyle(ButtonStyle.Secondary)
@@ -89,15 +92,30 @@ export class SelectMenuPaginator<Data extends unknown[], Asserted extends boolea
 				}
 
 				const { currentPage, data } = this.state;
-				const slice = data.slice(
-					currentPage * this.maxPageLength,
-					currentPage * this.maxPageLength + this.maxPageLength,
-				) as Data;
+				let offset = 0;
+				if (currentPage === 0) {
+					offset++;
+				}
+
+				if (currentPage === this.pageCount - 1) {
+					offset++;
+				}
+
+				const maxPageLength = this.maxPageLength - offset;
+				const slice = data.slice(currentPage * maxPageLength, currentPage * maxPageLength + maxPageLength) as Data;
 
 				return {
 					currentPage,
 					data: slice,
-					selectMenu: new SelectMenuBuilder().setMaxValues(slice.length),
+					pageLeftOption:
+						currentPage === 0
+							? new SelectMenuOptionBuilder().setEmoji({ name: '◀️' }).setValue('page-left')
+							: undefined,
+					pageRightOption:
+						currentPage === this.pageCount - 1
+							? new SelectMenuOptionBuilder().setEmoji({ name: '▶️' }).setValue('page-right')
+							: undefined,
+					selectMenu: new SelectMenuBuilder().setCustomId('select-menu').setMinValues(1).setMaxValues(slice.length),
 				};
 			},
 		};

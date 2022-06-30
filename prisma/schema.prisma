@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,6 +5,13 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model GuildSettings {
+  guildId          String  @id
+  modmailChannelId String?
+  greetingMessage  String?
+  farewellMessage  String?
 }
 
 model SnippetUpdates {
@@ -32,4 +36,60 @@ model Snippet {
   updates       SnippetUpdates[]
 
   @@unique([guildId, name])
+}
+
+model ScheduledThreadClose {
+  threadId      Int      @id
+  thread        Thread   @relation(fields: [threadId], references: [threadId], onDelete: Cascade)
+  scheduledById String
+  silent        Boolean  @default(false)
+  closeAt       DateTime
+}
+
+model ThreadMessage {
+  threadMessageId Int     @id @default(autoincrement())
+  guildId         String
+  threadId        Int
+  thread          Thread  @relation(fields: [threadId], references: [threadId], onDelete: Cascade)
+  userId          String
+  userMessageId   String
+  staffId         String?
+  guildMessageId  String
+}
+
+model Thread {
+  threadId       Int                   @id @default(autoincrement())
+  guildId        String
+  channelId      String
+  userId         String
+  createdById    String
+  createdAt      DateTime              @default(now()) @db.Timestamptz()
+  closedById     String?
+  closedAt       DateTime?             @db.Timestamptz()
+  scheduledClose ScheduledThreadClose?
+  messages       ThreadMessage[]
+  alerts         ThreadReplyAlert[]
+}
+
+model Block {
+  userId    String
+  guildId   String
+  expiresAt DateTime?
+
+  @@id([userId, guildId])
+}
+
+model ThreadOpenAlert {
+  guildId String
+  userId  String
+
+  @@id([guildId, userId])
+}
+
+model ThreadReplyAlert {
+  threadId Int
+  thread   Thread @relation(fields: [threadId], references: [threadId], onDelete: Cascade)
+  userId   String
+
+  @@id([threadId, userId])
 }

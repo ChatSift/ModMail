@@ -3,13 +3,59 @@
 		"success": {
 			"resource_creation": "Successfully created {{ resource }}",
 			"resource_deletion": "Successfully deleted the given {{ resource }}",
-			"resource_update": "Successfully updated the given {{ resource }}"
+			"resource_update": "Successfully updated the given {{ resource }}",
+			"archived": "Thread successfully archived",
+			"blocked": "User successfully blocked",
+			"unblocked": "User successfully unblocked",
+			"alert_global": "You will now be alerted when new threads are opened",
+			"no_alert_global": "You will no longer be alerted when new threads are opened",
+			"alert_thread": "You will now be alerted when the user replies to this thread",
+			"no_alert_thread": "You will no longer be alerted when the user replies to this thread",
+			"opened_thread": "Successfully opened thread"
 		},
 		"errors": {
 			"resource_exists": "A {{ resource }} with that name already exists",
 			"resource_not_found": "The {{ resource }} you are looking for could not be found",
 			"no_resources": "There are no {{ resource }} available",
-			"resource_too_long": "The given {{ snippet }} needs to be {{ length }} characters or less"
+			"resource_too_long": "The given {{ snippet }} needs to be {{ length }} characters or less",
+			"no_guilds": "Could not find your mutual guilds with the bot. This is most likely a bug",
+			"no_thread": "Could not find the channel associated with this thread. This is most likely because an Admin deleted it, opening a new thread with your message.",
+			"thread_creation": "Could not create the needed thread channel. This is likely a miss-configuration caused by an Admin",
+			"thread_exists": "A thread already exists with this user",
+			"invalid_time": "The given time is invalid",
+			"dm_fail": "Failed to send a DM to the user. This is most likely because they have closed their DMs",
+			"no_member": "Member is not currently in the server",
+			"not_own_message": "You are not the author of that message",
+			"user_deleted": "The user appears to have deleted their account",
+			"not_blocked": "User is not blocked",
+			"message_deleted": "Could not expose message, it was likely deleted"
+		}
+	},
+	"thread": {
+		"prompt": {
+			"embed": {
+				"title": "Please select a guild"
+			}
+		},
+		"start": {
+			"embed": {
+				"fields": {
+					"account_created": "📆 Account Created",
+					"joined_server": "📥 Joined Server",
+					"past_modmails": "🗂️ Past Modmails",
+					"opened_by": "🛠️ Opened by"
+				}
+			}
+		},
+		"greeting": {
+			"embed": {
+				"author": "ModMail - Greeting"
+			}
+		},
+		"farewell": {
+			"embed": {
+				"author": "ModMail - Farewell"
+			}
 		}
 	},
 	"commands": {
@@ -88,6 +134,102 @@
 				"description": "List all snippets",
 				"embed": {
 					"title": "Available snippets"
+				}
+			}
+		},
+		"close": {
+			"name": "close",
+			"description": "Close a thread",
+			"options": {
+				"time": {
+					"name": "time",
+					"description": "The amount of time to wait before closing the thread"
+				},
+				"silent": {
+					"name": "silent",
+					"description": "Whether or not to send the farewell message to the user - defaults to true"
+				},
+				"cancel": {
+					"name": "cancel",
+					"description": "Cancels a scheduled thread close"
+				}
+			},
+			"no_scheduled_close": "This thread wasn't scheduled to close",
+			"successfully_canceled": "Successfully canceled the given thread"
+		},
+		"reply": {
+			"name": "reply",
+			"description": "Reply to a thread",
+			"options": {
+				"content": {
+					"name": "content",
+					"description": "The content of the message"
+				},
+				"attachment": {
+					"name": "attachment",
+					"description": "Optional attachment to send"
+				}
+			}
+		},
+		"edit": {
+			"name": "edit",
+			"description": "Edit a reply to a thread",
+			"options": {
+				"id": {
+					"name": "id",
+					"description": "ID of the reply you wish to edit"
+				},
+				"content": {
+					"name": "content",
+					"description": "The new content of the reply"
+				},
+				"attachment": {
+					"name": "attachment",
+					"description": "Optional attachment to edit in"
+				}
+			}
+		},
+		"block": {
+			"name": "block",
+			"description": "Block the user from using ModMail",
+			"options": {
+				"duration": {
+					"name": "duration",
+					"description": "How long this user should be blocked for"
+				}
+			}
+		},
+		"unblock": {
+			"name": "unblock",
+			"description": "Unblock a user",
+			"options": {
+				"user": {
+					"name": "user",
+					"description": "The user to unblock"
+				}
+			}
+		},
+		"expose": {
+			"name": "expose",
+			"description": "Expose a message link for a user's message",
+			"options": {
+				"id": {
+					"name": "id",
+					"description": "The ID of the response to expose"
+				}
+			}
+		},
+		"alert": {
+			"name": "alert",
+			"description": "Recieve alerts for the current thread, or whenever new threads are opened"
+		},
+		"open": {
+			"name": "open",
+			"description": "Open a thread",
+			"options": {
+				"user": {
+					"name": "user",
+					"description": "The user to open a thread with"
 				}
 			}
 		}
