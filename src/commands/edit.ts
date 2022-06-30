@@ -2,8 +2,8 @@ import { PrismaClient } from '@prisma/client';
 import { ApplicationCommandOptionType, ApplicationCommandType, type ChatInputCommandInteraction } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
-import { editThreadMessage } from '../util/editThreadMessage';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
+import { editThreadMessage } from '#util/editThreadMessage';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {

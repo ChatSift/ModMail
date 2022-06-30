@@ -21,7 +21,8 @@
 			"no_member": "Member is not currently in the server",
 			"not_own_message": "You are not the author of that message",
 			"user_deleted": "The user appears to have deleted their account",
-			"not_blocked": "User is not blocked"
+			"not_blocked": "User is not blocked",
+			"message_deleted": "Could not expose message, it was likely deleted"
 		}
 	},
 	"thread": {
@@ -198,6 +199,16 @@
 				"user": {
 					"name": "user",
 					"description": "The user to unblock"
+				}
+			}
+		},
+		"expose": {
+			"name": "expose",
+			"description": "Expose a message link for a user's message",
+			"options": {
+				"id": {
+					"name": "id",
+					"description": "The ID of the response to expose"
 				}
 			}
 		}
