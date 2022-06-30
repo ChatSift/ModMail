@@ -34,6 +34,8 @@
 		}
 	},
 	"thread": {
+		"user_left": "User has left the server",
+		"user_rejoin": "User has rejoiend the server",
 		"prompt": "Please select a guild",
 		"reprompt": "Just to make sure you don't get it wrong, please select the guild this message is meant to go to once more",
 		"start": {
