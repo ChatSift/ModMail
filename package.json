@@ -22,9 +22,9 @@
 		"#util/*": "./dist/util/*.js"
 	},
 	"scripts": {
-		"lint": "eslint src --ext .ts",
+		"lint": "eslint src --ext .ts && prettier --check --plugin-search-dir=. .",
 		"build": "tsc",
-		"format": "prettier --ignore-path .gitignore --ignore-path .prettierignore --write --plugin-search-dir=. .",
+		"format": "prettier --write --plugin-search-dir=. .",
 		"test": "jest",
 		"test:ci": "jest --ci --no-stack-trace --verbose",
 		"test:debug": "jest --runInBand",
