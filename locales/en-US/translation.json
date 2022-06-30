@@ -10,7 +10,8 @@
 			"alert_global": "You will now be alerted when new threads are opened",
 			"no_alert_global": "You will no longer be alerted when new threads are opened",
 			"alert_thread": "You will now be alerted when the user replies to this thread",
-			"no_alert_thread": "You will no longer be alerted when the user replies to this thread"
+			"no_alert_thread": "You will no longer be alerted when the user replies to this thread",
+			"opened_thread": "Successfully opened thread"
 		},
 		"errors": {
 			"resource_exists": "A {{ resource }} with that name already exists",
@@ -20,6 +21,7 @@
 			"no_guilds": "Could not find your mutual guilds with the bot. This is most likely a bug",
 			"no_thread": "Could not find the channel associated with this thread. This is most likely because an Admin deleted it, opening a new thread with your message.",
 			"thread_creation": "Could not create the needed thread channel. This is likely a miss-configuration caused by an Admin",
+			"thread_exists": "A thread already exists with this user",
 			"invalid_time": "The given time is invalid",
 			"dm_fail": "Failed to send a DM to the user. This is most likely because they have closed their DMs",
 			"no_member": "Member is not currently in the server",
@@ -40,7 +42,8 @@
 				"fields": {
 					"account_created": "📆 Account Created",
 					"joined_server": "📥 Joined Server",
-					"past_modmails": "🗂️ Past Modmails"
+					"past_modmails": "🗂️ Past Modmails",
+					"opened_by": "🛠️ Opened by"
 				}
 			}
 		},
@@ -219,6 +222,16 @@
 		"alert": {
 			"name": "alert",
 			"description": "Recieve alerts for the current thread, or whenever new threads are opened"
+		},
+		"open": {
+			"name": "open",
+			"description": "Open a thread",
+			"options": {
+				"user": {
+					"name": "user",
+					"description": "The user to open a thread with"
+				}
+			}
 		}
 	}
 }
