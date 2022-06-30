@@ -80,6 +80,22 @@ CREATE TABLE "Block" (
     CONSTRAINT "Block_pkey" PRIMARY KEY ("userId","guildId")
 );
 
+-- CreateTable
+CREATE TABLE "ThreadOpenAlert" (
+    "guildId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "ThreadOpenAlert_pkey" PRIMARY KEY ("guildId","userId")
+);
+
+-- CreateTable
+CREATE TABLE "ThreadReplyAlert" (
+    "threadId" INTEGER NOT NULL,
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "ThreadReplyAlert_pkey" PRIMARY KEY ("threadId","userId")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Snippet_guildId_name_key" ON "Snippet"("guildId", "name");
 
@@ -91,3 +107,6 @@ ALTER TABLE "ScheduledThreadClose" ADD CONSTRAINT "ScheduledThreadClose_threadId
 
 -- AddForeignKey
 ALTER TABLE "ThreadMessage" ADD CONSTRAINT "ThreadMessage_threadId_fkey" FOREIGN KEY ("threadId") REFERENCES "Thread"("threadId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ThreadReplyAlert" ADD CONSTRAINT "ThreadReplyAlert_threadId_fkey" FOREIGN KEY ("threadId") REFERENCES "Thread"("threadId") ON DELETE CASCADE ON UPDATE CASCADE;

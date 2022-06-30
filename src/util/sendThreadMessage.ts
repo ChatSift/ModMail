@@ -64,7 +64,16 @@ export async function sendThreadMessage({
 		embeds: [embed],
 	};
 
-	const message = interaction ? await interaction.reply({ ...options, fetchReply: true }) : await channel.send(options);
+	const alerts = await prisma.threadReplyAlert.findMany({ where: { threadId } });
+
+	const message = interaction
+		? await interaction.reply({ ...options, fetchReply: true })
+		: await channel.send({
+				...options,
+				content: `${alerts.length ? `Alerts: ${alerts.map((a) => `<@${a.userId}>`).join(' ')}\n` : ''}${
+					options.content ?? ''
+				}`,
+		  });
 
 	const threadMessage = await prisma.threadMessage.create({
 		data: {

@@ -129,9 +129,12 @@ export default class implements Event<typeof Events.MessageCreate> {
 		const pastModmails = await this.prisma.thread.findMany({
 			where: { guildId: guild.id, createdById: message.author.id },
 		});
+		const alerts = await this.prisma.threadOpenAlert.findMany({ where: { guildId: guild.id } });
 
 		const startMessage = await modmail.send({
-			content: member.toString(),
+			content: `${member.toString()}${
+				alerts.length ? `\nAlerts: ${alerts.map((a) => `<@${a.userId}>`).join(' ')}` : ''
+			}`,
 			embeds: [
 				new EmbedBuilder()
 					.setAuthor({ name: member.displayName, iconURL: member.displayAvatarURL() })

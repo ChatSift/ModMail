@@ -68,6 +68,7 @@ model Thread {
   closedAt       DateTime?             @db.Timestamptz()
   scheduledClose ScheduledThreadClose?
   messages       ThreadMessage[]
+  alerts         ThreadReplyAlert[]
 }
 
 model Block {
@@ -76,4 +77,19 @@ model Block {
   expiresAt DateTime?
 
   @@id([userId, guildId])
+}
+
+model ThreadOpenAlert {
+  guildId String
+  userId  String
+
+  @@id([guildId, userId])
+}
+
+model ThreadReplyAlert {
+  threadId Int
+  thread   Thread @relation(fields: [threadId], references: [threadId], onDelete: Cascade)
+  userId   String
+
+  @@id([threadId, userId])
 }
