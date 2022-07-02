@@ -271,6 +271,19 @@
 					"description": "Whether or not to use the simple mode for ModMail threads"
 				}
 			}
+		},
+		"logs": {
+			"name": "logs",
+			"description": "View the logs for a user",
+			"options": {
+				"user": {
+					"name": "user",
+					"description": "The user to view the logs for - defaults to the user that opened the current thread"
+				}
+			},
+			"embed": {
+				"title": "Available case logs"
+			}
 		}
 	}
 }
