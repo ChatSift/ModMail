@@ -12,6 +12,7 @@ import {
 	EmbedBuilder,
 	inlineCode,
 	PermissionsBitField,
+	ThreadChannel,
 	time,
 	TimestampStyles,
 	type APIEmbedField,
@@ -26,6 +27,7 @@ import { getLocalizedProp, type CommandBody, type Command } from '#struct/Comman
 import { SelectMenuPaginator, type SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
 import { diff } from '#util/diff';
 import { ellipsis } from '#util/ellipsis';
+import { sendStaffThreadMessage } from '#util/sendStaffThreadMessage';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
@@ -107,6 +109,25 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 				...getLocalizedProp('name', 'commands.snippets.list.name'),
 				...getLocalizedProp('description', 'commands.snippets.list.description'),
 				type: ApplicationCommandOptionType.Subcommand,
+			},
+			{
+				...getLocalizedProp('name', 'commands.snippets.use.name'),
+				...getLocalizedProp('description', 'commands.snippets.use.description'),
+				type: ApplicationCommandOptionType.Subcommand,
+				options: [
+					{
+						...getLocalizedProp('name', 'commands.snippets.use.options.name.name'),
+						...getLocalizedProp('description', 'commands.snippets.use.options.name.description'),
+						type: ApplicationCommandOptionType.String,
+						required: true,
+						autocomplete: true,
+					},
+					{
+						...getLocalizedProp('name', 'commands.snippets.use.options.anon.name'),
+						...getLocalizedProp('description', 'commands.snippets.use.options.anon.description'),
+						type: ApplicationCommandOptionType.Boolean,
+					},
+				],
 			},
 		],
 	};
@@ -428,6 +449,43 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 				}
 
 				return reply.edit({ components: [] });
+			}
+
+			case 'use': {
+				const thread = await this.prisma.thread.findFirst({
+					where: { channelId: interaction.channelId, closedById: null },
+				});
+				if (!thread) {
+					return interaction.reply(i18next.t('common.errors.no_thread'));
+				}
+
+				const name = interaction.options.getString('name', true);
+				const snippet = await this.prisma.snippet.findFirst({ where: { name, guildId: interaction.guild.id } });
+				if (!snippet) {
+					return interaction.reply(
+						i18next.t('common.errors.resource_not_found', { resource: 'snippet', lng: interaction.locale }),
+					);
+				}
+
+				const anon = interaction.options.getBoolean('anon');
+
+				const member = await interaction.guild.members.fetch(thread.userId).catch(() => null);
+				if (!member) {
+					return i18next.t('common.errors.no_member', { lng: interaction.locale });
+				}
+
+				const settings = await this.prisma.guildSettings.findFirst({ where: { guildId: interaction.guild.id } });
+
+				return sendStaffThreadMessage({
+					content: snippet.content,
+					staff: interaction.member,
+					member,
+					channel: interaction.channel as ThreadChannel,
+					threadId: thread.threadId,
+					simpleMode: settings?.simpleMode ?? false,
+					anon: anon ?? false,
+					interaction,
+				});
 			}
 
 			default: {

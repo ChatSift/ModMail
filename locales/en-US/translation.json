@@ -137,6 +137,20 @@
 				"embed": {
 					"title": "Available snippets"
 				}
+			},
+			"use": {
+				"name": "use",
+				"description": "Use a snippet in response to the current thread",
+				"options": {
+					"name": {
+						"name": "name",
+						"description": "The name of the snippet"
+					},
+					"anon": {
+						"name": "anon",
+						"description": "Wether this should be an anonymous reply or not"
+					}
+				}
 			}
 		},
 		"close": {
@@ -284,6 +298,20 @@
 			"embed": {
 				"title": "Available case logs"
 			}
+		}
+	},
+	"context-menus": {
+		"open": {
+			"name": "Open"
+		},
+		"expose": {
+			"name": "Expose Link"
+		},
+		"reply": {
+			"name": "Reply w/ Message"
+		},
+		"reply-anon": {
+			"name": "Reply Anon w/ Message"
 		}
 	}
 }

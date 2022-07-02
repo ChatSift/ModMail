@@ -17,6 +17,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		...getLocalizedProp('name', 'commands.block.name'),
 		...getLocalizedProp('description', 'commands.block.description'),
 		type: ApplicationCommandType.ChatInput,
+		default_member_permissions: '0',
 		dm_permission: false,
 		options: [
 			{

@@ -9,6 +9,7 @@ import {
 	MessageOptions,
 	ThreadChannel,
 	Message,
+	MessageContextMenuCommandInteraction,
 } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
@@ -22,7 +23,7 @@ export interface SendStaffThreadMessageOptions {
 	threadId: number;
 	simpleMode: boolean;
 	anon: boolean;
-	interaction?: ChatInputCommandInteraction<'cached'>;
+	interaction?: ChatInputCommandInteraction<'cached'> | MessageContextMenuCommandInteraction<'cached'>;
 	existing?: { user: Message; guild: Message; replyId: number };
 }
 

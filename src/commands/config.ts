@@ -5,7 +5,6 @@ import {
 	ApplicationCommandType,
 	ChannelType,
 	Client,
-	PermissionsBitField,
 	TextChannel,
 	type ChatInputCommandInteraction,
 } from 'discord.js';
@@ -18,7 +17,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		...getLocalizedProp('name', 'commands.config.name'),
 		...getLocalizedProp('description', 'commands.config.description'),
 		type: ApplicationCommandType.ChatInput,
-		default_member_permissions: new PermissionsBitField(PermissionsBitField.Flags.ManageGuild).toJSON(),
+		default_member_permissions: '0',
 		dm_permission: false,
 		options: [
 			{
