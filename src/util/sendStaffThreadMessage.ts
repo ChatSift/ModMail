@@ -56,14 +56,14 @@ export async function sendStaffThreadMessage({
 			.setDescription(content)
 			.setImage(attachment?.url ?? null)
 			.setFooter({
-				text: `${existing ? `Reply ID: ${existing.replyId} | ` : ''}${member.user.tag} (${member.user.id})`,
-				iconURL: member.user.displayAvatarURL(),
+				text: `${existing ? `Reply ID: ${existing.replyId} | ` : ''}${staff.user.tag} (${staff.user.id})`,
+				iconURL: staff.user.displayAvatarURL(),
 			});
 
 		if (anon) {
-			embed.setAuthor({ name: `${member.guild.name} Team`, iconURL: member.guild.iconURL() ?? undefined });
+			embed.setAuthor({ name: `${staff.guild.name} Team`, iconURL: staff.guild.iconURL() ?? undefined });
 		} else {
-			embed.setAuthor({ name: member.displayName, iconURL: member.displayAvatarURL() });
+			embed.setAuthor({ name: staff.displayName, iconURL: staff.displayAvatarURL() });
 		}
 
 		options.embeds = [embed];
@@ -116,8 +116,8 @@ export async function sendStaffThreadMessage({
 	} else {
 		const [embed] = options.embeds as [EmbedBuilder];
 		embed.setFooter({
-			text: `Reply ID: ${threadMessage.threadMessageId} | ${member.user.tag} (${member.user.id})`,
-			iconURL: member.user.displayAvatarURL(),
+			text: `Reply ID: ${threadMessage.threadMessageId} | ${staff.user.tag} (${staff.user.id})`,
+			iconURL: staff.user.displayAvatarURL(),
 		});
 		options.embeds = [embed];
 	}
