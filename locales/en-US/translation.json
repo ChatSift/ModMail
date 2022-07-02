@@ -170,6 +170,10 @@
 				"attachment": {
 					"name": "attachment",
 					"description": "Optional attachment to send"
+				},
+				"anon": {
+					"name": "anon",
+					"description": "Whether or not to send the message as anonymous - defaults to false"
 				}
 			}
 		},

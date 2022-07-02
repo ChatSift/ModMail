@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import { Client, Events, Message, PartialMessage } from 'discord.js';
+import { Client, Events, Message, PartialMessage, ThreadChannel } from 'discord.js';
 import { singleton } from 'tsyringe';
 import type { Event } from '#struct/Event';
-import { editThreadMessage } from '#util/editThreadMessage';
+import { sendMemberThreadMessage } from '#util/sendMemberThreadMessage';
 
 @singleton()
 export default class implements Event<typeof Events.MessageUpdate> {
@@ -10,7 +10,7 @@ export default class implements Event<typeof Events.MessageUpdate> {
 
 	public constructor(private readonly prisma: PrismaClient, private readonly client: Client<true>) {}
 
-	public async handle(_: Message | PartialMessage, message: Message | PartialMessage) {
+	public async handle(old: Message | PartialMessage, message: Message | PartialMessage) {
 		message = await message.fetch();
 
 		if (message.inGuild() || message.author.bot) {
@@ -26,17 +26,26 @@ export default class implements Event<typeof Events.MessageUpdate> {
 		}
 
 		const guild = this.client.guilds.cache.get(threadMessage.guildId);
-		const member = await guild?.members.fetch(message.author.id);
+		const member = await guild?.members.fetch(message.author.id).catch(() => null);
+		const channel = (await guild?.channels
+			.fetch(threadMessage.thread.channelId)
+			.catch(() => null)) as ThreadChannel | null;
 
-		if (!member) {
+		if (!member || !channel) {
 			return;
 		}
 
-		await editThreadMessage({
-			threadMessage,
-			content: message.content,
-			attachment: message.attachments.first(),
+		const settings = await this.prisma.guildSettings.findFirst({ where: { guildId: member.guild.id } });
+		const existing = await channel.messages.fetch(threadMessage.guildMessageId);
+
+		return sendMemberThreadMessage({
+			userMessage: message,
 			member,
+			channel,
+			threadId: threadMessage.threadId,
+			simpleMode: settings?.simpleMode ?? false,
+			oldContent: old.content,
+			existing,
 		});
 	}
 }

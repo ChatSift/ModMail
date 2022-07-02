@@ -85,7 +85,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			• **modmail channel**: ${configured.modmailChannelId ? `<#${configured.modmailChannelId}>` : 'none'}
 			• **greeting message**: ${configured.greetingMessage ? configured.greetingMessage : 'none'}
 			• **farewell message**: ${configured.farewellMessage ? configured.farewellMessage : 'none'}
-			* **simple mode**: ${configured.simpleMode ? 'enabled' : 'disabled'}
+			• **simple mode**: ${configured.simpleMode ? 'enabled' : 'disabled'}
 		`);
 	}
 }

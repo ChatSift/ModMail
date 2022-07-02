@@ -54,6 +54,7 @@ CREATE TABLE "ThreadMessage" (
     "userMessageId" TEXT NOT NULL,
     "staffId" TEXT,
     "guildMessageId" TEXT NOT NULL,
+    "anon" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "ThreadMessage_pkey" PRIMARY KEY ("threadMessageId")
 );

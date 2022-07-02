@@ -89,7 +89,11 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 						},
 						{
 							name: i18next.t('thread.start.embed.fields.roles'),
-							value: member.roles.cache.map((r) => r.toString()).join(', '),
+							value: member.roles.cache
+								.filter((r) => r.id === interaction.guild.id)
+								.sort((a, b) => b.position - a.position)
+								.map((r) => r.toString())
+								.join(', '),
 							inline: true,
 						},
 					),
