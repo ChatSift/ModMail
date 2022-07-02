@@ -7,7 +7,6 @@ import { getLocalizedProp, type CommandBody, type Command } from '#struct/Comman
 export default class implements Command<ApplicationCommandType.Message> {
 	public readonly interactionOptions: CommandBody<ApplicationCommandType.Message> = {
 		...getLocalizedProp('name', 'context-menus.reply-anon.name'),
-		...getLocalizedProp('description', 'context-menus.reply-anon.description'),
 		type: ApplicationCommandType.Message,
 		default_member_permissions: '0',
 		dm_permission: false,
