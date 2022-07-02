@@ -184,7 +184,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 						{
 							name: i18next.t('thread.start.embed.fields.roles'),
 							value: member.roles.cache
-								.filter((r) => r.id === guild.id)
+								.filter((r) => r.id !== guild.id)
 								.sort((a, b) => b.position - a.position)
 								.map((r) => r.toString())
 								.join(', '),
