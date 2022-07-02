@@ -51,7 +51,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			},
 		});
 		if (!thread) {
-			return interaction.reply(i18next.t('commands.errors.no_thread'));
+			return interaction.reply(i18next.t('common.errors.no_thread'));
 		}
 
 		const cancel = interaction.options.getBoolean('cancel') ?? false;

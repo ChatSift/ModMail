@@ -37,7 +37,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			where: { channelId: interaction.channelId, closedById: null },
 		});
 		if (!thread) {
-			return interaction.reply(i18next.t('commands.errors.no_thread'));
+			return interaction.reply(i18next.t('common.errors.no_thread'));
 		}
 
 		const rawTime = interaction.options.getString('duration');
@@ -61,7 +61,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 		const user = await this.client.users.fetch(thread.userId).catch(() => null);
 		if (!user) {
-			return interaction.reply(i18next.t('commands.errors.user_deleted'));
+			return interaction.reply(i18next.t('common.errors.user_deleted'));
 		}
 
 		const base = {

@@ -25,7 +25,6 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 				...getLocalizedProp('description', 'commands.reply.options.content.description'),
 				type: ApplicationCommandOptionType.String,
 				required: true,
-				autocomplete: true,
 			},
 			{
 				...getLocalizedProp('name', 'commands.reply.options.attachment.name'),
@@ -61,7 +60,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			where: { channelId: interaction.channelId, closedById: null },
 		});
 		if (!thread) {
-			return interaction.reply(i18next.t('commands.errors.no_thread'));
+			return interaction.reply(i18next.t('common.errors.no_thread'));
 		}
 
 		const content = interaction.options.getString('content', true);
@@ -70,7 +69,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 		const member = await interaction.guild.members.fetch(thread.userId).catch(() => null);
 		if (!member) {
-			return i18next.t('commands.errors.no_member', { lng: interaction.locale });
+			return i18next.t('common.errors.no_member', { lng: interaction.locale });
 		}
 
 		const settings = await this.prisma.guildSettings.findFirst({ where: { guildId: interaction.guild.id } });

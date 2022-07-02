@@ -44,21 +44,19 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 				where: { channelId: interaction.channelId, closedById: null },
 			});
 			if (!thread) {
-				return interaction.reply(i18next.t('commands.errors.no_thread', { lng: interaction.locale }));
+				return interaction.reply(i18next.t('common.errors.no_thread', { lng: interaction.locale }));
 			}
 
 			user = await this.client.users.fetch(thread.userId).catch(() => null);
 		}
 
 		if (!user) {
-			return interaction.reply(i18next.t('commands.errors.user_deleted', { lng: interaction.locale }));
+			return interaction.reply(i18next.t('common.errors.user_deleted', { lng: interaction.locale }));
 		}
 
 		const threads = await this.prisma.thread.findMany({ where: { userId: user.id } });
 		if (!threads.length) {
-			return interaction.reply(
-				i18next.t('commands.errors.no_resources', { resource: 'logs', lng: interaction.locale }),
-			);
+			return interaction.reply(i18next.t('common.errors.no_resources', { resource: 'logs', lng: interaction.locale }));
 		}
 
 		const paginator = new SelectMenuPaginator({

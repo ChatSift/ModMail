@@ -52,7 +52,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		const guildId = interaction.options.getString('guild', true);
 		const guild = this.client.guilds.cache.get(guildId);
 		if (!guild) {
-			return interaction.reply(i18next.t('commands.errors.no_guild'));
+			return interaction.reply(i18next.t('common.errors.no_guild'));
 		}
 
 		this.modmailMessageCreateHandler.overwriteUserSelection(interaction.user.id, guild.id);

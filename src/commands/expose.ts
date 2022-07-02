@@ -33,14 +33,14 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			where: { channelId: interaction.channelId, closedById: null },
 		});
 		if (!thread) {
-			return interaction.reply(i18next.t('commands.errors.no_thread'));
+			return interaction.reply(i18next.t('common.errors.no_thread'));
 		}
 
 		const id = interaction.options.getInteger('id', true);
 		const threadMessage = await this.prisma.threadMessage.findFirst({ where: { thread, threadMessageId: id } });
 		if (!threadMessage) {
 			return interaction.reply(
-				i18next.t('commands.errors.resource_not_found', { resource: 'message', lng: interaction.locale }),
+				i18next.t('common.errors.resource_not_found', { resource: 'message', lng: interaction.locale }),
 			);
 		}
 
@@ -49,7 +49,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		const message = await channel.messages.fetch(threadMessage.userMessageId).catch(() => null);
 
 		if (!message) {
-			return interaction.reply(i18next.t('commands.errors.message_deleted', { lng: interaction.locale }));
+			return interaction.reply(i18next.t('common.errors.message_deleted', { lng: interaction.locale }));
 		}
 
 		return interaction.reply(message.url);
