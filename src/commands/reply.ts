@@ -10,7 +10,7 @@ import {
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
-import { sendThreadMessage } from '#util/sendThreadMessage';
+import { sendStaffThreadMessage } from '#util/sendStaffThreadMessage';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
@@ -31,6 +31,11 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 				...getLocalizedProp('name', 'commands.reply.options.attachment.name'),
 				...getLocalizedProp('description', 'commands.reply.options.attachment.description'),
 				type: ApplicationCommandOptionType.Attachment,
+			},
+			{
+				...getLocalizedProp('name', 'commands.reply.options.anon.name'),
+				...getLocalizedProp('description', 'commands.reply.options.anon.description'),
+				type: ApplicationCommandOptionType.Boolean,
 			},
 		],
 	};
@@ -59,20 +64,26 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			return interaction.reply(i18next.t('commands.errors.no_thread'));
 		}
 
+		const content = interaction.options.getString('content', true);
 		const attachment = interaction.options.getAttachment('attachment');
+		const anon = interaction.options.getBoolean('anon');
 
 		const member = await interaction.guild.members.fetch(thread.userId).catch(() => null);
 		if (!member) {
 			return i18next.t('commands.errors.no_member', { lng: interaction.locale });
 		}
 
-		await sendThreadMessage({
-			threadId: thread.threadId,
-			content: interaction.options.getString('content', true),
+		const settings = await this.prisma.guildSettings.findFirst({ where: { guildId: interaction.guild.id } });
+
+		await sendStaffThreadMessage({
+			content,
 			attachment,
+			staff: interaction.member,
 			member,
 			channel: interaction.channel as ThreadChannel,
-			staffId: interaction.user.id,
+			threadId: thread.threadId,
+			simpleMode: settings?.simpleMode ?? false,
+			anon: anon ?? false,
 			interaction,
 		});
 	}

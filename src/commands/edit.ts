@@ -1,9 +1,15 @@
 import { PrismaClient } from '@prisma/client';
-import { ApplicationCommandOptionType, ApplicationCommandType, type ChatInputCommandInteraction } from 'discord.js';
+import {
+	ApplicationCommandOptionType,
+	ApplicationCommandType,
+	Client,
+	ThreadChannel,
+	type ChatInputCommandInteraction,
+} from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
-import { editThreadMessage } from '#util/editThreadMessage';
+import { sendStaffThreadMessage } from '#util/sendStaffThreadMessage';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
@@ -33,7 +39,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		],
 	};
 
-	public constructor(private readonly prisma: PrismaClient) {}
+	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		const thread = await this.prisma.thread.findFirst({
@@ -52,7 +58,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		}
 
 		if (threadMessage.staffId !== interaction.user.id) {
-			return interaction.reply(i18next.t('not_own_message', { lng: interaction.locale }));
+			return interaction.reply(i18next.t('common.errors.not_own_message', { lng: interaction.locale }));
 		}
 
 		const content = interaction.options.getString('content', true);
@@ -63,12 +69,22 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			return interaction.reply(i18next.t('commands.errors.no_member', { lng: interaction.locale }));
 		}
 
-		await editThreadMessage({
-			threadMessage,
+		const settings = await this.prisma.guildSettings.findFirst({ where: { guildId: interaction.guild.id } });
+		const guildMessage = await (interaction.channel as ThreadChannel).messages.fetch(threadMessage.guildMessageId);
+		const userChannel = await member.createDM();
+		const userMessage = await userChannel.messages.fetch(threadMessage.userMessageId);
+
+		await sendStaffThreadMessage({
 			content,
 			attachment,
+			staff: interaction.member,
 			member,
+			channel: interaction.channel as ThreadChannel,
+			threadId: thread.threadId,
+			simpleMode: settings?.simpleMode ?? false,
+			anon: threadMessage.anon,
 			interaction,
+			existing: { guild: guildMessage, user: userMessage, replyId: threadMessage.threadMessageId },
 		});
 	}
 }

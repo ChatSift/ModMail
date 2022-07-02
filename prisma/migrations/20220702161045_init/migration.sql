@@ -4,6 +4,7 @@ CREATE TABLE "GuildSettings" (
     "modmailChannelId" TEXT,
     "greetingMessage" TEXT,
     "farewellMessage" TEXT,
+    "simpleMode" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "GuildSettings_pkey" PRIMARY KEY ("guildId")
 );
@@ -53,6 +54,7 @@ CREATE TABLE "ThreadMessage" (
     "userMessageId" TEXT NOT NULL,
     "staffId" TEXT,
     "guildMessageId" TEXT NOT NULL,
+    "anon" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "ThreadMessage_pkey" PRIMARY KEY ("threadMessageId")
 );

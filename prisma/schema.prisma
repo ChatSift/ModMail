@@ -12,6 +12,7 @@ model GuildSettings {
   modmailChannelId String?
   greetingMessage  String?
   farewellMessage  String?
+  simpleMode       Boolean @default(false)
 }
 
 model SnippetUpdates {
@@ -55,6 +56,7 @@ model ThreadMessage {
   userMessageId   String
   staffId         String?
   guildMessageId  String
+  anon            Boolean @default(false)
 }
 
 model Thread {

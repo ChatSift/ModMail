@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import {
 	ActionRowBuilder,
+	bold,
 	Client,
 	Collection,
 	Colors,
@@ -9,6 +10,7 @@ import {
 	Events,
 	Guild,
 	Message,
+	MessageOptions,
 	SelectMenuBuilder,
 	SelectMenuOptionBuilder,
 	TextChannel,
@@ -21,7 +23,7 @@ import { singleton } from 'tsyringe';
 import type { Event } from '#struct/Event';
 import { SelectMenuPaginator, SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
 import { getUserGuilds } from '#util/getUserGuilds';
-import { sendThreadMessage } from '#util/sendThreadMessage';
+import { sendMemberThreadMessage } from '#util/sendMemberThreadMessage';
 
 @singleton()
 export default class implements Event<typeof Events.MessageCreate> {
@@ -136,14 +138,12 @@ export default class implements Event<typeof Events.MessageCreate> {
 		if (existingThread) {
 			const channel = guild.channels.cache.get(existingThread.channelId) as ThreadChannel | undefined;
 			if (channel) {
-				return sendThreadMessage({
-					content: message.content,
-					stickers: message.stickers,
-					attachment: message.attachments.first(),
-					member,
+				return sendMemberThreadMessage({
 					userMessage: message,
+					member,
 					channel,
 					threadId: existingThread.threadId,
+					simpleMode: settings.simpleMode,
 				});
 			}
 
@@ -179,6 +179,16 @@ export default class implements Event<typeof Events.MessageCreate> {
 						{
 							name: i18next.t('thread.start.embed.fields.past_modmails'),
 							value: pastModmails.length.toString(),
+							inline: true,
+						},
+						{
+							name: i18next.t('thread.start.embed.fields.roles'),
+							value: member.roles.cache
+								.filter((r) => r.id === guild.id)
+								.sort((a, b) => b.position - a.position)
+								.map((r) => r.toString())
+								.join(', '),
+							inline: true,
 						},
 					),
 			],
@@ -197,27 +207,34 @@ export default class implements Event<typeof Events.MessageCreate> {
 			},
 		});
 
-		await sendThreadMessage({
-			threadId: thread.threadId,
-			content: message.content,
-			stickers: message.stickers,
-			attachment: message.attachments.first(),
-			member,
+		await sendMemberThreadMessage({
 			userMessage: message,
+			member,
 			channel: threadChannel,
+			threadId: thread.threadId,
+			simpleMode: settings.simpleMode,
 		});
 
 		if (settings.greetingMessage) {
-			const greetingEmbed = new EmbedBuilder()
-				.setAuthor({
-					name: i18next.t('thread.greeting.embed.author'),
-					iconURL: this.client.user.displayAvatarURL(),
-				})
-				.setDescription(settings.greetingMessage)
-				.setColor(Colors.NotQuiteBlack);
+			const options: MessageOptions = {};
+			if (settings.simpleMode) {
+				options.content = `⚙️ ${bold(`${guild.name} Staff:`)} ${settings.greetingMessage}`;
+			} else {
+				const greetingEmbed = new EmbedBuilder()
+					.setAuthor({
+						name: i18next.t('thread.greeting.embed.author', {
+							guild: guild.name,
+							iconURL: member.guild.iconURL() ?? undefined,
+						}),
+						iconURL: this.client.user.displayAvatarURL(),
+					})
+					.setDescription(settings.greetingMessage)
+					.setColor(Colors.NotQuiteBlack);
+				options.embeds = [greetingEmbed];
+			}
 
-			await message.channel.send({ embeds: [greetingEmbed] });
-			await threadChannel.send({ embeds: [greetingEmbed] });
+			await message.channel.send(options);
+			await threadChannel.send(options);
 		}
 	}
 }

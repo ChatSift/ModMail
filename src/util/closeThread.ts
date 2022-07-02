@@ -1,6 +1,6 @@
-import { EmbedBuilder } from '@discordjs/builders';
+import { EmbedBuilder, bold } from '@discordjs/builders';
 import { PrismaClient, Thread } from '@prisma/client';
-import { Client, Colors, ThreadChannel } from 'discord.js';
+import { Colors, MessageOptions, ThreadChannel } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
 
@@ -12,34 +12,35 @@ export interface CloseThreadOptions {
 
 export async function closeThread({ thread, channel, silent }: CloseThreadOptions) {
 	const prisma = container.resolve(PrismaClient);
-	const client = container.resolve<Client<true>>(Client);
 
 	if (!silent) {
 		const settings = await prisma.guildSettings.findFirst({ where: { guildId: thread.guildId } });
-		const farewellEmbed = new EmbedBuilder()
-			.setAuthor({
-				name: i18next.t('thread.farewell.embed.author'),
-				iconURL: client.user.displayAvatarURL(),
-			})
-			.setDescription(
-				settings?.farewellMessage ??
-					'This thread has been closed. You can start a new one in the future by sending another message here.',
-			)
-			.setColor(Colors.NotQuiteBlack);
+		const farewellMessage =
+			settings?.farewellMessage ??
+			'This thread has been closed. You can start a new one in the future by sending another message here.';
 
-		if (!settings?.farewellMessage) {
-			farewellEmbed.setFooter({
-				text: "Note: The above wasn't set to the user as you do not have a farewell message set. It is merely a placeholder",
-			});
+		const options: MessageOptions = {};
+		if (settings?.simpleMode) {
+			options.content = `⚙️ ${bold(`${channel.guild.name} Staff:`)} ${farewellMessage}`;
+		} else {
+			const farewellEmbed = new EmbedBuilder()
+				.setAuthor({
+					name: i18next.t('thread.farewell.embed.author', { guild: channel.guild.name }),
+					iconURL: channel.guild.iconURL() ?? undefined,
+				})
+				.setDescription(farewellMessage)
+				.setColor(Colors.NotQuiteBlack);
+
+			options.embeds = [farewellEmbed];
 		}
 
-		await channel.send({ embeds: [farewellEmbed] });
+		await channel.send(options);
 
 		if (settings?.farewellMessage) {
 			const member = await channel.guild.members.fetch(thread.userId).catch(() => null);
 			if (member) {
 				try {
-					await member.send({ embeds: [farewellEmbed] });
+					await member.send(options);
 				} catch {
 					return channel.send(i18next.t('common.errors.dm_fail'));
 				}
