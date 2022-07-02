@@ -179,6 +179,12 @@ export default class implements Event<typeof Events.MessageCreate> {
 						{
 							name: i18next.t('thread.start.embed.fields.past_modmails'),
 							value: pastModmails.length.toString(),
+							inline: true,
+						},
+						{
+							name: i18next.t('thread.start.embed.fields.roles'),
+							value: member.roles.cache.map((r) => r.toString()).join(', '),
+							inline: true,
 						},
 					),
 			],
@@ -210,7 +216,10 @@ export default class implements Event<typeof Events.MessageCreate> {
 		if (settings.greetingMessage) {
 			const greetingEmbed = new EmbedBuilder()
 				.setAuthor({
-					name: i18next.t('thread.greeting.embed.author'),
+					name: i18next.t('thread.greeting.embed.author', {
+						guild: guild.name,
+						iconURL: member.guild.iconURL() ?? undefined,
+					}),
 					iconURL: this.client.user.displayAvatarURL(),
 				})
 				.setDescription(settings.greetingMessage)

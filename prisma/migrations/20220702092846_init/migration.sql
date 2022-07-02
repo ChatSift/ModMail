@@ -4,6 +4,7 @@ CREATE TABLE "GuildSettings" (
     "modmailChannelId" TEXT,
     "greetingMessage" TEXT,
     "farewellMessage" TEXT,
+    "simpleMode" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "GuildSettings_pkey" PRIMARY KEY ("guildId")
 );

@@ -13,7 +13,6 @@ import {
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
-import { durationAutoComplete } from '#util/durationAutoComplete';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
@@ -33,8 +32,6 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 	};
 
 	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
-
-	public handleAutocomplete = durationAutoComplete;
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		const settings = await this.prisma.guildSettings.findFirst({ where: { guildId: interaction.guild.id } });
@@ -88,6 +85,11 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 						{
 							name: i18next.t('thread.start.embed.fields.opened_by'),
 							value: interaction.user.toString(),
+							inline: true,
+						},
+						{
+							name: i18next.t('thread.start.embed.fields.roles'),
+							value: member.roles.cache.map((r) => r.toString()).join(', '),
 							inline: true,
 						},
 					),

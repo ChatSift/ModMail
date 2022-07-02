@@ -23,6 +23,7 @@ export interface SendThreadMessageOptions {
 	staffId?: string | null;
 	interaction?: ChatInputCommandInteraction<'cached'>;
 	threadId: number;
+	anon?: boolean;
 }
 
 export async function sendThreadMessage({
@@ -35,6 +36,7 @@ export async function sendThreadMessage({
 	staffId,
 	interaction,
 	threadId,
+	anon,
 }: SendThreadMessageOptions) {
 	const prisma = container.resolve(PrismaClient);
 
@@ -45,11 +47,17 @@ export async function sendThreadMessage({
 	}
 
 	const embed = new EmbedBuilder()
-		.setAuthor({ name: member.displayName, iconURL: member.displayAvatarURL() })
-		.setFooter({ text: `${member.user.tag} (${member.user.id})`, iconURL: member.user.displayAvatarURL() })
 		.setColor(staffId ? Colors.Blurple : Colors.Green)
 		.setDescription(content)
 		.setImage(attachment?.url ?? null);
+
+	if (anon) {
+		embed.setAuthor({ name: `${member.guild.name} Team`, iconURL: member.guild.iconURL() ?? undefined });
+	} else {
+		embed
+			.setAuthor({ name: member.displayName, iconURL: member.displayAvatarURL() })
+			.setFooter({ text: `${member.user.tag} (${member.user.id})`, iconURL: member.user.displayAvatarURL() });
+	}
 
 	if (staffId) {
 		try {

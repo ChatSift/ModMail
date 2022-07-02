@@ -1,6 +1,6 @@
 import { EmbedBuilder } from '@discordjs/builders';
 import { PrismaClient, Thread } from '@prisma/client';
-import { Client, Colors, ThreadChannel } from 'discord.js';
+import { Colors, ThreadChannel } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
 
@@ -12,14 +12,13 @@ export interface CloseThreadOptions {
 
 export async function closeThread({ thread, channel, silent }: CloseThreadOptions) {
 	const prisma = container.resolve(PrismaClient);
-	const client = container.resolve<Client<true>>(Client);
 
 	if (!silent) {
 		const settings = await prisma.guildSettings.findFirst({ where: { guildId: thread.guildId } });
 		const farewellEmbed = new EmbedBuilder()
 			.setAuthor({
-				name: i18next.t('thread.farewell.embed.author'),
-				iconURL: client.user.displayAvatarURL(),
+				name: i18next.t('thread.farewell.embed.author', { guild: channel.guild.name }),
+				iconURL: channel.guild.iconURL() ?? undefined,
 			})
 			.setDescription(
 				settings?.farewellMessage ??

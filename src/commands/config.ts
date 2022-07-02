@@ -37,6 +37,11 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 				...getLocalizedProp('description', 'commands.config.options.farewell.description'),
 				type: ApplicationCommandOptionType.String,
 			},
+			{
+				...getLocalizedProp('name', 'commands.config.options.simple_mode.name'),
+				...getLocalizedProp('description', 'commands.config.options.simple_mode.description'),
+				type: ApplicationCommandOptionType.Boolean,
+			},
 		],
 	};
 
@@ -52,6 +57,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		const channel = interaction.options.getChannel('modmail-channel') as TextChannel | null;
 		const greeting = interaction.options.getString('greeting');
 		const farewell = interaction.options.getString('farewell');
+		const simple = interaction.options.getBoolean('simple-mode');
 
 		if (channel) {
 			settings.modmailChannelId = channel.id;
@@ -65,6 +71,10 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			settings.farewellMessage = farewell;
 		}
 
+		if (simple != null) {
+			settings.simpleMode = simple;
+		}
+
 		const configured = await this.prisma.guildSettings.upsert({
 			create: { guildId: interaction.guild.id, ...settings },
 			update: settings,
@@ -75,6 +85,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			• **modmail channel**: ${configured.modmailChannelId ? `<#${configured.modmailChannelId}>` : 'none'}
 			• **greeting message**: ${configured.greetingMessage ? configured.greetingMessage : 'none'}
 			• **farewell message**: ${configured.farewellMessage ? configured.farewellMessage : 'none'}
+			* **simple mode**: ${configured.simpleMode ? 'enabled' : 'disabled'}
 		`);
 	}
 }
