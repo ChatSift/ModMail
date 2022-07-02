@@ -4,7 +4,6 @@ import { singleton } from 'tsyringe';
 export class Env {
 	public readonly discordToken = process.env.DISCORD_TOKEN!;
 	public readonly discordClientId = process.env.DISCORD_CLIENT_ID!;
-	public readonly testGuildIds = process.env.TEST_GUILD_IDS?.split(',');
 	public readonly isProd = process.env.NODE_ENV === 'prod';
 	public readonly deploySlashCommands = Boolean(process.env.DEPLOY);
 	public readonly debugJobs = process.env.DEBUG_JOBS === 'true';
