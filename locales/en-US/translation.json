@@ -244,6 +244,24 @@
 				}
 			},
 			"success": "Succesfully switched to the given guild"
+		},
+		"config": {
+			"name": "config",
+			"description": "Manage your server's configuration",
+			"options": {
+				"modmail_channel": {
+					"name": "modmail-channel",
+					"description": "The channel your modmail threads should be going to"
+				},
+				"greeting": {
+					"name": "greeting",
+					"description": "The initial message to send to the user when they open a new thread"
+				},
+				"farewell": {
+					"name": "farewell",
+					"description": "The message to send to the user when a thread is closed"
+				}
+			}
 		}
 	}
 }

@@ -2230,6 +2230,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/common-tags@npm:^1.8.1":
+  version: 1.8.1
+  resolution: "@types/common-tags@npm:1.8.1"
+  checksum: bec6f68c8c434834380abd1dc057aa6ba26661bb0c65c700b65049e9b104d7be96a987d93dbe8726be68554a23a52514a6967d8903fdb51fb8c78cf909d1e4c1
+  languageName: node
+  linkType: hard
+
 "@types/eslint@npm:^8.4.2":
   version: 8.4.2
   resolution: "@types/eslint@npm:8.4.2"
@@ -3279,7 +3286,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"common-tags@npm:^1.4.0":
+"common-tags@npm:^1.4.0, common-tags@npm:^1.8.2":
   version: 1.8.2
   resolution: "common-tags@npm:1.8.2"
   checksum: 767a6255a84bbc47df49a60ab583053bb29a7d9687066a18500a516188a062c4e4cd52de341f22de0b07062e699b1b8fe3cfa1cb55b241cb9301aeb4f45b4dff
@@ -6048,6 +6055,7 @@ __metadata:
     "@naval-base/ms": ^3.1.0
     "@prisma/client": ^3.15.1
     "@sapphire/async-queue": ^1.3.1
+    "@types/common-tags": ^1.8.1
     "@types/i18next-fs-backend": ^1.1.2
     "@types/jest": ^27.5.2
     "@types/node": ^16.11.40
@@ -6057,6 +6065,7 @@ __metadata:
     babel-plugin-const-enum: ^1.2.0
     babel-plugin-transform-typescript-metadata: ^0.3.2
     bree: ^9.0.1
+    common-tags: ^1.8.2
     discord.js: dev
     dotenv-cli: ^5.1.0
     eslint: ^8.17.0
