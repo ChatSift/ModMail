@@ -32,14 +32,14 @@ export default class implements Command<ApplicationCommandType.User> {
 
 		const modmail = interaction.guild.channels.cache.get(settings.modmailChannelId) as TextChannel;
 		const existingThread = await this.prisma.thread.findFirst({
-			where: { guildId: interaction.guild.id, userId: interaction.user.id, closedById: null },
+			where: { guildId: interaction.guild.id, userId: interaction.targetUser.id, closedById: null },
 		});
 
 		if (existingThread) {
 			return interaction.reply(i18next.t('common.errors.thread_exists', { lng: interaction.locale }));
 		}
 
-		const member = await interaction.guild.members.fetch(interaction.user).catch(() => null);
+		const member = await interaction.guild.members.fetch(interaction.targetUser).catch(() => null);
 		if (!member) {
 			return interaction.reply(i18next.t('common.errors.no_member', { lng: interaction.locale }));
 		}
