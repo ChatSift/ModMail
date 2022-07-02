@@ -29,6 +29,10 @@ export default class implements Command<ApplicationCommandType.Message> {
 			return i18next.t('common.errors.no_member', { lng: interaction.locale });
 		}
 
+		if (!interaction.targetMessage.content) {
+			return interaction.reply(i18next.t('common.errors.no_content', { lng: interaction.locale }));
+		}
+
 		const settings = await this.prisma.guildSettings.findFirst({ where: { guildId: interaction.guild.id } });
 
 		await sendStaffThreadMessage({
