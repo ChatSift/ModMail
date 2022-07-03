@@ -35,11 +35,12 @@ export default class implements Command<ApplicationCommandType.Message> {
 		const user = await this.client.users.fetch(thread.userId);
 		const channel = await user.createDM();
 		const message = await channel.messages.fetch(threadMessage.userMessageId).catch(() => null);
+		const guildMessage = await interaction.channel!.messages.fetch(threadMessage.guildMessageId);
 
 		if (!message) {
 			return interaction.reply(i18next.t('common.errors.message_deleted', { lng: interaction.locale }));
 		}
 
-		return interaction.reply(message.url);
+		return interaction.reply({ content: message.url, embeds: guildMessage.embeds });
 	}
 }
