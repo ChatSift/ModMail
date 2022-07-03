@@ -35,7 +35,9 @@
 			"no_content": "Messages require content to be used as replies",
 			"no_results": "No server found",
 			"reserved_name": "That name cannot be used, as its reserved for internal purposes",
-			"resource_limit_reached": "You have reached the limit of {{ limit }} {{ resource }}s"
+			"resource_limit_reached": "You have reached the limit of {{ limit }} {{ resource }}s",
+			"no_args": "You need to provide at least {{ count }} arguments to use this command",
+			"arg_conflict": "You cannot provide both {{ first }} and {{ second }}"
 		}
 	},
 	"snippet_command": {
@@ -206,6 +208,10 @@
 				"attachment": {
 					"name": "attachment",
 					"description": "Optional attachment to edit in"
+				},
+				"clear_attachment": {
+					"name": "clear-attachment",
+					"description": "Clears the attachment of the reply"
 				}
 			}
 		},

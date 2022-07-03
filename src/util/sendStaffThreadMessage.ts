@@ -50,6 +50,9 @@ export async function sendStaffThreadMessage({
 		)} ${content}`;
 		if (attachment) {
 			options.files = [attachment];
+		} else {
+			options.files = [];
+			options.attachments = [];
 		}
 	} else {
 		const embed = new EmbedBuilder()

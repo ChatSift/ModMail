@@ -37,6 +37,11 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 				...getLocalizedProp('description', 'commands.edit.options.attachment.description'),
 				type: ApplicationCommandOptionType.Attachment,
 			},
+			{
+				...getLocalizedProp('name', 'commands.edit.options.clear_attachment.name'),
+				...getLocalizedProp('description', 'commands.edit.options.clear_attachment.description'),
+				type: ApplicationCommandOptionType.Boolean,
+			},
 		],
 	};
 
@@ -64,6 +69,17 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 		const content = interaction.options.getString('content', true);
 		const attachment = interaction.options.getAttachment('attachment');
+		const clearAttachment = interaction.options.getBoolean('clear-attachment');
+
+		if (attachment && clearAttachment) {
+			return interaction.reply(
+				i18next.t('common.errors.arg_conflict', {
+					first: 'attachment',
+					second: 'clear-attachment',
+					lng: interaction.locale,
+				}),
+			);
+		}
 
 		const member = await interaction.guild.members.fetch(thread.userId).catch(() => null);
 		if (!member) {
@@ -76,8 +92,8 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		const userMessage = await userChannel.messages.fetch(threadMessage.userMessageId);
 
 		await sendStaffThreadMessage({
-			content,
-			attachment,
+			content: content,
+			attachment: clearAttachment ? null : attachment,
 			staff: interaction.member,
 			member,
 			channel: interaction.channel as ThreadChannel,
