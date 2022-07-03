@@ -9,23 +9,29 @@ export default class implements Event<typeof Events.InteractionCreate> {
 
 	public constructor(private readonly commandHandler: CommandHandler) {}
 
-	public handle(interaction: AnyInteraction) {
-		if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
-			return this.commandHandler.handleAutocomplete(interaction);
-		}
-
-		if (interaction.type === InteractionType.MessageComponent) {
-			if (!interaction.inCachedGuild()) {
-				return;
+	public async handle(interaction: AnyInteraction) {
+		switch (interaction.type) {
+			case InteractionType.ApplicationCommandAutocomplete: {
+				await this.commandHandler.handleAutocomplete(interaction);
+				break;
 			}
 
-			return this.commandHandler.handleMessageComponent(interaction);
-		}
+			case InteractionType.MessageComponent: {
+				if (interaction.inCachedGuild()) {
+					await this.commandHandler.handleMessageComponent(interaction);
+				}
 
-		if (interaction.type === InteractionType.ApplicationCommand) {
-			return this.commandHandler.handleCommand(interaction);
-		}
+				break;
+			}
 
-		console.warn(`Unknown interaction type: ${interaction.type}`);
+			case InteractionType.ApplicationCommand: {
+				await this.commandHandler.handleCommand(interaction);
+				break;
+			}
+
+			default: {
+				console.warn(`Unknown interaction type: ${interaction.type}`);
+			}
+		}
 	}
 }

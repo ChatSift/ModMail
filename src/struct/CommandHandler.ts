@@ -28,7 +28,25 @@ export class CommandHandler {
 	// TODO(DD): Error handling
 	public async handleAutocomplete(interaction: AutocompleteInteraction) {
 		const command = this.commands.get(interaction.commandName);
-		if (!command?.handleAutocomplete) {
+		if (!command) {
+			if (interaction.inCachedGuild()) {
+				const snippets = await this.prisma.snippet.findMany({
+					where: { guildId: interaction.guild.id },
+				});
+
+				const input = interaction.options.getFocused();
+				return interaction.respond(
+					snippets
+						.filter((snippet) => snippet.name.includes(input) || snippet.content.includes(input))
+						.map((snippet) => ({ name: snippet.name, value: snippet.name }))
+						.slice(0, 5),
+				);
+			}
+
+			return;
+		}
+
+		if (!command.handleAutocomplete) {
 			return interaction.respond([]);
 		}
 
