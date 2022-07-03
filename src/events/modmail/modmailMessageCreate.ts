@@ -147,7 +147,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 				});
 			}
 
-			await message.channel.send(i18next.t('common.errors.no_thread', { lng: guild.preferredLocale }));
+			await message.channel.send(i18next.t('common.errors.thread_deleted', { lng: guild.preferredLocale }));
 		}
 
 		const modmail = guild.channels.cache.get(settings.modmailChannelId) as TextChannel;
