@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
@@ -48,29 +49,33 @@ model ScheduledThreadClose {
 }
 
 model ThreadMessage {
-  threadMessageId Int     @id @default(autoincrement())
-  guildId         String
-  threadId        Int
-  thread          Thread  @relation(fields: [threadId], references: [threadId], onDelete: Cascade)
-  userId          String
-  userMessageId   String
-  staffId         String?
-  guildMessageId  String
-  anon            Boolean @default(false)
+  threadMessageId      Int     @id @default(autoincrement())
+  localThreadMessageId Int
+  guildId              String
+  threadId             Int
+  thread               Thread  @relation(fields: [threadId], references: [threadId], onDelete: Cascade)
+  userId               String
+  userMessageId        String
+  staffId              String?
+  guildMessageId       String
+  anon                 Boolean @default(false)
+
+  @@unique([guildId, localThreadMessageId])
 }
 
 model Thread {
-  threadId       Int                   @id @default(autoincrement())
-  guildId        String
-  channelId      String
-  userId         String
-  createdById    String
-  createdAt      DateTime              @default(now()) @db.Timestamptz()
-  closedById     String?
-  closedAt       DateTime?             @db.Timestamptz()
-  scheduledClose ScheduledThreadClose?
-  messages       ThreadMessage[]
-  alerts         ThreadReplyAlert[]
+  threadId                 Int                   @id @default(autoincrement())
+  guildId                  String
+  channelId                String
+  userId                   String
+  createdById              String
+  createdAt                DateTime              @default(now()) @db.Timestamptz()
+  closedById               String?
+  closedAt                 DateTime?             @db.Timestamptz()
+  scheduledClose           ScheduledThreadClose?
+  lastLocalThreadMessageId Int                   @default(0)
+  messages                 ThreadMessage[]
+  alerts                   ThreadReplyAlert[]
 }
 
 model Block {

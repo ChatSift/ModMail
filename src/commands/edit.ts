@@ -51,7 +51,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		}
 
 		const id = interaction.options.getInteger('id', true);
-		const threadMessage = await this.prisma.threadMessage.findFirst({ where: { thread, threadMessageId: id } });
+		const threadMessage = await this.prisma.threadMessage.findFirst({ where: { thread, localThreadMessageId: id } });
 		if (!threadMessage) {
 			return interaction.reply(
 				i18next.t('common.errors.resource_not_found', { resource: 'message', lng: interaction.locale }),
@@ -85,7 +85,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			simpleMode: settings?.simpleMode ?? false,
 			anon: threadMessage.anon,
 			interaction,
-			existing: { guild: guildMessage, user: userMessage, replyId: threadMessage.threadMessageId },
+			existing: { guild: guildMessage, user: userMessage, replyId: threadMessage.localThreadMessageId },
 		});
 	}
 }

@@ -92,32 +92,42 @@ export async function sendStaffThreadMessage({
 		? await interaction.reply({ ...options, fetchReply: true })
 		: await channel.send(options);
 
-	let userMessage;
+	let userMessage: Message;
 	try {
 		userMessage = await member.send(userOptions);
 	} catch {
 		return channel.send(i18next.t('common.errors.dm_fail'));
 	}
 
-	const threadMessage = await prisma.threadMessage.create({
-		data: {
-			guildId: member.guild.id,
-			threadId,
-			userId: member.user.id,
-			userMessageId: userMessage.id,
-			guildMessageId: guildMessage.id,
-			staffId: staff.user.id,
-			anon,
-		},
+	const threadMessage = await prisma.$transaction(async (prisma) => {
+		const { lastLocalThreadMessageId: localThreadMessageId } = await prisma.thread.update({
+			data: {
+				lastLocalThreadMessageId: { increment: 1 },
+			},
+			where: { threadId },
+		});
+
+		return prisma.threadMessage.create({
+			data: {
+				guildId: member.guild.id,
+				localThreadMessageId,
+				threadId,
+				userId: member.user.id,
+				userMessageId: userMessage.id,
+				guildMessageId: guildMessage.id,
+				staffId: staff.user.id,
+				anon,
+			},
+		});
 	});
 
 	// Edit the reply ID in
 	if (simpleMode) {
-		options.content = `${inlineCode(threadMessage.threadMessageId.toString())} ${options.content!}`;
+		options.content = `${inlineCode(threadMessage.localThreadMessageId.toString())} ${options.content!}`;
 	} else {
 		const [embed] = options.embeds as [EmbedBuilder];
 		embed.setFooter({
-			text: `Reply ID: ${threadMessage.threadMessageId} | ${staff.user.tag} (${staff.user.id})`,
+			text: `Reply ID: ${threadMessage.localThreadMessageId} | ${staff.user.tag} (${staff.user.id})`,
 			iconURL: staff.user.displayAvatarURL(),
 		});
 		options.embeds = [embed];

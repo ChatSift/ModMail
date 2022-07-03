@@ -48,6 +48,7 @@ CREATE TABLE "ScheduledThreadClose" (
 -- CreateTable
 CREATE TABLE "ThreadMessage" (
     "threadMessageId" SERIAL NOT NULL,
+    "localThreadMessageId" INTEGER NOT NULL,
     "guildId" TEXT NOT NULL,
     "threadId" INTEGER NOT NULL,
     "userId" TEXT NOT NULL,
@@ -69,6 +70,7 @@ CREATE TABLE "Thread" (
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "closedById" TEXT,
     "closedAt" TIMESTAMPTZ,
+    "lastLocalThreadMessageId" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "Thread_pkey" PRIMARY KEY ("threadId")
 );
@@ -100,6 +102,9 @@ CREATE TABLE "ThreadReplyAlert" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Snippet_guildId_name_key" ON "Snippet"("guildId", "name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ThreadMessage_guildId_localThreadMessageId_key" ON "ThreadMessage"("guildId", "localThreadMessageId");
 
 -- AddForeignKey
 ALTER TABLE "SnippetUpdates" ADD CONSTRAINT "SnippetUpdates_snippetId_fkey" FOREIGN KEY ("snippetId") REFERENCES "Snippet"("snippetId") ON DELETE CASCADE ON UPDATE CASCADE;

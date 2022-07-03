@@ -231,16 +231,6 @@
 				}
 			}
 		},
-		"expose": {
-			"name": "expose",
-			"description": "Expose a message link for a user's message",
-			"options": {
-				"id": {
-					"name": "id",
-					"description": "The ID of the response to expose"
-				}
-			}
-		},
 		"alert": {
 			"name": "alert",
 			"description": "Recieve alerts for the current thread, or whenever new threads are opened"
