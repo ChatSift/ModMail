@@ -2,18 +2,28 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readdirRecurse } from '@chatsift/readdir';
 import { REST } from '@discordjs/rest';
-import { AutocompleteInteraction, CommandInteraction, MessageComponentInteraction, Routes } from 'discord.js';
+import { PrismaClient } from '@prisma/client';
+import {
+	AutocompleteInteraction,
+	ChatInputCommandInteraction,
+	CommandInteraction,
+	MessageComponentInteraction,
+	Routes,
+	ThreadChannel,
+} from 'discord.js';
+import i18next from 'i18next';
 import { container, singleton } from 'tsyringe';
 import type { Command, CommandConstructor } from '#struct/Command';
 import { Component, ComponentConstructor, getComponentInfo } from '#struct/Component';
 import { Env } from '#struct/Env';
+import { sendStaffThreadMessage } from '#util/sendStaffThreadMessage';
 
 @singleton()
 export class CommandHandler {
-	private readonly commands = new Map<string, Command>();
-	private readonly components = new Map<string, Component>();
+	public readonly commands = new Map<string, Command>();
+	public readonly components = new Map<string, Component>();
 
-	public constructor(private readonly env: Env) {}
+	public constructor(private readonly env: Env, private readonly prisma: PrismaClient) {}
 
 	// TODO(DD): Error handling
 	public async handleAutocomplete(interaction: AutocompleteInteraction) {
@@ -39,6 +49,10 @@ export class CommandHandler {
 	public handleCommand(interaction: CommandInteraction) {
 		const command = this.commands.get(interaction.commandName);
 		if (!command) {
+			if (interaction.isChatInputCommand()) {
+				return this.handleSnippetCommand(interaction);
+			}
+
 			return;
 		}
 
@@ -58,6 +72,48 @@ export class CommandHandler {
 		const api = new REST().setToken(this.env.discordToken);
 		const options = [...this.commands.values()].map((command) => command.interactionOptions);
 		await api.put(Routes.applicationCommands(this.env.discordClientId), { body: options });
+	}
+
+	private async handleSnippetCommand(interaction: ChatInputCommandInteraction) {
+		if (!interaction.inCachedGuild()) {
+			return;
+		}
+
+		const thread = await this.prisma.thread.findFirst({
+			where: { channelId: interaction.channelId, closedById: null },
+		});
+		if (!thread) {
+			return interaction.reply(i18next.t('common.errors.no_thread'));
+		}
+
+		const snippet = await this.prisma.snippet.findFirst({
+			where: { name: interaction.commandName, guildId: interaction.guild.id },
+		});
+		if (!snippet) {
+			return interaction.reply(
+				i18next.t('common.errors.resource_not_found', { resource: 'snippet', lng: interaction.locale }),
+			);
+		}
+
+		const anon = interaction.options.getBoolean('anon');
+
+		const member = await interaction.guild.members.fetch(thread.userId).catch(() => null);
+		if (!member) {
+			return i18next.t('common.errors.no_member', { lng: interaction.locale });
+		}
+
+		const settings = await this.prisma.guildSettings.findFirst({ where: { guildId: interaction.guild.id } });
+
+		return sendStaffThreadMessage({
+			content: snippet.content,
+			staff: interaction.member,
+			member,
+			channel: interaction.channel as ThreadChannel,
+			threadId: thread.threadId,
+			simpleMode: settings?.simpleMode ?? false,
+			anon: anon ?? false,
+			interaction,
+		});
 	}
 
 	private async registerCommands(): Promise<void> {

@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma, Snippet, SnippetUpdates } from '@prisma/client';
+import { PrismaClient, Snippet, SnippetUpdates } from '@prisma/client';
 import {
 	ActionRowBuilder,
 	ApplicationCommandOptionType,
@@ -12,7 +12,6 @@ import {
 	EmbedBuilder,
 	inlineCode,
 	PermissionsBitField,
-	ThreadChannel,
 	time,
 	TimestampStyles,
 	type APIEmbedField,
@@ -21,13 +20,12 @@ import {
 	type ChatInputCommandInteraction,
 } from 'discord.js';
 import i18next from 'i18next';
-import { PrismaError } from 'prisma-error-enum';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
+import { CommandHandler } from '#struct/CommandHandler';
 import { SelectMenuPaginator, type SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
 import { diff } from '#util/diff';
 import { ellipsis } from '#util/ellipsis';
-import { sendStaffThreadMessage } from '#util/sendStaffThreadMessage';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
@@ -110,29 +108,14 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 				...getLocalizedProp('description', 'commands.snippets.list.description'),
 				type: ApplicationCommandOptionType.Subcommand,
 			},
-			{
-				...getLocalizedProp('name', 'commands.snippets.use.name'),
-				...getLocalizedProp('description', 'commands.snippets.use.description'),
-				type: ApplicationCommandOptionType.Subcommand,
-				options: [
-					{
-						...getLocalizedProp('name', 'commands.snippets.use.options.name.name'),
-						...getLocalizedProp('description', 'commands.snippets.use.options.name.description'),
-						type: ApplicationCommandOptionType.String,
-						required: true,
-						autocomplete: true,
-					},
-					{
-						...getLocalizedProp('name', 'commands.snippets.use.options.anon.name'),
-						...getLocalizedProp('description', 'commands.snippets.use.options.anon.description'),
-						type: ApplicationCommandOptionType.Boolean,
-					},
-				],
-			},
 		],
 	};
 
-	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
+	public constructor(
+		private readonly prisma: PrismaClient,
+		private readonly client: Client,
+		private readonly commandHandler: CommandHandler,
+	) {}
 
 	public async handleAutocomplete(
 		interaction: AutocompleteInteraction<'cached'>,
@@ -155,6 +138,30 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 				const name = interaction.options.getString('name', true);
 				const content = interaction.options.getString('content', true);
 
+				if (this.commandHandler.commands.has(name)) {
+					return interaction.reply({
+						content: i18next.t('common.errors.reserved_name', { lng: interaction.locale }),
+					});
+				}
+
+				const existing = await this.prisma.snippet.findFirst({ where: { guildId: interaction.guild.id, name } });
+				if (existing) {
+					return interaction.reply({
+						content: i18next.t('common.errors.resource_exists', { resource: 'snippet', lng: interaction.locale }),
+					});
+				}
+
+				const list = await this.prisma.snippet.findMany({ where: { guildId: interaction.guild.id } });
+				if (list.length >= 50) {
+					return interaction.reply({
+						content: i18next.t('common.errors.resource_limit_reached', {
+							resource: 'snippet',
+							limit: 50,
+							lng: interaction.locale,
+						}),
+					});
+				}
+
 				const maxLen = 1900;
 				if (content.length > maxLen) {
 					return interaction.reply({
@@ -166,50 +173,50 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 					});
 				}
 
-				try {
-					await this.prisma.snippet.create({
-						data: {
-							guildId: interaction.guildId,
-							createdById: interaction.member.id,
-							name,
-							content,
+				const command = await interaction.guild.commands.create({
+					name,
+					description: i18next.t('snippet_command.description'),
+					default_member_permissions: '0',
+					dm_permission: false,
+					options: [
+						{
+							...getLocalizedProp('name', 'snippet_command.options.anon.name'),
+							...getLocalizedProp('description', 'snippet_command.options.anon.description'),
+							type: ApplicationCommandOptionType.Boolean,
 						},
-					});
+					],
+				});
 
-					return await interaction.reply({
-						content: i18next.t('common.success.resource_creation', { resource: 'snippet', lng: interaction.locale }),
-					});
-				} catch (error) {
-					if (
-						error instanceof Prisma.PrismaClientKnownRequestError &&
-						error.code === PrismaError.UniqueConstraintViolation
-					) {
-						return interaction.reply({
-							content: i18next.t('common.errors.resource_exists', { resource: 'snippet', lng: interaction.locale }),
-						});
-					}
+				await this.prisma.snippet.create({
+					data: {
+						guildId: interaction.guildId,
+						commandId: command.id,
+						createdById: interaction.member.id,
+						name,
+						content,
+					},
+				});
 
-					throw error;
-				}
+				return interaction.reply({
+					content: i18next.t('common.success.resource_creation', { resource: 'snippet', lng: interaction.locale }),
+				});
 			}
 
 			case 'remove': {
 				const name = interaction.options.getString('name', true);
-
-				try {
-					await this.prisma.snippet.delete({ where: { guildId_name: { guildId: interaction.guildId, name } } });
-					return await interaction.reply({
-						content: i18next.t('common.success.resource_deletion', { resource: 'snippet', lng: interaction.locale }),
+				const existing = await this.prisma.snippet.findFirst({ where: { guildId: interaction.guild.id, name } });
+				if (!existing) {
+					return interaction.reply({
+						content: i18next.t('common.errors.resource_not_found', { resource: 'snippet', lng: interaction.locale }),
 					});
-				} catch (error) {
-					if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === PrismaError.RecordsNotFound) {
-						return interaction.reply({
-							content: i18next.t('common.errors.resource_not_found', { resource: 'snippet', lng: interaction.locale }),
-						});
-					}
-
-					throw error;
 				}
+
+				await this.prisma.snippet.delete({ where: { guildId_name: { guildId: interaction.guildId, name } } });
+				await interaction.guild.commands.delete(existing.commandId).catch(() => null);
+
+				return interaction.reply({
+					content: i18next.t('common.success.resource_deletion', { resource: 'snippet', lng: interaction.locale }),
+				});
 			}
 
 			case 'edit': {
@@ -449,43 +456,6 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 				}
 
 				return reply.edit({ components: [] });
-			}
-
-			case 'use': {
-				const thread = await this.prisma.thread.findFirst({
-					where: { channelId: interaction.channelId, closedById: null },
-				});
-				if (!thread) {
-					return interaction.reply(i18next.t('common.errors.no_thread'));
-				}
-
-				const name = interaction.options.getString('name', true);
-				const snippet = await this.prisma.snippet.findFirst({ where: { name, guildId: interaction.guild.id } });
-				if (!snippet) {
-					return interaction.reply(
-						i18next.t('common.errors.resource_not_found', { resource: 'snippet', lng: interaction.locale }),
-					);
-				}
-
-				const anon = interaction.options.getBoolean('anon');
-
-				const member = await interaction.guild.members.fetch(thread.userId).catch(() => null);
-				if (!member) {
-					return i18next.t('common.errors.no_member', { lng: interaction.locale });
-				}
-
-				const settings = await this.prisma.guildSettings.findFirst({ where: { guildId: interaction.guild.id } });
-
-				return sendStaffThreadMessage({
-					content: snippet.content,
-					staff: interaction.member,
-					member,
-					channel: interaction.channel as ThreadChannel,
-					threadId: thread.threadId,
-					simpleMode: settings?.simpleMode ?? false,
-					anon: anon ?? false,
-					interaction,
-				});
 			}
 
 			default: {

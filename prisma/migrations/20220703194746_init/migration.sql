@@ -25,6 +25,7 @@ CREATE TABLE "SnippetUpdates" (
 CREATE TABLE "Snippet" (
     "snippetId" SERIAL NOT NULL,
     "guildId" TEXT NOT NULL,
+    "commandId" TEXT NOT NULL,
     "createdById" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "content" TEXT NOT NULL,

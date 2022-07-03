@@ -33,7 +33,18 @@
 			"message_deleted": "Could not expose message, it was likely deleted",
 			"dm_only": "This command is meant to only be used in DMs",
 			"no_content": "Messages require content to be used as replies",
-			"no_results": "No server found"
+			"no_results": "No server found",
+			"reserved_name": "That name cannot be used, as its reserved for internal purposes",
+			"resource_limit_reached": "You have reached the limit of {{ limit }} {{ resource }}s"
+		}
+	},
+	"snippet_command": {
+		"description": "This is a local snippet",
+		"options": {
+			"anon": {
+				"name": "anon",
+				"description": "Whether or not to send the message as anonymous - defaults to false"
+			}
 		}
 	},
 	"thread": {
@@ -139,20 +150,6 @@
 				"description": "List all snippets",
 				"embed": {
 					"title": "Available snippets"
-				}
-			},
-			"use": {
-				"name": "use",
-				"description": "Use a snippet in response to the current thread",
-				"options": {
-					"name": {
-						"name": "name",
-						"description": "The name of the snippet"
-					},
-					"anon": {
-						"name": "anon",
-						"description": "Wether this should be an anonymous reply or not"
-					}
 				}
 			}
 		},

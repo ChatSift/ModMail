@@ -29,6 +29,7 @@ model SnippetUpdates {
 model Snippet {
   snippetId     Int              @id @default(autoincrement())
   guildId       String
+  commandId     String
   createdById   String
   name          String
   content       String
