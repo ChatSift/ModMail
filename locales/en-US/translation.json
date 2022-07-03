@@ -32,7 +32,8 @@
 			"not_blocked": "User is not blocked",
 			"message_deleted": "Could not expose message, it was likely deleted",
 			"dm_only": "This command is meant to only be used in DMs",
-			"no_content": "Messages require content to be used as replies"
+			"no_content": "Messages require content to be used as replies",
+			"no_results": "No server found"
 		}
 	},
 	"thread": {

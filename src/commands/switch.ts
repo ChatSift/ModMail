@@ -36,7 +36,17 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		const choices: ApplicationCommandOptionChoiceData[] = guilds.map((g) => ({ name: g.name, value: g.id }));
 
 		const input = interaction.options.getFocused();
-		return choices.filter((choice) => choice.name.includes(input));
+		const filtered = choices.filter((choice) => choice.name.includes(input));
+		if (!filtered.length) {
+			return [
+				{
+					name: i18next.t('common.errors.no_results'),
+					value: 'noop',
+				},
+			];
+		}
+
+		return filtered;
 	}
 
 	public constructor(
