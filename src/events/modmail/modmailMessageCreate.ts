@@ -154,12 +154,20 @@ export default class implements Event<typeof Events.MessageCreate> {
 		const pastModmails = await this.prisma.thread.findMany({
 			where: { guildId: guild.id, createdById: message.author.id },
 		});
-		const alerts = await this.prisma.threadOpenAlert.findMany({ where: { guildId: guild.id } });
+
+		let alert: string | null = null;
+		if (settings.alertRoleId) {
+			const role = guild.roles.cache.get(settings.alertRoleId);
+			if (role) {
+				alert = `Alert: ${role.toString()}`;
+			}
+		} else {
+			const alerts = await this.prisma.threadOpenAlert.findMany({ where: { guildId: guild.id } });
+			alert = alerts.length ? `Alerts: ${alerts.map((a) => `<@${a.userId}>`).join(' ')}` : null;
+		}
 
 		const startMessage = await modmail.send({
-			content: `${member.toString()}${
-				alerts.length ? `\nAlerts: ${alerts.map((a) => `<@${a.userId}>`).join(' ')}` : ''
-			}`,
+			content: `${member.toString()}${alert ? `\n${alert}` : ''}`,
 			embeds: [
 				new EmbedBuilder()
 					.setAuthor({ name: member.displayName, iconURL: member.displayAvatarURL() })

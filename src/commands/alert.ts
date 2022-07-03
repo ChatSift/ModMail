@@ -40,6 +40,19 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		}
 
 		// Global alerts
+		const settings = await this.prisma.guildSettings.findFirst({ where: { guildId: interaction.guild.id } });
+		if (settings?.alertRoleId) {
+			const role = interaction.guild.roles.cache.get(settings.alertRoleId);
+			if (role) {
+				if (interaction.member.roles.cache.has(role.id)) {
+					await interaction.member.roles.remove(role);
+					return interaction.reply(i18next.t('common.success.no_alert_global', { lng: interaction.locale }));
+				}
+				await interaction.member.roles.add(role);
+				return interaction.reply(i18next.t('common.success.alert_global', { lng: interaction.locale }));
+			}
+		}
+
 		const params = { guildId: interaction.guild.id, userId: interaction.user.id };
 		const existingAlert = await this.prisma.threadOpenAlert.findFirst({
 			where: params,

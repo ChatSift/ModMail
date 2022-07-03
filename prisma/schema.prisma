@@ -14,6 +14,7 @@ model GuildSettings {
   greetingMessage  String?
   farewellMessage  String?
   simpleMode       Boolean @default(false)
+  alertRoleId      String?
 }
 
 model SnippetUpdates {

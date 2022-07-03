@@ -5,6 +5,7 @@ CREATE TABLE "GuildSettings" (
     "greetingMessage" TEXT,
     "farewellMessage" TEXT,
     "simpleMode" BOOLEAN NOT NULL DEFAULT false,
+    "alertRoleId" TEXT,
 
     CONSTRAINT "GuildSettings_pkey" PRIMARY KEY ("guildId")
 );

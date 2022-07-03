@@ -41,6 +41,11 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 				...getLocalizedProp('description', 'commands.config.options.simple_mode.description'),
 				type: ApplicationCommandOptionType.Boolean,
 			},
+			{
+				...getLocalizedProp('name', 'commands.config.options.alert_role.name'),
+				...getLocalizedProp('description', 'commands.config.options.alert_role.description'),
+				type: ApplicationCommandOptionType.Role,
+			},
 		],
 	};
 
@@ -57,6 +62,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		const greeting = interaction.options.getString('greeting');
 		const farewell = interaction.options.getString('farewell');
 		const simple = interaction.options.getBoolean('simple-mode');
+		const alertRole = interaction.options.getRole('alert-role');
 
 		if (channel) {
 			settings.modmailChannelId = channel.id;
@@ -74,17 +80,25 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			settings.simpleMode = simple;
 		}
 
+		if (alertRole) {
+			settings.alertRoleId = alertRole.id;
+		}
+
 		const configured = await this.prisma.guildSettings.upsert({
 			create: { guildId: interaction.guild.id, ...settings },
 			update: settings,
 			where: { guildId: interaction.guild.id },
 		});
 
-		return interaction.reply(stripIndents`
-			• **modmail channel**: ${configured.modmailChannelId ? `<#${configured.modmailChannelId}>` : 'none'}
-			• **greeting message**: ${configured.greetingMessage ? configured.greetingMessage : 'none'}
-			• **farewell message**: ${configured.farewellMessage ? configured.farewellMessage : 'none'}
-			• **simple mode**: ${configured.simpleMode ? 'enabled' : 'disabled'}
-		`);
+		return interaction.reply({
+			content: stripIndents`
+				• **modmail channel**: ${configured.modmailChannelId ? `<#${configured.modmailChannelId}>` : 'none'}
+				• **greeting message**: ${configured.greetingMessage ? configured.greetingMessage : 'none'}
+				• **farewell message**: ${configured.farewellMessage ? configured.farewellMessage : 'none'}
+				• **simple mode**: ${configured.simpleMode ? 'enabled' : 'disabled'}
+				• **alert role**: ${configured.alertRoleId ? `<@&${configured.alertRoleId}>` : 'none'}
+			`,
+			allowedMentions: { parse: [] },
+		});
 	}
 }

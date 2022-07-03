@@ -276,6 +276,10 @@
 				"simple_mode": {
 					"name": "simple-mode",
 					"description": "Whether or not to use the simple mode for ModMail threads"
+				},
+				"alert_role": {
+					"name": "alert-role",
+					"description": "The role to ping when a new thread is open"
 				}
 			}
 		},
