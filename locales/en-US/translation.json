@@ -298,6 +298,16 @@
 			"embed": {
 				"title": "Available thread logs"
 			}
+		},
+		"delete": {
+			"name": "delete",
+			"description": "Delete a reply",
+			"options": {
+				"id": {
+					"name": "id",
+					"description": "The ID of the reply to delete"
+				}
+			}
 		}
 	},
 	"context-menus": {
