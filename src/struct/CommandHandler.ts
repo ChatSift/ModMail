@@ -7,12 +7,14 @@ import {
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
 	CommandInteraction,
+	inlineCode,
 	MessageComponentInteraction,
 	Routes,
 	ThreadChannel,
 } from 'discord.js';
 import i18next from 'i18next';
 import { container, singleton } from 'tsyringe';
+import { logger } from '../util/logger';
 import type { Command, CommandConstructor } from '#struct/Command';
 import { Component, ComponentConstructor, getComponentInfo } from '#struct/Component';
 import { Env } from '#struct/Env';
@@ -25,28 +27,10 @@ export class CommandHandler {
 
 	public constructor(private readonly env: Env, private readonly prisma: PrismaClient) {}
 
-	// TODO(DD): Error handling
 	public async handleAutocomplete(interaction: AutocompleteInteraction) {
 		const command = this.commands.get(interaction.commandName);
-		if (!command) {
-			if (interaction.inCachedGuild()) {
-				const snippets = await this.prisma.snippet.findMany({
-					where: { guildId: interaction.guild.id },
-				});
 
-				const input = interaction.options.getFocused();
-				return interaction.respond(
-					snippets
-						.filter((snippet) => snippet.name.includes(input) || snippet.content.includes(input))
-						.map((snippet) => ({ name: snippet.name, value: snippet.name }))
-						.slice(0, 5),
-				);
-			}
-
-			return;
-		}
-
-		if (!command.handleAutocomplete) {
+		if (!command?.handleAutocomplete) {
 			return interaction.respond([]);
 		}
 
@@ -54,32 +38,70 @@ export class CommandHandler {
 			return;
 		}
 
-		const options = await command.handleAutocomplete(interaction);
-		return interaction.respond(options.slice(0, 25));
+		try {
+			const options = await command.handleAutocomplete(interaction);
+			return await interaction.respond(options.slice(0, 25));
+		} catch (err) {
+			logger.error({ err, command: interaction.commandName }, 'Error handling autocomplete');
+			return interaction.respond([
+				{
+					name: 'Something went wrong fetching auto complete options. Please report this bug.',
+					value: 'noop',
+				},
+			]);
+		}
 	}
 
-	public handleMessageComponent(interaction: MessageComponentInteraction<'cached'>) {
+	public async handleMessageComponent(interaction: MessageComponentInteraction<'cached'>) {
 		const [name, ...args] = interaction.customId.split('|') as [string, ...string[]];
 		const component = this.components.get(name);
-		return component?.handle(interaction, ...args);
+
+		try {
+			// eslint-disable-next-line @typescript-eslint/return-await
+			return await component?.handle(interaction, ...args);
+		} catch (err) {
+			logger.error({ err, component: name }, 'Error handling message component');
+			const content = `Something went wrong running component. Please report this bug.\n\n${inlineCode(
+				(err as Error).message,
+			)}`;
+
+			// Try to display something to the user. We don't actually know what our component has done response wise, though
+			await interaction.reply({ content }).catch(() => null);
+			await interaction.update({ content }).catch(() => null);
+		}
 	}
 
-	public handleCommand(interaction: CommandInteraction) {
+	public async handleCommand(interaction: CommandInteraction) {
 		const command = this.commands.get(interaction.commandName);
 		if (!command) {
 			if (interaction.isChatInputCommand()) {
 				return this.handleSnippetCommand(interaction);
 			}
 
-			return;
+			return logger.warn(interaction, 'Command interaction not registered locally was not chatInput');
 		}
 
 		if (!command.interactionOptions.dm_permission && !interaction.inCachedGuild()) {
-			return;
+			return logger.warn(
+				{ interaction, command },
+				'Command interaction had dm_permission off and was not in cached guild',
+			);
 		}
 
-		// @ts-expect-error - Yet another instance of odd union behavior. Unsure if there's a way to avoid this
-		return command.handle(interaction);
+		try {
+			// @ts-expect-error - Yet another instance of odd union behavior. Unsure if there's a way to avoid this
+			// eslint-disable-next-line @typescript-eslint/return-await
+			return await command.handle(interaction);
+		} catch (err) {
+			// TODO(DD): Consider dealing with specific error
+			logger.error({ err, command: interaction.commandName }, 'Error handling command');
+			const content = `Something went wrong running command. This could be a bug, or it could be related to your permissions.\n\n${inlineCode(
+				(err as Error).message,
+			)}`;
+
+			// Try to display something to the user.
+			await interaction.reply({ content }).catch(() => null);
+		}
 	}
 
 	public init(): Promise<void[]> {

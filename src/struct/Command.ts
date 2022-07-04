@@ -24,7 +24,7 @@ export type CommandBody<Type extends ApplicationCommandType> = RESTPostAPIApplic
 export interface Command<Type extends ApplicationCommandType = ApplicationCommandType> {
 	readonly interactionOptions: CommandBody<Type>;
 	handleAutocomplete?: (interaction: AutocompleteInteraction<any>) => Awaitable<ApplicationCommandOptionChoiceData[]>;
-	handle: (interaction: InteractionTypeMapping[Type]) => unknown;
+	handle: (interaction: InteractionTypeMapping[Type]) => Awaitable<unknown>;
 }
 
 export type CommandConstructor = new (...args: any[]) => Command;
