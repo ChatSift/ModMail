@@ -222,7 +222,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 		});
 
 		if (settings.greetingMessage) {
-			const options: MessageOptions = {};
+			const options: MessageOptions = { allowedMentions: { roles: [] } };
 			const templateData = templateDataFromMember(member);
 			if (settings.simpleMode) {
 				options.content = `⚙️ ${bold(`${guild.name} Staff:`)} ${templateString(

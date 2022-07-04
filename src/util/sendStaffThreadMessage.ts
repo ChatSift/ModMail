@@ -43,7 +43,9 @@ export async function sendStaffThreadMessage({
 	const prisma = container.resolve(PrismaClient);
 	content = templateString(content, templateDataFromMember(member));
 
-	const options: Omit<MessageOptions, 'flags'> = {};
+	const options: Omit<MessageOptions, 'flags'> = {
+		allowedMentions: { roles: [] },
+	};
 	if (simpleMode) {
 		options.content = `${bold(
 			`${existing ? `${inlineCode(existing.replyId.toString())} ` : ''}${anon ? '(Anonymous) ' : ''}(${

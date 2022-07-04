@@ -24,7 +24,7 @@ export async function closeThread({ thread, channel, silent }: CloseThreadOption
 			? templateString(baseFarewellMessage, templateDataFromMember(member))
 			: baseFarewellMessage;
 
-		const options: MessageOptions = {};
+		const options: MessageOptions = { allowedMentions: { roles: [] } };
 		if (settings?.simpleMode) {
 			options.content = `⚙️ ${bold(`${channel.guild.name} Staff:`)} ${farewellMessage}`;
 		} else {
