@@ -87,14 +87,14 @@ export async function sendStaffThreadMessage({
 
 	if (existing) {
 		await interaction?.reply({ content: 'Successfully edited your message' });
-		setTimeout(() => void interaction?.deleteReply().catch(() => null), 1000);
+		setTimeout(() => void interaction?.deleteReply().catch(console.error), 1_500);
 		await existing.guild.edit(options);
 		return existing.user.edit(userOptions);
 	}
 
 	const guildMessage = await channel.send(options);
 	await interaction?.reply({ content: 'Successfully posted your message' });
-	setTimeout(() => void interaction?.deleteReply().catch(() => null), 1000);
+	setTimeout(() => void interaction?.deleteReply().catch(console.error), 1_500);
 
 	let userMessage: Message;
 	try {

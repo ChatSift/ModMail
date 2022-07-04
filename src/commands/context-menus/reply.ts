@@ -24,6 +24,10 @@ export default class implements Command<ApplicationCommandType.Message> {
 			return interaction.reply(i18next.t('common.errors.no_thread'));
 		}
 
+		if (interaction.targetMessage.author.id !== interaction.user.id) {
+			return interaction.reply(i18next.t('common.errors.not_own_message'));
+		}
+
 		const member = await interaction.guild.members.fetch(thread.userId).catch(() => null);
 		if (!member) {
 			return i18next.t('common.errors.no_member', { lng: interaction.locale });
