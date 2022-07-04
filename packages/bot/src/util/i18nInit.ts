@@ -1,11 +1,11 @@
-import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import i18next from 'i18next';
 import FsBackend from 'i18next-fs-backend';
 
 export function i18nInit() {
 	return i18next.use(FsBackend).init({
 		backend: {
-			loadPath: join(process.cwd(), 'locales', '{{lng}}', '{{ns}}.json'),
+			loadPath: fileURLToPath(new URL('../../locales/{{lng}}/{{ns}}.json', import.meta.url)),
 		},
 		cleanCode: true,
 		fallbackLng: ['en-US'],

@@ -1,0 +1,12 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"paths": {
+			"#struct/*": ["./src/struct/*.ts"],
+			"#util/*": ["./src/util/*.ts"]
+		}
+	},
+	"include": ["./src/**/*.ts"],
+	"exclude": ["./**/__tests__"]
+}
