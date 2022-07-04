@@ -22,8 +22,10 @@ import i18next from 'i18next';
 import { singleton } from 'tsyringe';
 import type { Event } from '#struct/Event';
 import { SelectMenuPaginator, SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
+import { getSortedMemberRolesString } from '#util/getSortedMemberRoles';
 import { getUserGuilds } from '#util/getUserGuilds';
 import { sendMemberThreadMessage } from '#util/sendMemberThreadMessage';
+import { templateDataFromMember, templateString } from '#util/templateString';
 
 @singleton()
 export default class implements Event<typeof Events.MessageCreate> {
@@ -191,11 +193,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 						},
 						{
 							name: i18next.t('thread.start.embed.fields.roles'),
-							value: member.roles.cache
-								.filter((r) => r.id !== guild.id)
-								.sort((a, b) => b.position - a.position)
-								.map((r) => r.toString())
-								.join(', '),
+							value: getSortedMemberRolesString(member),
 							inline: true,
 						},
 					),
@@ -225,8 +223,12 @@ export default class implements Event<typeof Events.MessageCreate> {
 
 		if (settings.greetingMessage) {
 			const options: MessageOptions = {};
+			const templateData = templateDataFromMember(member);
 			if (settings.simpleMode) {
-				options.content = `⚙️ ${bold(`${guild.name} Staff:`)} ${settings.greetingMessage}`;
+				options.content = `⚙️ ${bold(`${guild.name} Staff:`)} ${templateString(
+					settings.greetingMessage,
+					templateData,
+				)}`;
 			} else {
 				const greetingEmbed = new EmbedBuilder()
 					.setAuthor({
@@ -236,7 +238,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 						}),
 						iconURL: this.client.user.displayAvatarURL(),
 					})
-					.setDescription(settings.greetingMessage)
+					.setDescription(templateString(settings.greetingMessage, templateData))
 					.setColor(Colors.NotQuiteBlack);
 				options.embeds = [greetingEmbed];
 			}

@@ -13,6 +13,7 @@ import {
 } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
+import { templateDataFromMember, templateString } from '#util/templateString';
 
 export interface SendStaffThreadMessageOptions {
 	content: string;
@@ -40,6 +41,7 @@ export async function sendStaffThreadMessage({
 	existing,
 }: SendStaffThreadMessageOptions) {
 	const prisma = container.resolve(PrismaClient);
+	content = templateString(content, templateDataFromMember(member));
 
 	const options: Omit<MessageOptions, 'flags'> = {};
 	if (simpleMode) {

@@ -3,6 +3,7 @@ import { PrismaClient, Thread } from '@prisma/client';
 import { Colors, MessageOptions, ThreadChannel } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
+import { templateDataFromMember, templateString } from '#util/templateString';
 
 export interface CloseThreadOptions {
 	thread: Thread;
@@ -15,9 +16,13 @@ export async function closeThread({ thread, channel, silent }: CloseThreadOption
 
 	if (!silent) {
 		const settings = await prisma.guildSettings.findFirst({ where: { guildId: thread.guildId } });
-		const farewellMessage =
+		const member = await channel.guild.members.fetch(thread.userId).catch(() => null);
+		const baseFarewellMessage =
 			settings?.farewellMessage ??
 			'This thread has been closed. You can start a new one in the future by sending another message here.';
+		const farewellMessage = member
+			? templateString(baseFarewellMessage, templateDataFromMember(member))
+			: baseFarewellMessage;
 
 		const options: MessageOptions = {};
 		if (settings?.simpleMode) {
@@ -36,14 +41,11 @@ export async function closeThread({ thread, channel, silent }: CloseThreadOption
 
 		await channel.send(options);
 
-		if (settings?.farewellMessage) {
-			const member = await channel.guild.members.fetch(thread.userId).catch(() => null);
-			if (member) {
-				try {
-					await member.send(options);
-				} catch {
-					return channel.send(i18next.t('common.errors.dm_fail'));
-				}
+		if (member) {
+			try {
+				await member.send(options);
+			} catch {
+				return channel.send(i18next.t('common.errors.dm_fail'));
 			}
 		}
 	}
