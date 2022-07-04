@@ -2,6 +2,7 @@ import { AnyInteraction, Events, InteractionType } from 'discord.js';
 import { singleton } from 'tsyringe';
 import { CommandHandler } from '#struct/CommandHandler';
 import type { Event } from '#struct/Event';
+import { logger } from '#util/logger';
 
 @singleton()
 export default class implements Event<typeof Events.InteractionCreate> {
@@ -30,7 +31,7 @@ export default class implements Event<typeof Events.InteractionCreate> {
 			}
 
 			default: {
-				console.warn(`Unknown interaction type: ${interaction.type}`);
+				logger.warn(`Unknown interaction type: ${interaction.type}`);
 			}
 		}
 	}

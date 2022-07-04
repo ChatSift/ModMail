@@ -13,6 +13,7 @@ import {
 } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
+import { logger } from './logger';
 import { templateDataFromMember, templateString } from '#util/templateString';
 
 export interface SendStaffThreadMessageOptions {
@@ -91,14 +92,20 @@ export async function sendStaffThreadMessage({
 
 	if (existing) {
 		await interaction?.reply({ content: 'Successfully edited your message' });
-		setTimeout(() => void interaction?.deleteReply().catch(console.error), 1_500);
+		setTimeout(
+			() => void interaction?.deleteReply().catch((e) => logger.error(e, 'Bad interaction.deleteReply()')),
+			1_500,
+		);
 		await existing.guild.edit(options);
 		return existing.user.edit(userOptions);
 	}
 
 	const guildMessage = await channel.send(options);
 	await interaction?.reply({ content: 'Successfully posted your message' });
-	setTimeout(() => void interaction?.deleteReply().catch(console.error), 1_500);
+	setTimeout(
+		() => void interaction?.deleteReply().catch((e) => logger.error(e, 'Bad interaction.deleteReply()')),
+		1_500,
+	);
 
 	let userMessage: Message;
 	try {
