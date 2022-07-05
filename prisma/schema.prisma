@@ -62,7 +62,7 @@ model ThreadMessage {
   guildMessageId       String
   anon                 Boolean @default(false)
 
-  @@unique([guildId, localThreadMessageId])
+  @@unique([threadId, localThreadMessageId])
 }
 
 model Thread {

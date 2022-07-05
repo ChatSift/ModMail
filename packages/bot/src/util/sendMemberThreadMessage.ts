@@ -55,24 +55,22 @@ export async function sendMemberThreadMessage({
 
 	const guildMessage = await channel.send(options);
 
-	await prisma.$transaction(async (prisma) => {
-		const { lastLocalThreadMessageId: localThreadMessageId } = await prisma.thread.update({
-			data: {
-				lastLocalThreadMessageId: { increment: 1 },
-			},
-			where: { threadId },
-		});
+	const { lastLocalThreadMessageId: localThreadMessageId } = await prisma.thread.update({
+		data: {
+			lastLocalThreadMessageId: { increment: 1 },
+		},
+		where: { threadId },
+	});
 
-		await prisma.threadMessage.create({
-			data: {
-				guildId: member.guild.id,
-				localThreadMessageId,
-				threadId,
-				userId: member.user.id,
-				userMessageId: userMessage.id,
-				guildMessageId: guildMessage.id,
-			},
-		});
+	await prisma.threadMessage.create({
+		data: {
+			guildId: member.guild.id,
+			localThreadMessageId,
+			threadId,
+			userId: member.user.id,
+			userMessageId: userMessage.id,
+			guildMessageId: guildMessage.id,
+		},
 	});
 
 	const alerts = await prisma.threadReplyAlert.findMany({ where: { threadId } });

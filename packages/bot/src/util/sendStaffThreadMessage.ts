@@ -114,26 +114,24 @@ export async function sendStaffThreadMessage({
 		return channel.send(i18next.t('common.errors.dm_fail'));
 	}
 
-	const threadMessage = await prisma.$transaction(async (prisma) => {
-		const { lastLocalThreadMessageId: localThreadMessageId } = await prisma.thread.update({
-			data: {
-				lastLocalThreadMessageId: { increment: 1 },
-			},
-			where: { threadId },
-		});
+	const { lastLocalThreadMessageId: localThreadMessageId } = await prisma.thread.update({
+		data: {
+			lastLocalThreadMessageId: { increment: 1 },
+		},
+		where: { threadId },
+	});
 
-		return prisma.threadMessage.create({
-			data: {
-				guildId: member.guild.id,
-				localThreadMessageId,
-				threadId,
-				userId: member.user.id,
-				userMessageId: userMessage.id,
-				guildMessageId: guildMessage.id,
-				staffId: staff.user.id,
-				anon,
-			},
-		});
+	const threadMessage = await prisma.threadMessage.create({
+		data: {
+			guildId: member.guild.id,
+			localThreadMessageId,
+			threadId,
+			userId: member.user.id,
+			userMessageId: userMessage.id,
+			guildMessageId: guildMessage.id,
+			staffId: staff.user.id,
+			anon,
+		},
 	});
 
 	// Edit the reply ID in
