@@ -1,5 +1,5 @@
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readdirRecurse } from '@chatsift/readdir';
 import { REST } from '@discordjs/rest';
 import { PrismaClient } from '@prisma/client';
@@ -166,7 +166,7 @@ export class CommandHandler {
 		const files = readdirRecurse(path, { fileExtensions: ['js'] });
 
 		for await (const file of files) {
-			const mod = (await import(file)) as { default: CommandConstructor };
+			const mod = (await import(pathToFileURL(file).toString())) as { default: CommandConstructor };
 			const command = container.resolve(mod.default);
 
 			this.commands.set(command.interactionOptions.name, command);
