@@ -7,6 +7,7 @@ import { closeThread } from '#util/closeThread';
 
 export enum PayloadOpCode {
 	CloseThread,
+	UnarchiveThread,
 	Done,
 }
 
@@ -15,6 +16,12 @@ export type Payload =
 			op: PayloadOpCode.CloseThread;
 			data: Thread & {
 				scheduledClose: ScheduledThreadClose;
+			};
+	  }
+	| {
+			op: PayloadOpCode.UnarchiveThread;
+			data: {
+				channelId: string;
 			};
 	  }
 	| {
@@ -41,6 +48,12 @@ export class JobManager {
 			interval: '1m',
 			path: fileURLToPath(new URL('../jobs/autoUnblock.js', import.meta.url)),
 		});
+
+		await this.bree.add({
+			name: 'preventAutoArchive',
+			interval: '5m',
+			path: fileURLToPath(new URL('../jobs/preventAutoArchive.js', import.meta.url)),
+		});
 	}
 
 	public async start() {
@@ -65,6 +78,21 @@ export class JobManager {
 
 						const payload: Payload = { op: PayloadOpCode.Done };
 						worker.postMessage(payload);
+						break;
+					}
+
+					case PayloadOpCode.UnarchiveThread: {
+						const channel = (await this.client.channels
+							.fetch(message.data.channelId)
+							.catch(() => null)) as ThreadChannel | null;
+
+						if (channel?.archived) {
+							await channel.setArchived(false);
+						}
+
+						const payload: Payload = { op: PayloadOpCode.Done };
+						worker.postMessage(payload);
+						break;
 					}
 
 					case PayloadOpCode.Done: {
