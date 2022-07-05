@@ -37,7 +37,8 @@
 			"reserved_name": "That name cannot be used, as its reserved for internal purposes",
 			"resource_limit_reached": "You have reached the limit of {{ limit }} {{ resource }}s",
 			"no_args": "You need to provide at least {{ count }} arguments to use this command",
-			"arg_conflict": "You cannot provide both {{ first }} and {{ second }}"
+			"arg_conflict": "You cannot provide both {{ first }} and {{ second }}",
+			"bad_snippet_name": "The name of your snippet cannot be used for slash command creation. Please try a different name"
 		}
 	},
 	"snippet_command": {
@@ -173,7 +174,7 @@
 				}
 			},
 			"no_scheduled_close": "This thread wasn't scheduled to close",
-			"successfully_canceled": "Successfully canceled the given thread"
+			"successfully_canceled": "Successfully canceled the closing of this thread"
 		},
 		"reply": {
 			"name": "reply",

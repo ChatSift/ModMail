@@ -30,7 +30,22 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
-		const user = interaction.options.getUser('user', true);
+		let user = interaction.options.getUser('user');
+
+		if (!user) {
+			const thread = await this.prisma.thread.findFirst({
+				where: { channelId: interaction.channelId, closedById: null },
+			});
+			if (!thread) {
+				return interaction.reply(i18next.t('common.errors.no_thread', { lng: interaction.locale }));
+			}
+
+			user = await this.client.users.fetch(thread.userId).catch(() => null);
+		}
+
+		if (!user) {
+			return interaction.reply(i18next.t('common.errors.user_deleted', { lng: interaction.locale }));
+		}
 
 		try {
 			await this.prisma.block.delete({

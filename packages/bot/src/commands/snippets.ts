@@ -173,19 +173,26 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 					});
 				}
 
-				const command = await interaction.guild.commands.create({
-					name,
-					description: i18next.t('snippet_command.description'),
-					default_member_permissions: '0',
-					dm_permission: false,
-					options: [
-						{
-							...getLocalizedProp('name', 'snippet_command.options.anon.name'),
-							...getLocalizedProp('description', 'snippet_command.options.anon.description'),
-							type: ApplicationCommandOptionType.Boolean,
-						},
-					],
-				});
+				let command;
+				try {
+					command = await interaction.guild.commands.create({
+						name,
+						description: i18next.t('snippet_command.description'),
+						default_member_permissions: '0',
+						dm_permission: false,
+						options: [
+							{
+								...getLocalizedProp('name', 'snippet_command.options.anon.name'),
+								...getLocalizedProp('description', 'snippet_command.options.anon.description'),
+								type: ApplicationCommandOptionType.Boolean,
+							},
+						],
+					});
+				} catch {
+					return interaction.reply({
+						content: i18next.t('common.errors.bad_snippet_name', { lng: interaction.locale }),
+					});
+				}
 
 				await this.prisma.snippet.create({
 					data: {
@@ -274,7 +281,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 					fields.push({
 						name: i18next.t('commands.snippets.show.embed.fields.created_by', { lng: interaction.locale }),
-						value: createdBy?.tag ?? `Unknown user: ${snippet.createdById}`,
+						value: createdBy?.toString() ?? `Unknown user: ${snippet.createdById}`,
 					});
 
 					fields.push({

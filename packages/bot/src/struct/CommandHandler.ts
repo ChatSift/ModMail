@@ -144,7 +144,7 @@ export class CommandHandler {
 
 		const settings = await this.prisma.guildSettings.findFirst({ where: { guildId: interaction.guild.id } });
 
-		return sendStaffThreadMessage({
+		await sendStaffThreadMessage({
 			content: snippet.content,
 			staff: interaction.member,
 			member,
@@ -153,6 +153,11 @@ export class CommandHandler {
 			simpleMode: settings?.simpleMode ?? false,
 			anon: anon ?? false,
 			interaction,
+		});
+
+		await this.prisma.snippet.update({
+			data: { lastUsedAt: new Date(), timesUsed: { increment: 1 } },
+			where: { snippetId: snippet.snippetId },
 		});
 	}
 

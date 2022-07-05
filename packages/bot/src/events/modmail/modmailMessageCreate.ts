@@ -1,3 +1,4 @@
+import { ms } from '@naval-base/ms';
 import { PrismaClient } from '@prisma/client';
 import {
 	ActionRowBuilder,
@@ -41,7 +42,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 		setTimeout(() => {
 			this.userSelectionCache.delete(userId);
 			this.recentlyInCache.add(userId);
-		}, 180_000).unref();
+		}, ms('24h')).unref();
 	}
 
 	private async promptUser(message: Message, guilds: Collection<string, Guild>): Promise<Guild | null> {
