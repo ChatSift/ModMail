@@ -183,7 +183,7 @@ export class CommandHandler {
 				continue;
 			}
 
-			const mod = (await import(file)) as { default: ComponentConstructor };
+			const mod = (await import(pathToFileURL(file).toString())) as { default: ComponentConstructor };
 			const component = container.resolve(mod.default);
 			const name = component.name ?? info.name;
 
