@@ -1,4 +1,4 @@
-import { EmbedBuilder, bold, inlineCode } from '@discordjs/builders';
+import { EmbedBuilder, bold } from '@discordjs/builders';
 import { PrismaClient } from '@prisma/client';
 import { Colors, GuildMember, Message, MessageOptions, ThreadChannel } from 'discord.js';
 import { container } from 'tsyringe';
@@ -47,9 +47,12 @@ export async function sendMemberThreadMessage({
 	}
 
 	if (existing) {
-		await channel.send(
-			`User edited their message: <${existing.url}>${oldContent ? `\n\nOld content: ${inlineCode(oldContent)}` : ''}`,
-		);
+		await channel.send({
+			content: `**User edited their message:**\n\`Original message\`: ${
+				oldContent ?? '[failed to resolve]'
+			}\n\`Edited message\`: ${userMessage.content}`,
+			reply: { messageReference: existing },
+		});
 		return existing.edit(options);
 	}
 

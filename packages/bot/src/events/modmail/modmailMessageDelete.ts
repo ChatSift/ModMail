@@ -32,6 +32,6 @@ export default class implements Event<typeof Events.MessageDelete> {
 		}
 
 		const existing = await channel.messages.fetch(threadMessage.guildMessageId);
-		await channel.send(`User deleted their message: <${existing.url}>`);
+		await channel.send({ content: 'User deleted their message', reply: { messageReference: existing } });
 	}
 }
