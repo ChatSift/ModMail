@@ -71,7 +71,8 @@ export async function sendStaffThreadMessage({
 
 		if (anon) {
 			embed.setAuthor({ name: `${staff.guild.name} Team`, iconURL: staff.guild.iconURL() ?? undefined });
-		} else {
+		}
+		if (staff.nickname && !anon) {
 			embed.setAuthor({ name: staff.displayName, iconURL: staff.displayAvatarURL() });
 		}
 

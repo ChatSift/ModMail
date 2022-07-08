@@ -169,36 +169,39 @@ export default class implements Event<typeof Events.MessageCreate> {
 			alert = alerts.length ? `Alerts: ${alerts.map((a) => `<@${a.userId}>`).join(' ')}` : null;
 		}
 
+		const embed = new EmbedBuilder()
+			.setFooter({ text: `${member.user.tag} (${member.user.id})`, iconURL: member.user.displayAvatarURL() })
+			.setColor(Colors.NotQuiteBlack)
+			.setFields(
+				{
+					name: i18next.t('thread.start.embed.fields.account_created'),
+					value: time(member.user.createdAt, TimestampStyles.LongDate),
+					inline: true,
+				},
+				{
+					name: i18next.t('thread.start.embed.fields.joined_server'),
+					value: time(member.joinedAt!, TimestampStyles.LongDate),
+					inline: true,
+				},
+				{
+					name: i18next.t('thread.start.embed.fields.past_modmails'),
+					value: pastModmails.length.toString(),
+					inline: true,
+				},
+				{
+					name: i18next.t('thread.start.embed.fields.roles'),
+					value: getSortedMemberRolesString(member),
+					inline: true,
+				},
+			);
+
+		if (member.nickname) {
+			embed.setAuthor({ name: member.nickname, iconURL: member.displayAvatarURL() });
+		}
+
 		const startMessage = await modmail.send({
 			content: `${member.toString()}${alert ? `\n${alert}` : ''}`,
-			embeds: [
-				new EmbedBuilder()
-					.setAuthor({ name: member.displayName, iconURL: member.displayAvatarURL() })
-					.setFooter({ text: `${member.user.tag} (${member.user.id})`, iconURL: member.user.displayAvatarURL() })
-					.setColor(Colors.NotQuiteBlack)
-					.setFields(
-						{
-							name: i18next.t('thread.start.embed.fields.account_created'),
-							value: time(member.user.createdAt, TimestampStyles.LongDate),
-							inline: true,
-						},
-						{
-							name: i18next.t('thread.start.embed.fields.joined_server'),
-							value: time(member.joinedAt!, TimestampStyles.LongDate),
-							inline: true,
-						},
-						{
-							name: i18next.t('thread.start.embed.fields.past_modmails'),
-							value: pastModmails.length.toString(),
-							inline: true,
-						},
-						{
-							name: i18next.t('thread.start.embed.fields.roles'),
-							value: getSortedMemberRolesString(member),
-							inline: true,
-						},
-					),
-			],
+			embeds: [embed],
 		});
 
 		const threadChannel = await startMessage.startThread({
