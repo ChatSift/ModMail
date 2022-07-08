@@ -48,13 +48,106 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@chatsift/readdir@npm:^0.1.0":
-  version: 0.1.0
-  resolution: "@chatsift/readdir@npm:0.1.0"
+"@chatsift/modmail-api@workspace:packages/api":
+  version: 0.0.0-use.local
+  resolution: "@chatsift/modmail-api@workspace:packages/api"
+  dependencies:
+    "@chatsift/readdir": ^0.2.0
+    "@chatsift/rest-utils": ^0.4.1
+    "@hapi/boom": ^10.0.0
+    "@prisma/client": ^4.0.0
+    "@sapphire/shapeshift": ^3.4.1
+    "@types/cors": ^2.8.12
+    "@types/node": ^16.11.43
+    "@types/pino": ^7.0.5
+    cors: ^2.8.5
+    discord-api-types: ^0.36.1
+    helmet: ^5.1.0
+    pino: ^8.1.0
+    pino-pretty: ^8.1.0
+    polka: next
+    prisma: ^4.0.0
+    prisma-error-enum: ^0.1.2
+    reflect-metadata: ^0.1.13
+    tslib: ^2.4.0
+    typescript: ^4.7.4
+  languageName: unknown
+  linkType: soft
+
+"@chatsift/modmail-bot@workspace:packages/bot":
+  version: 0.0.0-use.local
+  resolution: "@chatsift/modmail-bot@workspace:packages/bot"
+  dependencies:
+    "@chatsift/readdir": ^0.2.0
+    "@discordjs/builders": ^0.15.0
+    "@discordjs/rest": ^0.5.0
+    "@naval-base/ms": ^3.1.0
+    "@prisma/client": ^4.0.0
+    "@types/common-tags": ^1.8.1
+    "@types/i18next-fs-backend": ^1.1.2
+    "@types/node": ^16.11.43
+    "@types/pino": ^7.0.5
+    bree: ^9.1.1
+    common-tags: ^1.8.2
+    discord.js: dev
+    i18next: ^21.8.13
+    i18next-fs-backend: ^1.1.4
+    nanoid: ^4.0.0
+    pino: ^8.1.0
+    pino-pretty: ^8.1.0
+    prisma: ^4.0.0
+    prisma-error-enum: ^0.1.2
+    reflect-metadata: ^0.1.13
+    tslib: ^2.4.0
+    tsyringe: ^4.7.0
+    typescript: ^4.7.4
+  languageName: unknown
+  linkType: soft
+
+"@chatsift/modmail@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@chatsift/modmail@workspace:."
+  dependencies:
+    "@commitlint/cli": ^17.0.3
+    "@commitlint/config-angular": ^17.0.3
+    "@typescript-eslint/eslint-plugin": ^5.30.5
+    "@typescript-eslint/parser": ^5.30.5
+    dotenv-cli: ^5.1.0
+    eslint: ^8.19.0
+    eslint-config-marine: ^9.4.1
+    eslint-config-prettier: ^8.5.0
+    eslint-plugin-import: ^2.26.0
+    husky: ^8.0.1
+    prettier: ^2.7.1
+    prettier-eslint: ^15.0.1
+    prisma: ^4.0.0
+    tsyringe: ^4.7.0
+    turbo: ^1.3.1
+    typescript: ^4.7.4
+  languageName: unknown
+  linkType: soft
+
+"@chatsift/readdir@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "@chatsift/readdir@npm:0.2.0"
   dependencies:
     tiny-typed-emitter: ^2.1.0
-    tslib: ^2.3.1
-  checksum: 5c12260c05c41c2c0c36176b4119a0c3400ece69ec28683663cb41fe42b04f3b6710523eb941ea9a0f9967ada08d9d51abbbd2d955e10c6328d53598f14530b6
+    tslib: ^2.4.0
+  checksum: bb13baf4fc5e29945bceef4fc60c917336f2c6a1117044f970b956514cbe0b24c00a4e093ba4f1780bffd591e9b339448e9464035edf3d742e3b9c3880849dde
+  languageName: node
+  linkType: hard
+
+"@chatsift/rest-utils@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@chatsift/rest-utils@npm:0.4.1"
+  dependencies:
+    "@hapi/boom": ^10.0.0
+    "@sapphire/shapeshift": ^3.4.1
+    cookie: ^0.5.0
+    tslib: ^2.4.0
+    tsyringe: ^4.7.0
+    undici: ^5.6.0
+  checksum: 2a42a6a1256c0541589eb0862be8937fb9c9ba9dff5a2649bd90df8b1e2296d98ea6dbf0f653a197b317153a2824b63bf680d6e47e8914fa84cf9229dc9d2d03
   languageName: node
   linkType: hard
 
@@ -350,6 +443,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hapi/boom@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "@hapi/boom@npm:10.0.0"
+  dependencies:
+    "@hapi/hoek": 10.x.x
+  checksum: ea2b234fa1c76667b73a541f51e83251233a6f1db2a3f6ade9beb5174ce0ed2b55eea4d8a2a9fd0329bba31e1969c41bdb3af9218bef3abac58a30ea28e3d43e
+  languageName: node
+  linkType: hard
+
+"@hapi/hoek@npm:10.x.x":
+  version: 10.0.0
+  resolution: "@hapi/hoek@npm:10.0.0"
+  checksum: d665c61b0a12b017ec442eea441e698c5ed0752b4f092b2494f6507da359996447113838702eb072ea161ba85cb8dbac339b6c8d65e0eab3f39aa712e4346922
+  languageName: node
+  linkType: hard
+
 "@humanwhocodes/config-array@npm:^0.9.2":
   version: 0.9.5
   resolution: "@humanwhocodes/config-array@npm:0.9.5"
@@ -391,55 +500,6 @@ __metadata:
   checksum: d89597752fd88d3f3480845691a05a44bd21faac18e2185b6f436c3b0fd0c5a859fbbd9aaa92050c4052caf325ad3e10e2e1d1b64327517471b7d51babc0ddef
   languageName: node
   linkType: hard
-
-"@modmail/api@workspace:packages/api":
-  version: 0.0.0-use.local
-  resolution: "@modmail/api@workspace:packages/api"
-  dependencies:
-    "@prisma/client": ^4.0.0
-    "@types/node": ^16.11.7
-    "@types/pino": ^7.0.5
-    pino: ^8.1.0
-    pino-pretty: ^8.1.0
-    polka: next
-    prisma: ^4.0.0
-    prisma-error-enum: ^0.1.2
-    reflect-metadata: ^0.1.13
-    tslib: ^2.4.0
-    tsyringe: ^4.7.0
-    typescript: ^4.7.4
-  languageName: unknown
-  linkType: soft
-
-"@modmail/bot@workspace:packages/bot":
-  version: 0.0.0-use.local
-  resolution: "@modmail/bot@workspace:packages/bot"
-  dependencies:
-    "@chatsift/readdir": ^0.1.0
-    "@discordjs/builders": ^0.15.0
-    "@discordjs/rest": ^0.5.0
-    "@naval-base/ms": ^3.1.0
-    "@prisma/client": ^4.0.0
-    "@types/common-tags": ^1.8.1
-    "@types/i18next-fs-backend": ^1.1.2
-    "@types/node": ^16.11.7
-    "@types/pino": ^7.0.5
-    bree: ^9.1.0
-    common-tags: ^1.8.2
-    discord.js: dev
-    i18next: ^21.8.12
-    i18next-fs-backend: ^1.1.4
-    nanoid: ^4.0.0
-    pino: ^8.1.0
-    pino-pretty: ^8.1.0
-    prisma: ^4.0.0
-    prisma-error-enum: ^0.1.2
-    reflect-metadata: ^0.1.13
-    tslib: ^2.4.0
-    tsyringe: ^4.7.0
-    typescript: ^4.7.4
-  languageName: unknown
-  linkType: soft
 
 "@naval-base/ms@npm:^3.1.0":
   version: 3.1.0
@@ -524,6 +584,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sapphire/shapeshift@npm:^3.4.1":
+  version: 3.4.1
+  resolution: "@sapphire/shapeshift@npm:3.4.1"
+  checksum: 97006b34941136c26dd1a8259c1838df08e7e15e869e515a3e4e844d2c5757c4bb92d79eeec72c73ff856e9be00876c88bf71142d11f4b55e043ec76153365cd
+  languageName: node
+  linkType: hard
+
 "@sapphire/snowflake@npm:^3.2.2":
   version: 3.2.2
   resolution: "@sapphire/snowflake@npm:3.2.2"
@@ -570,6 +637,13 @@ __metadata:
   version: 1.8.1
   resolution: "@types/common-tags@npm:1.8.1"
   checksum: bec6f68c8c434834380abd1dc057aa6ba26661bb0c65c700b65049e9b104d7be96a987d93dbe8726be68554a23a52514a6967d8903fdb51fb8c78cf909d1e4c1
+  languageName: node
+  linkType: hard
+
+"@types/cors@npm:^2.8.12":
+  version: 2.8.12
+  resolution: "@types/cors@npm:2.8.12"
+  checksum: 8c45f112c7d1d2d831b4b266f2e6ed33a1887a35dcbfe2a18b28370751fababb7cd045e745ef84a523c33a25932678097bf79afaa367c6cb3fa0daa7a6438257
   languageName: node
   linkType: hard
 
@@ -634,7 +708,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^16.11.7":
+"@types/node@npm:^16.11.43":
   version: 16.11.43
   resolution: "@types/node@npm:16.11.43"
   checksum: 96d09e68347c49ebf84fe1443360edc3f98336f0794256abc8e4f29ef3070546357cae17083d6fd9767b631239367c4f245fe64accff4af057d17bd6694f0b2b
@@ -1084,9 +1158,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bree@npm:^9.1.0":
-  version: 9.1.0
-  resolution: "bree@npm:9.1.0"
+"bree@npm:^9.1.1":
+  version: 9.1.1
+  resolution: "bree@npm:9.1.1"
   dependencies:
     "@breejs/later": ^4.1.0
     boolean: ^3.2.0
@@ -1098,7 +1172,7 @@ __metadata:
     ms: ^2.1.3
     p-wait-for: 3
     safe-timers: ^1.1.0
-  checksum: 72a3acbf6ca3782099a3c39ae131bbc5e0a2e2d9bf45c109460c4743d61aa6f2bbad00bd888279569864166ab80a222d94f9aeb6d81bbccfcea8f6af5f4492f4
+  checksum: e15ed82ac234c95a9b989d455718d861475fc6b241e54d4bcf9055abb62a31721a86a0d0d443a61baff3f559104e55fd4fa3bfa921d1f9b0f8f68419c96f27ed
   languageName: node
   linkType: hard
 
@@ -1281,6 +1355,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cookie@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "cookie@npm:0.5.0"
+  checksum: 1f4bd2ca5765f8c9689a7e8954183f5332139eb72b6ff783d8947032ec1fdf43109852c178e21a953a30c0dd42257828185be01b49d1eb1a67fd054ca588a180
+  languageName: node
+  linkType: hard
+
+"cors@npm:^2.8.5":
+  version: 2.8.5
+  resolution: "cors@npm:2.8.5"
+  dependencies:
+    object-assign: ^4
+    vary: ^1
+  checksum: ced838404ccd184f61ab4fdc5847035b681c90db7ac17e428f3d81d69e2989d2b680cc254da0e2554f5ed4f8a341820a1ce3d1c16b499f6e2f47a1b9b07b5006
+  languageName: node
+  linkType: hard
+
 "cosmiconfig-typescript-loader@npm:^2.0.0":
   version: 2.0.1
   resolution: "cosmiconfig-typescript-loader@npm:2.0.1"
@@ -1440,6 +1531,13 @@ __metadata:
   version: 0.33.5
   resolution: "discord-api-types@npm:0.33.5"
   checksum: 6dcaad640c5693a69c9a4f5e444e739dde11ba835164ae6fd3dd5a1ab7b4d7f96cd022ed653eeaff2c8051ead0d998a5d502a2915cfacdde596364b82d9e3b3f
+  languageName: node
+  linkType: hard
+
+"discord-api-types@npm:^0.36.1":
+  version: 0.36.1
+  resolution: "discord-api-types@npm:0.36.1"
+  checksum: 6f9cae3d855a5c8fe6585f5f827795260683038d7b66ba9f1633e96005047d4c0d07bc084eb7bfbb967c5b99a0257b03cb94634fe7cd8a4975fce12bba89b306
   languageName: node
   linkType: hard
 
@@ -2284,6 +2382,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"helmet@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "helmet@npm:5.1.0"
+  checksum: 076958ed8262b72e77276f9e7e9a5e3628b3a44bf39a64a856e919fd3d5a887d3a29b58c1729dfdb0645afd440e763d29a871e866f1fa658f91a718da82ca052
+  languageName: node
+  linkType: hard
+
 "help-me@npm:^4.0.1":
   version: 4.0.1
   resolution: "help-me@npm:4.0.1"
@@ -2351,12 +2456,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:^21.8.12":
-  version: 21.8.12
-  resolution: "i18next@npm:21.8.12"
+"i18next@npm:^21.8.13":
+  version: 21.8.13
+  resolution: "i18next@npm:21.8.13"
   dependencies:
     "@babel/runtime": ^7.17.2
-  checksum: e3bbb9ee633c0fa74971d1e057917b5a303245b8b5602ce4db86b45be2a5ad23d06ef039a65d76f4de08a4200a8ebc5beed8c992433840a467e8253ed1d40bde
+  checksum: 0cc9a5213326d5c33a25b7fd753cd759a8357574d8e878372eeb84fa4e1b0839d3e840b6193ae6b37317d3af6c385c67799c830bb5f3ca388462b0bcb4464a97
   languageName: node
   linkType: hard
 
@@ -3019,28 +3124,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"modmail@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "modmail@workspace:."
-  dependencies:
-    "@commitlint/cli": ^17.0.3
-    "@commitlint/config-angular": ^17.0.3
-    "@typescript-eslint/eslint-plugin": ^5.30.5
-    "@typescript-eslint/parser": ^5.30.5
-    dotenv-cli: ^5.1.0
-    eslint: ^8.19.0
-    eslint-config-marine: ^9.4.1
-    eslint-config-prettier: ^8.5.0
-    eslint-plugin-import: ^2.26.0
-    husky: ^8.0.1
-    prettier: ^2.7.1
-    prettier-eslint: ^15.0.1
-    prisma: ^4.0.0
-    turbo: ^1.3.1
-    typescript: ^4.7.4
-  languageName: unknown
-  linkType: soft
-
 "ms@npm:2.0.0":
   version: 2.0.0
   resolution: "ms@npm:2.0.0"
@@ -3122,6 +3205,13 @@ __metadata:
   version: 1.1.0
   resolution: "numbered@npm:1.1.0"
   checksum: cdc238990fe29818cb603ac8d4050ff82a05b63e10d8848d1ff1e315231e94813c48b405e651b22d32edc8ccf1f323920d1182ea02c081f11d94ea22b1f8c17a
+  languageName: node
+  linkType: hard
+
+"object-assign@npm:^4":
+  version: 4.1.1
+  resolution: "object-assign@npm:4.1.1"
+  checksum: fcc6e4ea8c7fe48abfbb552578b1c53e0d194086e2e6bbbf59e0a536381a292f39943c6e9628af05b5528aa5e3318bb30d6b2e53cadaf5b8fe9e12c4b69af23f
   languageName: node
   linkType: hard
 
@@ -4186,7 +4276,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.3.1, tslib@npm:^2.4.0":
+"tslib@npm:^2.4.0":
   version: 2.4.0
   resolution: "tslib@npm:2.4.0"
   checksum: 8c4aa6a3c5a754bf76aefc38026134180c053b7bd2f81338cb5e5ebf96fefa0f417bff221592bf801077f5bf990562f6264fecbc42cd3309b33872cb6fc3b113
@@ -4460,6 +4550,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"undici@npm:^5.6.0":
+  version: 5.6.0
+  resolution: "undici@npm:5.6.0"
+  checksum: b9052c2cb9c44b000d375468c266b629032fc72d2024fb07b2988fd42d54937bedb54f44e76bb0ee6ca4c4960c0eee0e77573d178c156647da7ebaa088174baf
+  languageName: node
+  linkType: hard
+
 "universalify@npm:^2.0.0":
   version: 2.0.0
   resolution: "universalify@npm:2.0.0"
@@ -4504,6 +4601,13 @@ __metadata:
     spdx-correct: ^3.0.0
     spdx-expression-parse: ^3.0.0
   checksum: 35703ac889d419cf2aceef63daeadbe4e77227c39ab6287eeb6c1b36a746b364f50ba22e88591f5d017bc54685d8137bc2d328d0a896e4d3fd22093c0f32a9ad
+  languageName: node
+  linkType: hard
+
+"vary@npm:^1":
+  version: 1.1.2
+  resolution: "vary@npm:1.1.2"
+  checksum: ae0123222c6df65b437669d63dfa8c36cee20a504101b2fcd97b8bf76f91259c17f9f2b4d70a1e3c6bbcee7f51b28392833adb6b2770b23b01abec84e369660b
   languageName: node
   linkType: hard
 
