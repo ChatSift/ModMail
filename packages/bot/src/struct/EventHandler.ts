@@ -1,5 +1,5 @@
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readdirRecurse } from '@chatsift/readdir';
 import { Client, ClientEvents } from 'discord.js';
 import { container, singleton } from 'tsyringe';
@@ -19,7 +19,7 @@ export class EventHandler {
 				continue;
 			}
 
-			const mod = (await import(file)) as { default: EventConstructor };
+			const mod = (await import(pathToFileURL(file).toString())) as { default: EventConstructor };
 			const event = container.resolve(mod.default);
 			const name = event.name ?? (info.name as keyof ClientEvents);
 
