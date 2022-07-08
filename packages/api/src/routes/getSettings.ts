@@ -2,7 +2,7 @@ import { Route, RouteMethod } from '@chatsift/rest-utils';
 import { PrismaClient } from '@prisma/client';
 import type { Middleware, Request, Response } from 'polka';
 import { singleton } from 'tsyringe';
-import type { GuildSettings } from '#util/models';
+import type { GuildSettings } from '../util/models';
 
 @singleton()
 export default class extends Route<GuildSettings, never> {

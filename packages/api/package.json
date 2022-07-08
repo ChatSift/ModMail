@@ -1,12 +1,12 @@
 {
 	"name": "@chatsift/modmail-api",
+	"main": "./not_importable.js",
 	"types": "./dist/index.d.ts",
-	"version": "0.1.0-dev",
+	"version": "0.1.0",
 	"type": "module",
-	"imports": {
-		"#util/*": "./dist/util/*.js",
-		"#struct/*": "./dist/struct/*.js"
-	},
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"lint": "eslint src --ext .ts",
 		"build": "tsc"

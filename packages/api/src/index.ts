@@ -9,8 +9,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import polka, { Middleware } from 'polka';
 import { container } from 'tsyringe';
-import { Env } from '#util/env';
-import { logger } from '#util/logger';
+import { Env } from './util/env';
+import { logger } from './util/logger';
 
 const env = container.resolve(Env);
 container.register(PrismaClient, { useValue: new PrismaClient() });

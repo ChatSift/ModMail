@@ -3,8 +3,8 @@ import { PrismaClient } from '@prisma/client';
 import { BaseValidator, InferType, s } from '@sapphire/shapeshift';
 import type { Response } from 'polka';
 import { singleton } from 'tsyringe';
-import type { GuildSettings } from '#util/models';
-import { snowflakeSchema } from '#util/snowflakeSchema';
+import type { GuildSettings } from '../util/models';
+import { snowflakeSchema } from '../util/snowflakeSchema';
 
 const schema = s.object({
 	modMailChannelId: snowflakeSchema.nullish,

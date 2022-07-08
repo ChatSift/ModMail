@@ -25,3 +25,5 @@ export type InferModmailRouteResult<
 	TPath extends keyof ModmailRoutes,
 	TMethod extends keyof ModmailRoutes[TPath],
 > = InferRouteResult<ModmailRoutes[TPath][TMethod]>;
+
+export * from './util/models';
