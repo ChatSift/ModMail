@@ -79,10 +79,10 @@ export default class implements Command<ApplicationCommandType.User> {
 					value: getSortedMemberRolesString(member),
 					inline: true,
 				},
-			)
+			);
 
 		if (member.nickname) {
-			embed.setAuthor({ name: member.nickname, iconURL: member.displayAvatarURL() })
+			embed.setAuthor({ name: member.nickname, iconURL: member.displayAvatarURL() });
 		}
 
 		const startMessage = await modmail.send({

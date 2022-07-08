@@ -193,17 +193,15 @@ export default class implements Event<typeof Events.MessageCreate> {
 					value: getSortedMemberRolesString(member),
 					inline: true,
 				},
-			)
+			);
 
 		if (member.nickname) {
-			embed.setAuthor({ name: member.nickname, iconURL: member.displayAvatarURL() })
+			embed.setAuthor({ name: member.nickname, iconURL: member.displayAvatarURL() });
 		}
 
 		const startMessage = await modmail.send({
 			content: `${member.toString()}${alert ? `\n${alert}` : ''}`,
-			embeds: [
-				
-			],
+			embeds: [embed],
 		});
 
 		const threadChannel = await startMessage.startThread({

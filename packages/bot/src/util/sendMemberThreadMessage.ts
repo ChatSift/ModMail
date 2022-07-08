@@ -42,8 +42,8 @@ export async function sendMemberThreadMessage({
 			.setFooter({ text: `${member.user.tag} (${member.user.id})`, iconURL: member.user.displayAvatarURL() });
 
 		if (member.nickname) {
-			embed.setAuthor({ name: member.nickname, iconURL: member.displayAvatarURL() })
-		};
+			embed.setAuthor({ name: member.nickname, iconURL: member.displayAvatarURL() });
+		}
 
 		options.content = userMessage.stickers.size ? 'This message also included a sticker' : null;
 		options.embeds = [embed];
