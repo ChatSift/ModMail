@@ -46,7 +46,7 @@ for await (const file of files) {
 	const mod = (await import(pathToFileURL(file).toString())) as { default?: new () => Route<any, any> };
 	if (mod.default) {
 		const route = container.resolve(mod.default);
-		console.log(route.info);
+		logger.info(route.info, 'Registering route');
 		route.register(app);
 	}
 }
