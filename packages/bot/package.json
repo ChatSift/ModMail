@@ -1,6 +1,7 @@
 {
-	"name": "@modmail/bot",
+	"name": "@chatsift/modmail-bot",
 	"main": "./dist/index.js",
+	"private": true,
 	"version": "0.1.0-dev",
 	"type": "module",
 	"imports": {
@@ -17,23 +18,21 @@
 	"devDependencies": {
 		"@types/common-tags": "^1.8.1",
 		"@types/i18next-fs-backend": "^1.1.2",
-		"@types/node": "^18.0.1",
+		"@types/node": "^16.11.43",
 		"@types/pino": "^7.0.5",
-		"@typescript-eslint/eslint-plugin": "^5.30.5",
-		"@typescript-eslint/parser": "^5.30.5",
 		"prisma": "^4.0.0",
 		"typescript": "^4.7.4"
 	},
 	"dependencies": {
-		"@chatsift/readdir": "^0.1.0",
+		"@chatsift/readdir": "^0.2.0",
 		"@discordjs/builders": "^0.15.0",
 		"@discordjs/rest": "^0.5.0",
 		"@naval-base/ms": "^3.1.0",
 		"@prisma/client": "^4.0.0",
-		"bree": "^9.1.0",
+		"bree": "^9.1.1",
 		"common-tags": "^1.8.2",
 		"discord.js": "dev",
-		"i18next": "^21.8.12",
+		"i18next": "^21.8.13",
 		"i18next-fs-backend": "^1.1.4",
 		"nanoid": "^4.0.0",
 		"pino": "^8.1.0",

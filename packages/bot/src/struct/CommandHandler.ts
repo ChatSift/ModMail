@@ -14,10 +14,10 @@ import {
 } from 'discord.js';
 import i18next from 'i18next';
 import { container, singleton } from 'tsyringe';
-import { logger } from '../util/logger';
 import type { Command, CommandConstructor } from '#struct/Command';
 import { Component, ComponentConstructor, getComponentInfo } from '#struct/Component';
 import { Env } from '#struct/Env';
+import { logger } from '#util/logger';
 import { sendStaffThreadMessage } from '#util/sendStaffThreadMessage';
 
 @singleton()
