@@ -18,7 +18,7 @@
 			"resource_not_found": "The {{ resource }} you are looking for could not be found",
 			"no_resources": "There are no {{ resource }} available",
 			"resource_too_long": "The given {{ snippet }} needs to be {{ length }} characters or less",
-			"no_guilds": "Could not find your mutual guilds with the bot. This is most likely a bug",
+			"no_guilds": "Could not find any mutual guilds that are setup with this bot.",
 			"no_guild": "Could not find that guild. Are you sure you're still in it?",
 			"no_thread": "This does not appear to be a thread",
 			"thread_deleted": "Could not find the channel associated with this thread. This is most likely because an Admin deleted it, opening a new thread with your message.",
