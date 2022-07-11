@@ -1,4 +1,4 @@
-import { AnyInteraction, Events, InteractionType } from 'discord.js';
+import { Interaction, Events, InteractionType } from 'discord.js';
 import { singleton } from 'tsyringe';
 import { CommandHandler } from '#struct/CommandHandler';
 import type { Event } from '#struct/Event';
@@ -10,7 +10,7 @@ export default class implements Event<typeof Events.InteractionCreate> {
 
 	public constructor(private readonly commandHandler: CommandHandler) {}
 
-	public async handle(interaction: AnyInteraction) {
+	public async handle(interaction: Interaction) {
 		switch (interaction.type) {
 			case InteractionType.ApplicationCommandAutocomplete: {
 				await this.commandHandler.handleAutocomplete(interaction);

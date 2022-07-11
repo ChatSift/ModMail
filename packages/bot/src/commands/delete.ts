@@ -61,5 +61,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 		const guildMessage = await (interaction.channel as ThreadChannel).messages.fetch(threadMessage.guildMessageId);
 		await guildMessage.delete().catch(() => null);
+
+		return interaction.reply(i18next.t('common.success.reply_deleted', { lng: interaction.locale }));
 	}
 }

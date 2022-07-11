@@ -173,6 +173,8 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 					});
 				}
 
+				await interaction.deferReply();
+
 				let command;
 				try {
 					command = await interaction.guild.commands.create({
@@ -189,7 +191,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 						],
 					});
 				} catch {
-					return interaction.reply({
+					return interaction.editReply({
 						content: i18next.t('common.errors.bad_snippet_name', { lng: interaction.locale }),
 					});
 				}
@@ -204,7 +206,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 					},
 				});
 
-				return interaction.reply({
+				return interaction.editReply({
 					content: i18next.t('common.success.resource_creation', { resource: 'snippet', lng: interaction.locale }),
 				});
 			}
@@ -218,10 +220,12 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 					});
 				}
 
+				await interaction.deferReply();
+
 				await this.prisma.snippet.delete({ where: { guildId_name: { guildId: interaction.guildId, name } } });
 				await interaction.guild.commands.delete(existing.commandId).catch(() => null);
 
-				return interaction.reply({
+				return interaction.editReply({
 					content: i18next.t('common.success.resource_deletion', { resource: 'snippet', lng: interaction.locale }),
 				});
 			}
