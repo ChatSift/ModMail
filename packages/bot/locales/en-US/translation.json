@@ -11,7 +11,8 @@
 			"no_alert_global": "You will no longer be alerted when new threads are opened",
 			"alert_thread": "You will now be alerted when the user replies to this thread",
 			"no_alert_thread": "You will no longer be alerted when the user replies to this thread",
-			"opened_thread": "Successfully opened thread"
+			"opened_thread": "Successfully opened thread",
+			"reply_deleted": "Successfully deleted your reply"
 		},
 		"errors": {
 			"resource_exists": "A {{ resource }} with that name already exists",
