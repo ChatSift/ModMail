@@ -83,10 +83,14 @@ export async function sendStaffThreadMessage({
 	// Now that we've sent the message locally, we can purge all identifying information from anon messages
 	if (anon) {
 		if (simpleMode) {
-			userOptions.content = `${bold(`${staff.guild.name} Team:`)} ${content}`;
+			userOptions.content = `${bold(
+				`${existing ? `${inlineCode(existing.replyId.toString())} ` : ''}(Anonymous) ${staff.guild.name} Team:`,
+			)} ${content}`;
 		} else {
 			const [embed] = userOptions.embeds as [EmbedBuilder];
-			embed.setFooter(null);
+			embed.setFooter({
+				text: `${existing ? `Reply ID: ${existing.replyId} | ` : ''}(Anonymous)`,
+			});
 			userOptions.embeds = [embed];
 		}
 	}
