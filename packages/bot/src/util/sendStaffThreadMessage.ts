@@ -88,7 +88,8 @@ export async function sendStaffThreadMessage({
 			)} ${content}`;
 		} else {
 			const [embed] = userOptions.embeds as [EmbedBuilder];
-			embed.setFooter({
+			const newEmbed = new EmbedBuilder(embed.toJSON());
+			newEmbed.setFooter({
 				text: `${existing ? `Reply ID: ${existing.replyId} | ` : ''}(Anonymous)`,
 			});
 			userOptions.embeds = [embed];
