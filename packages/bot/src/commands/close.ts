@@ -103,9 +103,11 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 					threadId: thread.threadId,
 					closeAt,
 					scheduledById: interaction.user.id,
+					silent,
 				},
 				update: {
 					closeAt,
+					silent,
 				},
 				where: { threadId: thread.threadId },
 			});
