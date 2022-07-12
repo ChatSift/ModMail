@@ -155,7 +155,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 
 		const modmail = guild.channels.cache.get(settings.modmailChannelId) as TextChannel;
 		const pastModmails = await this.prisma.thread.findMany({
-			where: { guildId: guild.id, createdById: message.author.id },
+			where: { guildId: guild.id, userId: message.author.id },
 		});
 
 		let alert: string | null = null;

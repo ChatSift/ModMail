@@ -56,7 +56,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			return interaction.reply(i18next.t('common.errors.no_member', { lng: interaction.locale }));
 		}
 		const pastModmails = await this.prisma.thread.findMany({
-			where: { guildId: interaction.guild.id, createdById: member.id },
+			where: { guildId: interaction.guild.id, userId: member.id },
 		});
 
 		await interaction.deferReply();
