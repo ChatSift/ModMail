@@ -19,7 +19,7 @@ type Body = InferType<typeof schema>;
 export default class extends Route<GuildSettings, Body> {
 	public info = {
 		method: RouteMethod.patch,
-		path: '/guilds/:guildId/settings/',
+		path: '/modmail/v1/guilds/:guildId/settings/',
 	} as const;
 
 	public override readonly bodyValidationSchema: BaseValidator<Body> = schema;

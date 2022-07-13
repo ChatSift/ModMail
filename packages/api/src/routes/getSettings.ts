@@ -8,7 +8,7 @@ import type { GuildSettings } from '../util/models';
 export default class extends Route<GuildSettings, never> {
 	public info = {
 		method: RouteMethod.get,
-		path: '/guilds/:guildId/settings/',
+		path: '/modmail/v1/guilds/:guildId/settings/',
 	} as const;
 
 	public override middleware: Middleware[] = [];

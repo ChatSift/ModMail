@@ -53,10 +53,10 @@ __metadata:
   resolution: "@chatsift/modmail-api@workspace:packages/api"
   dependencies:
     "@chatsift/readdir": ^0.2.0
-    "@chatsift/rest-utils": ^0.4.1
+    "@chatsift/rest-utils": ^0.5.0
     "@hapi/boom": ^10.0.0
     "@prisma/client": ^4.0.0
-    "@sapphire/shapeshift": ^3.4.1
+    "@sapphire/shapeshift": ^3.5.0
     "@types/cors": ^2.8.12
     "@types/node": ^16.11.43
     "@types/pino": ^7.0.5
@@ -110,8 +110,8 @@ __metadata:
   dependencies:
     "@commitlint/cli": ^17.0.3
     "@commitlint/config-angular": ^17.0.3
-    "@typescript-eslint/eslint-plugin": ^5.30.5
-    "@typescript-eslint/parser": ^5.30.5
+    "@typescript-eslint/eslint-plugin": ^5.30.6
+    "@typescript-eslint/parser": ^5.30.6
     dotenv-cli: ^5.1.0
     eslint: ^8.19.0
     eslint-config-marine: ^9.4.1
@@ -136,9 +136,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@chatsift/rest-utils@npm:^0.4.1":
-  version: 0.4.1
-  resolution: "@chatsift/rest-utils@npm:0.4.1"
+"@chatsift/rest-utils@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "@chatsift/rest-utils@npm:0.5.0"
   dependencies:
     "@hapi/boom": ^10.0.0
     "@sapphire/shapeshift": ^3.4.1
@@ -146,7 +146,7 @@ __metadata:
     tslib: ^2.4.0
     tsyringe: ^4.7.0
     undici: ^5.6.0
-  checksum: 2a42a6a1256c0541589eb0862be8937fb9c9ba9dff5a2649bd90df8b1e2296d98ea6dbf0f653a197b317153a2824b63bf680d6e47e8914fa84cf9229dc9d2d03
+  checksum: 490281dd8bea556e3cc020fb7f6b2835cd4cbac89dc199a4271f1951533f25e35a605498d799e5991a0cca7bcf638cb621762434646c479fdacb6990adc3c1e7
   languageName: node
   linkType: hard
 
@@ -575,7 +575,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sapphire/shapeshift@npm:^3.1.0, @sapphire/shapeshift@npm:^3.4.1":
+"@sapphire/shapeshift@npm:^3.1.0, @sapphire/shapeshift@npm:^3.4.1, @sapphire/shapeshift@npm:^3.5.0":
   version: 3.5.0
   resolution: "@sapphire/shapeshift@npm:3.5.0"
   dependencies:
@@ -748,7 +748,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/eslint-plugin@npm:^5.30.5":
+"@typescript-eslint/eslint-plugin@npm:^5.30.6":
   version: 5.30.6
   resolution: "@typescript-eslint/eslint-plugin@npm:5.30.6"
   dependencies:
@@ -771,7 +771,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:^5.10.0, @typescript-eslint/parser@npm:^5.30.5":
+"@typescript-eslint/parser@npm:^5.10.0, @typescript-eslint/parser@npm:^5.30.6":
   version: 5.30.6
   resolution: "@typescript-eslint/parser@npm:5.30.6"
   dependencies:
