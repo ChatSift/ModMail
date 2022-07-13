@@ -70,6 +70,7 @@ __metadata:
     prisma-error-enum: ^0.1.2
     reflect-metadata: ^0.1.13
     tslib: ^2.4.0
+    tsyringe: ^4.7.0
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
