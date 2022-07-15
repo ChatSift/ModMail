@@ -7,7 +7,7 @@ import {
 } from 'discord.js';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
-import { handleThreadManagement } from '#util/handleThreadManagement';
+import { handleStaffThreadMessage } from '#util/handleStaffThreadMessage';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
@@ -46,6 +46,6 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
-		return handleThreadManagement(interaction, 'edit');
+		return handleStaffThreadMessage(interaction, 'edit');
 	}
 }
