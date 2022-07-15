@@ -152,5 +152,5 @@ export async function sendStaffThreadMessage({
 		options.embeds = [embed];
 	}
 
-	await guildMessage.edit(options as MessageEditOptions);
+	return guildMessage.edit(options as MessageEditOptions);
 }
