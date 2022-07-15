@@ -2,15 +2,13 @@ import { PrismaClient } from '@prisma/client';
 import {
 	ApplicationCommandOptionType,
 	ApplicationCommandType,
-	ThreadChannel,
 	type ApplicationCommandOptionChoiceData,
 	type AutocompleteInteraction,
 	type ChatInputCommandInteraction,
 } from 'discord.js';
-import i18next from 'i18next';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
-import { sendStaffThreadMessage } from '#util/sendStaffThreadMessage';
+import { handleThreadManagement } from '#util/handleThreadManagement';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
@@ -57,34 +55,6 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 	}
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
-		const thread = await this.prisma.thread.findFirst({
-			where: { channelId: interaction.channelId, closedById: null },
-		});
-		if (!thread) {
-			return interaction.reply(i18next.t('common.errors.no_thread'));
-		}
-
-		const content = interaction.options.getString('content', true);
-		const attachment = interaction.options.getAttachment('attachment');
-		const anon = interaction.options.getBoolean('anon');
-
-		const member = await interaction.guild.members.fetch(thread.userId).catch(() => null);
-		if (!member) {
-			return i18next.t('common.errors.no_member', { lng: interaction.locale });
-		}
-
-		const settings = await this.prisma.guildSettings.findFirst({ where: { guildId: interaction.guild.id } });
-
-		await sendStaffThreadMessage({
-			content,
-			attachment,
-			staff: interaction.member,
-			member,
-			channel: interaction.channel as ThreadChannel,
-			threadId: thread.threadId,
-			simpleMode: settings?.simpleMode ?? false,
-			anon: anon ?? false,
-			interaction,
-		});
+		return handleThreadManagement(interaction, 'reply');
 	}
 }
