@@ -1,10 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-import {
-	ApplicationCommandOptionType,
-	ApplicationCommandType,
-	Client,
-	type ChatInputCommandInteraction,
-} from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, type ChatInputCommandInteraction } from 'discord.js';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
 import { handleStaffThreadMessage, HandleStaffThreadMessageAction } from '#util/handleStaffThreadMessage';
@@ -42,8 +36,6 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			},
 		],
 	};
-
-	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		return handleStaffThreadMessage(interaction, HandleStaffThreadMessageAction.Edit);
