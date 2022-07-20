@@ -7,40 +7,49 @@ import {
 	time,
 	TimestampStyles,
 	type UserContextMenuCommandInteraction,
+	Message,
+	type MessageOptions,
 } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
 import { getSortedMemberRolesString } from './getSortedMemberRoles';
 
-export async function handleThreadManagement(
-	interaction: ChatInputCommandInteraction<'cached'> | UserContextMenuCommandInteraction<'cached'>,
+export async function openThread(
+	input: ChatInputCommandInteraction<'cached'> | UserContextMenuCommandInteraction<'cached'> | Message<true>,
 ) {
 	const prisma = container.resolve(PrismaClient);
-	const user = 'targetUser' in interaction ? interaction.targetUser : interaction.options.getUser('user', true);
+	const isMessage = input instanceof Message;
+	const send = isMessage
+		? (key: string) => input.channel.send(i18next.t(key, { lng: input.guild.preferredLocale }))
+		: (key: string) => input.reply(i18next.t(key, { lng: input.locale }));
+	const user =
+		'targetUser' in input ? input.targetUser : isMessage ? input.author : input.options.getUser('user', true);
 
-	const settings = await prisma.guildSettings.findFirst({ where: { guildId: interaction.guild.id } });
-	if (!settings?.modmailChannelId || !interaction.guild.channels.cache.has(settings.modmailChannelId)) {
-		return interaction.reply(i18next.t('common.errors.thread_creation', { lng: interaction.locale }));
+	const settings = await prisma.guildSettings.findFirst({ where: { guildId: input.guild.id } });
+	if (!settings?.modmailChannelId || !input.guild.channels.cache.has(settings.modmailChannelId)) {
+		return send('common.errors.thread_creation');
 	}
 
-	const modmail = interaction.guild.channels.cache.get(settings.modmailChannelId) as TextChannel;
+	const modmail = input.guild.channels.cache.get(settings.modmailChannelId) as TextChannel;
 	const existingThread = await prisma.thread.findFirst({
-		where: { guildId: interaction.guild.id, userId: user.id, closedById: null },
+		where: { guildId: input.guild.id, userId: user.id, closedById: null },
 	});
 
 	if (existingThread) {
-		return interaction.reply(i18next.t('common.errors.thread_exists', { lng: interaction.locale }));
+		return send('common.errors.thread_exists');
 	}
 
-	const member = await interaction.guild.members.fetch(user).catch(() => null);
+	const member = await input.guild.members.fetch(user).catch(() => null);
 	if (!member) {
-		return interaction.reply(i18next.t('common.errors.no_member', { lng: interaction.locale }));
+		return send('common.errors.no_member');
 	}
 	const pastModmails = await prisma.thread.findMany({
-		where: { guildId: interaction.guild.id, userId: member.id },
+		where: { guildId: input.guild.id, userId: member.id },
 	});
 
-	await interaction.deferReply();
+	if (!isMessage) {
+		await input.deferReply();
+	}
 
 	const embed = new EmbedBuilder()
 		.setFooter({ text: `${member.user.tag} (${member.user.id})`, iconURL: member.user.displayAvatarURL() })
@@ -63,7 +72,7 @@ export async function handleThreadManagement(
 			},
 			{
 				name: i18next.t('thread.start.embed.fields.opened_by'),
-				value: interaction.user.toString(),
+				value: user.toString(),
 				inline: true,
 			},
 			{
@@ -77,23 +86,52 @@ export async function handleThreadManagement(
 		embed.setAuthor({ name: member.nickname, iconURL: member.displayAvatarURL() });
 	}
 
-	const startMessage = await modmail.send({
-		content: member.toString(),
+	const startMessageOptions: MessageOptions = {
 		embeds: [embed],
-	});
+	};
+
+	if (isMessage) {
+		embed.spliceFields(3, 1);
+
+		let alert: string | null = null;
+		if (settings.alertRoleId) {
+			const role = input.guild.roles.cache.get(settings.alertRoleId);
+			if (role) {
+				alert = `Alert: ${role.toString()}`;
+			}
+		} else {
+			const alerts = await prisma.threadOpenAlert.findMany({ where: { guildId: input.guild.id } });
+			alert = alerts.length ? `Alerts: ${alerts.map((a) => `<@${a.userId}>`).join(' ')}` : null;
+		}
+
+		startMessageOptions.content = `${member.toString()}${alert ? `\n${alert}` : ''}`;
+	} else {
+		startMessageOptions.content = member.toString();
+	}
+
+	const startMessage = await modmail.send(startMessageOptions);
 
 	const threadChannel = await startMessage.startThread({
 		name: `${member.user.username}-${member.user.discriminator}`,
 	});
 
-	await prisma.thread.create({
+	const thread = await prisma.thread.create({
 		data: {
-			guildId: interaction.guild.id,
+			guildId: input.guild.id,
 			channelId: threadChannel.id,
 			userId: member.id,
-			createdById: interaction.user.id,
+			createdById: user.id,
 		},
 	});
 
-	return interaction.editReply(i18next.t('common.success.opened_thread', { lng: interaction.locale }));
+	if (isMessage) {
+		return {
+			thread,
+			threadChannel,
+			member,
+			settings,
+		};
+	}
+
+	return input.editReply(i18next.t('common.success.opened_thread', { lng: input.locale }));
 }

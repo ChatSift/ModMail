@@ -14,17 +14,13 @@ import {
 	MessageOptions,
 	SelectMenuBuilder,
 	SelectMenuOptionBuilder,
-	TextChannel,
-	ThreadChannel,
-	time,
-	TimestampStyles,
 } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
 import type { Event } from '#struct/Event';
 import { SelectMenuPaginator, SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
-import { getSortedMemberRolesString } from '#util/getSortedMemberRoles';
 import { getUserGuilds } from '#util/getUserGuilds';
+import { openThread } from '#util/handleThreadManagement';
 import { sendMemberThreadMessage } from '#util/sendMemberThreadMessage';
 import { templateDataFromMember, templateString } from '#util/templateString';
 
@@ -128,94 +124,13 @@ export default class implements Event<typeof Events.MessageCreate> {
 			return;
 		}
 
-		const member = await guild.members.fetch(message.author.id);
-		const existingThread = await this.prisma.thread.findFirst({
-			where: { guildId: guild.id, userId: message.author.id, closedById: null },
-		});
+		const threadResults = await openThread(message as Message<true>);
 
-		const settings = await this.prisma.guildSettings.findFirst({ where: { guildId: guild.id } });
-		if (!settings?.modmailChannelId || !guild.channels.cache.has(settings.modmailChannelId)) {
-			return message.channel.send(i18next.t('common.errors.thread_creation', { lng: guild.preferredLocale }));
+		if (!('settings' in threadResults)) {
+			return;
 		}
 
-		if (existingThread) {
-			const channel = guild.channels.cache.get(existingThread.channelId) as ThreadChannel | undefined;
-			if (channel) {
-				return sendMemberThreadMessage({
-					userMessage: message,
-					member,
-					channel,
-					threadId: existingThread.threadId,
-					simpleMode: settings.simpleMode,
-				});
-			}
-
-			await message.channel.send(i18next.t('common.errors.thread_deleted', { lng: guild.preferredLocale }));
-		}
-
-		const modmail = guild.channels.cache.get(settings.modmailChannelId) as TextChannel;
-		const pastModmails = await this.prisma.thread.findMany({
-			where: { guildId: guild.id, userId: message.author.id },
-		});
-
-		let alert: string | null = null;
-		if (settings.alertRoleId) {
-			const role = guild.roles.cache.get(settings.alertRoleId);
-			if (role) {
-				alert = `Alert: ${role.toString()}`;
-			}
-		} else {
-			const alerts = await this.prisma.threadOpenAlert.findMany({ where: { guildId: guild.id } });
-			alert = alerts.length ? `Alerts: ${alerts.map((a) => `<@${a.userId}>`).join(' ')}` : null;
-		}
-
-		const embed = new EmbedBuilder()
-			.setFooter({ text: `${member.user.tag} (${member.user.id})`, iconURL: member.user.displayAvatarURL() })
-			.setColor(Colors.NotQuiteBlack)
-			.setFields(
-				{
-					name: i18next.t('thread.start.embed.fields.account_created'),
-					value: time(member.user.createdAt, TimestampStyles.LongDate),
-					inline: true,
-				},
-				{
-					name: i18next.t('thread.start.embed.fields.joined_server'),
-					value: time(member.joinedAt!, TimestampStyles.LongDate),
-					inline: true,
-				},
-				{
-					name: i18next.t('thread.start.embed.fields.past_modmails'),
-					value: pastModmails.length.toString(),
-					inline: true,
-				},
-				{
-					name: i18next.t('thread.start.embed.fields.roles'),
-					value: getSortedMemberRolesString(member),
-					inline: true,
-				},
-			);
-
-		if (member.nickname) {
-			embed.setAuthor({ name: member.nickname, iconURL: member.displayAvatarURL() });
-		}
-
-		const startMessage = await modmail.send({
-			content: `${member.toString()}${alert ? `\n${alert}` : ''}`,
-			embeds: [embed],
-		});
-
-		const threadChannel = await startMessage.startThread({
-			name: `${message.author.username}-${message.author.discriminator}`,
-		});
-
-		const thread = await this.prisma.thread.create({
-			data: {
-				guildId: guild.id,
-				channelId: threadChannel.id,
-				userId: message.author.id,
-				createdById: message.author.id,
-			},
-		});
+		const { settings, member, thread, threadChannel } = threadResults;
 
 		await sendMemberThreadMessage({
 			userMessage: message,
