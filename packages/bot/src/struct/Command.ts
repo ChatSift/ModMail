@@ -1,14 +1,15 @@
-import {
+import type {
 	ApplicationCommandOptionChoiceData,
+	ApplicationCommandSubCommand,
 	ApplicationCommandType,
 	AutocompleteInteraction,
 	Awaitable,
 	ChatInputCommandInteraction,
-	Locale,
 	MessageContextMenuCommandInteraction,
 	RESTPostAPIApplicationCommandsJSONBody,
 	UserContextMenuCommandInteraction,
 } from 'discord.js';
+import { Locale } from 'discord.js';
 import i18next from 'i18next';
 
 interface InteractionTypeMapping {
@@ -25,6 +26,14 @@ export interface Command<Type extends ApplicationCommandType = ApplicationComman
 	readonly interactionOptions: CommandBody<Type>;
 	handleAutocomplete?: (interaction: AutocompleteInteraction<any>) => Awaitable<ApplicationCommandOptionChoiceData[]>;
 	handle: (interaction: InteractionTypeMapping[Type]) => Awaitable<unknown>;
+}
+
+export interface CommandWithSubcommands {
+	readonly interactionOptions: Omit<CommandBody<ApplicationCommandType.ChatInput>, 'options'>;
+}
+
+export interface Subcommand extends Omit<Command<ApplicationCommandType.ChatInput>, 'interactionOptions'> {
+	readonly interactionOptions: ApplicationCommandSubCommand;
 }
 
 export type CommandConstructor = new (...args: any[]) => Command;
