@@ -4,6 +4,11 @@ import i18next from 'i18next';
 import { container } from 'tsyringe';
 import { sendStaffThreadMessage, type SendStaffThreadMessageOptions } from './sendStaffThreadMessage';
 
+export enum HandleStaffThreadMessageAction {
+	Reply,
+	Edit,
+}
+
 /**
  *
  * @param interaction A received interaction from the edit and reply commands.
@@ -11,7 +16,7 @@ import { sendStaffThreadMessage, type SendStaffThreadMessageOptions } from './se
  */
 export async function handleStaffThreadMessage(
 	interaction: ChatInputCommandInteraction<'cached'>,
-	action: 'reply' | 'edit',
+	action: HandleStaffThreadMessageAction,
 ) {
 	const prisma = container.resolve(PrismaClient);
 
@@ -22,7 +27,7 @@ export async function handleStaffThreadMessage(
 		return interaction.reply(i18next.t('common.errors.no_thread'));
 	}
 
-	const options: Partial<SendStaffThreadMessageOptions> = {
+	let options: Partial<SendStaffThreadMessageOptions> = {
 		content: interaction.options.getString('content', true),
 		staff: interaction.member,
 		channel: interaction.channel as ThreadChannel,
@@ -38,7 +43,7 @@ export async function handleStaffThreadMessage(
 	}
 	options.member = member;
 
-	if (action === 'reply') {
+	if (action === HandleStaffThreadMessageAction.Reply) {
 		options.anon = interaction.options.getBoolean('anon') ?? false;
 		options.attachment = attachment;
 	} else {
@@ -70,15 +75,16 @@ export async function handleStaffThreadMessage(
 		const userChannel = await member.createDM();
 		const userMessage = await userChannel.messages.fetch(threadMessage.userMessageId);
 
-		Object.assign<typeof options, Partial<typeof options>>(options, {
-			attachment: clearAttachment ? null : attachment,
+		options = {
+			...options,
+			attachment,
 			anon: threadMessage.anon,
 			existing: {
 				guild: guildMessage,
 				user: userMessage,
 				replyId: threadMessage.localThreadMessageId,
 			},
-		});
+		};
 	}
 
 	const settings = await prisma.guildSettings.findFirst({ where: { guildId: interaction.guild.id } });

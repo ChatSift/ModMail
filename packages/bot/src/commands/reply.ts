@@ -8,7 +8,7 @@ import {
 } from 'discord.js';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
-import { handleStaffThreadMessage } from '#util/handleStaffThreadMessage';
+import { handleStaffThreadMessage, HandleStaffThreadMessageAction } from '#util/handleStaffThreadMessage';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
@@ -54,7 +54,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			.slice(0, 5);
 	}
 
-	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
-		return handleStaffThreadMessage(interaction, 'reply');
+	public handle(interaction: ChatInputCommandInteraction<'cached'>) {
+		return handleStaffThreadMessage(interaction, HandleStaffThreadMessageAction.Reply);
 	}
 }
