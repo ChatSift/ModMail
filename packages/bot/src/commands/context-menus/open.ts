@@ -1,5 +1,4 @@
-import type { PrismaClient } from '@prisma/client';
-import { ApplicationCommandType, type Client, type UserContextMenuCommandInteraction } from 'discord.js';
+import { ApplicationCommandType, type UserContextMenuCommandInteraction } from 'discord.js';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
 import { openThread } from '#util/handleThreadManagement';
@@ -13,9 +12,7 @@ export default class implements Command<ApplicationCommandType.User> {
 		dm_permission: false,
 	};
 
-	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
-
-	public async handle(interaction: UserContextMenuCommandInteraction<'cached'>) {
+	public handle(interaction: UserContextMenuCommandInteraction<'cached'>) {
 		return openThread(interaction);
 	}
 }
