@@ -11,7 +11,9 @@ export default class implements Event<typeof Events.GuildMemberRemove> {
 	public constructor(private readonly prisma: PrismaClient, private readonly client: Client<true>) {}
 
 	public async handle(member: GuildMember | PartialGuildMember) {
-		member = await member.fetch();
+		try {
+			member = await member.fetch();
+		} catch {}
 
 		const existingThread = await this.prisma.thread.findFirst({
 			where: { guildId: member.guild.id, userId: member.id, closedById: null },
