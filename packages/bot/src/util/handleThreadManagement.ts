@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { type GuildSettings, PrismaClient, type Thread } from '@prisma/client';
 import {
 	type ChatInputCommandInteraction,
 	Colors,
@@ -9,42 +9,73 @@ import {
 	type UserContextMenuCommandInteraction,
 	Message,
 	type MessageOptions,
+	type Guild,
+	type GuildMember,
+	Client,
+	ThreadChannel,
 } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
 import { getSortedMemberRolesString } from './getSortedMemberRoles';
 
+export interface MessageOpenThreadReturn {
+	thread: Thread;
+	threadChannel: ThreadChannel;
+	member: GuildMember;
+	settings: GuildSettings;
+}
+
+export function openThread(
+	input: ChatInputCommandInteraction<'cached'> | UserContextMenuCommandInteraction<'cached'>,
+): Promise<Message>;
+
+export function openThread(input: Message<false>, definedGuild: Guild): Promise<MessageOpenThreadReturn>;
+
 export async function openThread(
-	input: ChatInputCommandInteraction<'cached'> | UserContextMenuCommandInteraction<'cached'> | Message<true>,
-) {
+	input: ChatInputCommandInteraction<'cached'> | UserContextMenuCommandInteraction<'cached'> | Message<false>,
+	definedGuild?: Guild,
+): Promise<MessageOpenThreadReturn | Message> {
 	const prisma = container.resolve(PrismaClient);
+	const client = container.resolve(Client);
 	const isMessage = input instanceof Message;
+	const guild = isMessage ? definedGuild! : input.guild;
+
 	const send = isMessage
-		? (key: string) => input.channel.send(i18next.t(key, { lng: input.guild.preferredLocale }))
+		? (key: string) => input.channel.send(i18next.t(key, { lng: guild.preferredLocale }))
 		: (key: string) => input.reply(i18next.t(key, { lng: input.locale }));
 	const user =
 		'targetUser' in input ? input.targetUser : isMessage ? input.author : input.options.getUser('user', true);
 
-	const settings = await prisma.guildSettings.findFirst({ where: { guildId: input.guild.id } });
-	if (!settings?.modmailChannelId || !input.guild.channels.cache.has(settings.modmailChannelId)) {
+	const settings = await prisma.guildSettings.findFirst({ where: { guildId: guild.id } });
+	if (!settings?.modmailChannelId || !guild.channels.cache.has(settings.modmailChannelId)) {
 		return send('common.errors.thread_creation');
 	}
 
-	const modmail = input.guild.channels.cache.get(settings.modmailChannelId) as TextChannel;
+	const modmail = guild.channels.cache.get(settings.modmailChannelId) as TextChannel;
 	const existingThread = await prisma.thread.findFirst({
-		where: { guildId: input.guild.id, userId: user.id, closedById: null },
+		where: { guildId: guild.id, userId: user.id, closedById: null },
 	});
 
-	if (existingThread) {
-		return send('common.errors.thread_exists');
-	}
-
-	const member = await input.guild.members.fetch(user).catch(() => null);
+	const member = await guild.members.fetch(user).catch(() => null);
 	if (!member) {
 		return send('common.errors.no_member');
 	}
+
+	if (existingThread) {
+		if (isMessage) {
+			return {
+				thread: existingThread,
+				threadChannel: (await client.channels.fetch(existingThread.channelId)) as ThreadChannel,
+				member,
+				settings,
+			};
+		}
+
+		return send('common.errors.thread_exists');
+	}
+
 	const pastModmails = await prisma.thread.findMany({
-		where: { guildId: input.guild.id, userId: member.id },
+		where: { guildId: guild.id, userId: member.id },
 	});
 
 	if (!isMessage) {
@@ -95,12 +126,12 @@ export async function openThread(
 
 		let alert: string | null = null;
 		if (settings.alertRoleId) {
-			const role = input.guild.roles.cache.get(settings.alertRoleId);
+			const role = guild.roles.cache.get(settings.alertRoleId);
 			if (role) {
 				alert = `Alert: ${role.toString()}`;
 			}
 		} else {
-			const alerts = await prisma.threadOpenAlert.findMany({ where: { guildId: input.guild.id } });
+			const alerts = await prisma.threadOpenAlert.findMany({ where: { guildId: guild.id } });
 			alert = alerts.length ? `Alerts: ${alerts.map((a) => `<@${a.userId}>`).join(' ')}` : null;
 		}
 
@@ -117,7 +148,7 @@ export async function openThread(
 
 	const thread = await prisma.thread.create({
 		data: {
-			guildId: input.guild.id,
+			guildId: guild.id,
 			channelId: threadChannel.id,
 			userId: member.id,
 			createdById: user.id,

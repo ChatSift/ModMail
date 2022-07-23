@@ -124,7 +124,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 			return;
 		}
 
-		const threadResults = await openThread(message as Message<true>);
+		const threadResults = await openThread(message as Message<false>, guild);
 
 		if (!('settings' in threadResults)) {
 			return;
