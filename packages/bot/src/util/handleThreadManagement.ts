@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { type GuildSettings, PrismaClient, type Thread } from '@prisma/client';
 import {
 	type ChatInputCommandInteraction,
 	Colors,
@@ -9,11 +9,26 @@ import {
 	type UserContextMenuCommandInteraction,
 	Message,
 	type MessageOptions,
-	Guild,
+	type Guild,
+	type GuildMember,
+	type AnyThreadChannel,
 } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
 import { getSortedMemberRolesString } from './getSortedMemberRoles';
+
+export interface MessageOpenThreadReturn {
+	thread: Thread;
+	threadChannel: AnyThreadChannel;
+	member: GuildMember;
+	settings: GuildSettings;
+}
+
+export function openThread(
+	input: ChatInputCommandInteraction<'cached'> | UserContextMenuCommandInteraction<'cached'>,
+): Promise<Message>;
+
+export function openThread(input: Message<false>, definedGuild: Guild): Promise<MessageOpenThreadReturn>;
 
 export async function openThread(
 	input: ChatInputCommandInteraction<'cached'> | UserContextMenuCommandInteraction<'cached'> | Message<false>,
@@ -39,14 +54,24 @@ export async function openThread(
 		where: { guildId: guild.id, userId: user.id, closedById: null },
 	});
 
-	if (existingThread) {
-		return send('common.errors.thread_exists');
-	}
-
 	const member = await guild.members.fetch(user).catch(() => null);
 	if (!member) {
 		return send('common.errors.no_member');
 	}
+
+	if (existingThread) {
+		if (isMessage) {
+			return {
+				thread: existingThread,
+				threadChannel: guild.channels.cache.get(existingThread.channelId),
+				member,
+				settings,
+			};
+		}
+
+		return send('common.errors.thread_exists');
+	}
+
 	const pastModmails = await prisma.thread.findMany({
 		where: { guildId: guild.id, userId: member.id },
 	});
