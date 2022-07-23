@@ -11,7 +11,8 @@ import {
 	type MessageOptions,
 	type Guild,
 	type GuildMember,
-	type AnyThreadChannel,
+	Client,
+	ThreadChannel,
 } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
@@ -19,7 +20,7 @@ import { getSortedMemberRolesString } from './getSortedMemberRoles';
 
 export interface MessageOpenThreadReturn {
 	thread: Thread;
-	threadChannel: AnyThreadChannel;
+	threadChannel: ThreadChannel;
 	member: GuildMember;
 	settings: GuildSettings;
 }
@@ -33,8 +34,9 @@ export function openThread(input: Message<false>, definedGuild: Guild): Promise<
 export async function openThread(
 	input: ChatInputCommandInteraction<'cached'> | UserContextMenuCommandInteraction<'cached'> | Message<false>,
 	definedGuild?: Guild,
-) {
+): Promise<MessageOpenThreadReturn | Message> {
 	const prisma = container.resolve(PrismaClient);
+	const client = container.resolve(Client);
 	const isMessage = input instanceof Message;
 	const guild = isMessage ? definedGuild! : input.guild;
 
@@ -63,7 +65,7 @@ export async function openThread(
 		if (isMessage) {
 			return {
 				thread: existingThread,
-				threadChannel: guild.channels.cache.get(existingThread.channelId),
+				threadChannel: (await client.channels.fetch(existingThread.channelId)) as ThreadChannel,
 				member,
 				settings,
 			};
