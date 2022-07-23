@@ -1,7 +1,7 @@
 import type { GuildMember } from 'discord.js';
 
 export function getSortedMemberRolesString(member: GuildMember): string {
-	if (!member.roles.cache.size) {
+	if (member.roles.cache.size <= 1) {
 		return 'none';
 	}
 
