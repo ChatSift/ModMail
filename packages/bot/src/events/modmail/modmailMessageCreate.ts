@@ -1,4 +1,3 @@
-import { ms } from '@naval-base/ms';
 import { PrismaClient } from '@prisma/client';
 import {
 	ActionRowBuilder,
@@ -26,32 +25,13 @@ import { templateDataFromMember, templateString } from '#util/templateString';
 
 @singleton()
 export default class implements Event<typeof Events.MessageCreate> {
-	private readonly userSelectionCache = new Collection<string, string>();
 	private readonly recentlyInCache = new Set<string>();
 
 	public readonly name = Events.MessageCreate;
 
 	public constructor(private readonly prisma: PrismaClient, private readonly client: Client<true>) {}
 
-	public overwriteUserSelection(userId: string, guildId: string) {
-		this.userSelectionCache.set(userId, guildId);
-		setTimeout(() => {
-			this.userSelectionCache.delete(userId);
-			this.recentlyInCache.add(userId);
-		}, ms('24h')).unref();
-	}
-
 	private async promptUser(message: Message, guilds: Collection<string, Guild>): Promise<Guild | null> {
-		if (this.userSelectionCache.has(message.author.id)) {
-			const guildId = this.userSelectionCache.get(message.author.id)!;
-			const guild = guilds.get(guildId);
-			if (guild) {
-				return guild;
-			}
-
-			this.userSelectionCache.delete(message.author.id);
-		}
-
 		const paginator = new SelectMenuPaginator({ key: 'user-guild-selector', data: [...guilds.values()] });
 
 		const actionRow = new ActionRowBuilder<SelectMenuBuilder>();
@@ -61,7 +41,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 			const { data, currentPage, selectMenu, pageLeftOption, pageRightOption } = consumers.asSelectMenu();
 			content = `${i18next.t(
 				this.recentlyInCache.has(message.author.id) ? 'thread.reprompt' : 'thread.prompt',
-			)} - Page ${currentPage}/${paginator.pageCount}`;
+			)} - Page ${currentPage + 1}/${paginator.pageCount}`;
 			const options: SelectMenuOptionBuilder[] = [];
 			if (pageLeftOption) {
 				options.push(pageLeftOption);
@@ -96,7 +76,6 @@ export default class implements Event<typeof Events.MessageCreate> {
 			}
 
 			await prompt.delete();
-			this.overwriteUserSelection(message.author.id, value);
 			return guilds.get(value)!;
 		}
 
@@ -124,7 +103,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 			return;
 		}
 
-		const threadResults = await openThread(message as Message<true>);
+		const threadResults = await openThread(message as Message<false>, guild);
 
 		if (!('settings' in threadResults)) {
 			return;
