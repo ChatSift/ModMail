@@ -109,7 +109,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 			return;
 		}
 
-		const { settings, member, thread, threadChannel, greeted } = threadResults;
+		const { settings, member, thread, threadChannel, existing } = threadResults;
 
 		await sendMemberThreadMessage({
 			userMessage: message,
@@ -119,7 +119,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 			simpleMode: settings.simpleMode,
 		});
 
-		if (greeted) {
+		if (existing) {
 			return;
 		}
 
