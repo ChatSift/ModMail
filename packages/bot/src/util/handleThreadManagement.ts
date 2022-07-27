@@ -23,6 +23,7 @@ export interface MessageOpenThreadReturn {
 	threadChannel: ThreadChannel;
 	member: GuildMember;
 	settings: GuildSettings;
+	existing: boolean;
 }
 
 export function openThread(
@@ -68,6 +69,7 @@ export async function openThread(
 				threadChannel: (await client.channels.fetch(existingThread.channelId)) as ThreadChannel,
 				member,
 				settings,
+				existing: true,
 			};
 		}
 
@@ -161,6 +163,7 @@ export async function openThread(
 			threadChannel,
 			member,
 			settings,
+			existing: false,
 		};
 	}
 

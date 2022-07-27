@@ -109,7 +109,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 			return;
 		}
 
-		const { settings, member, thread, threadChannel } = threadResults;
+		const { settings, member, thread, threadChannel, existing } = threadResults;
 
 		await sendMemberThreadMessage({
 			userMessage: message,
@@ -118,6 +118,10 @@ export default class implements Event<typeof Events.MessageCreate> {
 			threadId: thread.threadId,
 			simpleMode: settings.simpleMode,
 		});
+
+		if (existing) {
+			return;
+		}
 
 		if (settings.greetingMessage) {
 			const options: MessageOptions = { allowedMentions: { roles: [] } };
