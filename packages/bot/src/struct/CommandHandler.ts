@@ -4,6 +4,7 @@ import { readdirRecurse } from '@chatsift/readdir';
 import { REST } from '@discordjs/rest';
 import { PrismaClient } from '@prisma/client';
 import {
+	ApplicationCommandOptionType,
 	AutocompleteInteraction,
 	ChatInputCommandInteraction,
 	CommandInteraction,
@@ -14,7 +15,15 @@ import {
 } from 'discord.js';
 import i18next from 'i18next';
 import { container, singleton } from 'tsyringe';
-import type { Command, CommandConstructor } from '#struct/Command';
+import {
+	AllowedInteractionOptionTypes,
+	Command,
+	CommandConstructor,
+	CommandWithSubcommands,
+	interactionOptionTypeToReceivedOptionValue,
+	Subcommand,
+	SubcommandData,
+} from '#struct/Command';
 import { Component, ComponentConstructor, getComponentInfo } from '#struct/Component';
 import { Env } from '#struct/Env';
 import { logger } from '#util/logger';
@@ -22,7 +31,7 @@ import { sendStaffThreadMessage } from '#util/sendStaffThreadMessage';
 
 @singleton()
 export class CommandHandler {
-	public readonly commands = new Map<string, Command>();
+	public readonly commands = new Map<string, Command | CommandWithSubcommands>();
 	public readonly components = new Map<string, Component>();
 
 	public constructor(private readonly env: Env, private readonly prisma: PrismaClient) {}
@@ -89,9 +98,39 @@ export class CommandHandler {
 		}
 
 		try {
-			// @ts-expect-error - Yet another instance of odd union behavior. Unsure if there's a way to avoid this
+			// TODO(SirH): rewrite this handle to check if the command that's being called is using a subcommand, then call its subcommand handle instead
+			if ('subcommands' in command) {
+				if (!interaction.isChatInputCommand()) {
+					return logger.warn(interaction, 'Command interaction with subcommand call was not chatInput');
+				}
+				const subcommandValue = interaction.options.getSubcommand(true);
+				const subcommand = command.subcommands.get(subcommandValue);
+				if (!subcommand) {
+					return logger.warn(interaction, 'Command interaction with subcommands map had no subcommand');
+				}
+
+				const subcommandOptions: Record<string, AllowedInteractionOptionTypes | null> = {};
+				for (const option of subcommand.interactionOptions.options!) {
+					subcommandOptions[option.name] = interactionOptionTypeToReceivedOptionValue(interaction.options, {
+						name: option.name,
+						// did this type cast cause overloads were causing me absolute pain and I'm too lazy to figure it out at the moment
+						type: option.type as ApplicationCommandOptionType.String,
+						required: option.required,
+						isMember: option.isMember,
+					});
+				}
+
+				// eslint-disable-next-line @typescript-eslint/return-await
+				return await subcommand.handle(
+					interaction as ChatInputCommandInteraction<'cached'>,
+					subcommandOptions as SubcommandData,
+				);
+			}
+
+			// the ts-expect-error thing has been replaced with just type casting the chat input class to the interaction.
+			// If you'd like, you can avoid the type cast by using the `isChatInputCommand` method beforehand.
 			// eslint-disable-next-line @typescript-eslint/return-await
-			return await command.handle(interaction);
+			return await command.handle(interaction as ChatInputCommandInteraction<'cached'>);
 		} catch (err) {
 			// TODO(DD): Consider dealing with specific error
 			logger.error({ err, command: interaction.commandName }, 'Error handling command');
@@ -110,7 +149,17 @@ export class CommandHandler {
 
 	public async registerInteractions(): Promise<void> {
 		const api = new REST().setToken(this.env.discordToken);
-		const options = [...this.commands.values()].map((command) => command.interactionOptions);
+		const options = [...this.commands.values()].map((command) =>
+			'subcommands' in command
+				? {
+						...command.interactionOptions,
+						options: [...command.subcommands].map((subcmd) => ({
+							...subcmd,
+							type: ApplicationCommandOptionType.Subcommand,
+						})),
+				  }
+				: command.interactionOptions,
+		);
 		await api.put(Routes.applicationCommands(this.env.discordClientId), { body: options });
 	}
 
@@ -168,6 +217,25 @@ export class CommandHandler {
 		for await (const file of files) {
 			const mod = (await import(pathToFileURL(file).toString())) as { default: CommandConstructor };
 			const command = container.resolve(mod.default);
+
+			if ('subcommands' in command) {
+				const subPath = join(
+					dirname(fileURLToPath(import.meta.url)),
+					'..',
+					'subcommands',
+					command.interactionOptions.name,
+				);
+				const subFiles = readdirRecurse(subPath, { fileExtensions: ['js'] });
+
+				for await (const subFile of subFiles) {
+					const subMod = (await import(pathToFileURL(subFile).toString())) as {
+						default: new (...args: any[]) => Subcommand;
+					};
+					const subCommand = container.resolve(subMod.default);
+
+					command.subcommands.set(subCommand.interactionOptions.name, subCommand);
+				}
+			}
 
 			this.commands.set(command.interactionOptions.name, command);
 		}
