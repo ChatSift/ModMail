@@ -1,22 +1,16 @@
 import type { PrismaClient } from '@prisma/client';
 import {
-	APIApplicationCommandSubcommandOption,
+	type APIApplicationCommandSubcommandOption,
 	ApplicationCommandOptionType,
 	type ChatInputCommandInteraction,
 } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
-import { getLocalizedProp, type Subcommand, SubcommandData } from '#struct/Command';
+import { getLocalizedProp, type Subcommand } from '#struct/Command';
 import type { CommandHandler } from '#struct/CommandHandler';
 
-// refer to explanation in struct/Command.ts above Subcommand interface declaration
-interface SnippetAddOptions extends SubcommandData {
-	readonly name: string;
-	readonly content: string;
-}
-
 @singleton()
-export default class implements Subcommand<SnippetAddOptions> {
+export default class implements Subcommand {
 	public readonly interactionOptions: Omit<APIApplicationCommandSubcommandOption, 'type'> = {
 		...getLocalizedProp('name', 'commands.snippets.add.name'),
 		...getLocalizedProp('description', 'commands.snippets.add.description'),
@@ -38,8 +32,9 @@ export default class implements Subcommand<SnippetAddOptions> {
 
 	public constructor(private readonly prisma: PrismaClient, private readonly commandHandler: CommandHandler) {}
 
-	public async handle(interaction: ChatInputCommandInteraction<'cached'>, options?: SnippetAddOptions) {
-		const { name, content } = options!;
+	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
+		const name = interaction.options.getString('name', true);
+		const content = interaction.options.getString('content', true);
 
 		if (this.commandHandler.commands.has(name)) {
 			return interaction.reply({

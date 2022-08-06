@@ -7,6 +7,7 @@ import { sendStaffThreadMessage } from '#util/sendStaffThreadMessage';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.Message> {
+	public readonly containsSubcommands = false;
 	public readonly interactionOptions: CommandBody<ApplicationCommandType.Message> = {
 		...getLocalizedProp('name', 'context-menus.reply.name'),
 		type: ApplicationCommandType.Message,

@@ -12,6 +12,7 @@ import { getLocalizedProp, type CommandBody, type Command } from '#struct/Comman
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
+	public readonly containsSubcommands = false;
 	public readonly interactionOptions: CommandBody<ApplicationCommandType.ChatInput> = {
 		...getLocalizedProp('name', 'commands.unblock.name'),
 		...getLocalizedProp('description', 'commands.unblock.description'),

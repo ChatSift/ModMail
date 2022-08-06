@@ -7,6 +7,7 @@ import { durationAutoComplete } from '#util/durationAutoComplete';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
+	public readonly containsSubcommands = false;
 	public readonly interactionOptions: CommandBody<ApplicationCommandType.ChatInput> = {
 		...getLocalizedProp('name', 'commands.alert.name'),
 		...getLocalizedProp('description', 'commands.alert.description'),
