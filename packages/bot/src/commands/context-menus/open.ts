@@ -5,7 +5,6 @@ import { openThread } from '#util/handleThreadManagement';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.User> {
-	public readonly containsSubcommands = false;
 	public readonly interactionOptions: CommandBody<ApplicationCommandType.User> = {
 		...getLocalizedProp('name', 'context-menus.open.name'),
 		type: ApplicationCommandType.User,

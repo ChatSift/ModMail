@@ -41,13 +41,15 @@ export class CommandHandler {
 		}
 
 		try {
-			const subcmd = interaction.options.getSubcommand(false);
-			const handleAutocomplete = subcmd
-				? this.commands.get(`${command.interactionOptions.name}-${subcmd}`)?.handleAutocomplete ??
-				  command.handleAutocomplete!
-				: command.handleAutocomplete!;
+			const subcommandName = interaction.options.getSubcommand(false);
+			const subcommand = this.commands.get(`${command.interactionOptions.name}-${subcommandName!}`);
 
-			const options = await handleAutocomplete(interaction);
+			const autocompleteHandler = subcommand?.handleAutocomplete ? subcommand : command;
+			const options = await autocompleteHandler.handleAutocomplete?.(interaction);
+			if (!options) {
+				return await interaction.respond([]);
+			}
+
 			return await interaction.respond(options.slice(0, 25));
 		} catch (err) {
 			logger.error({ err, command: interaction.commandName }, 'Error handling autocomplete');

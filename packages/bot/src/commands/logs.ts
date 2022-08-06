@@ -20,7 +20,6 @@ import { SelectMenuPaginator, SelectMenuPaginatorConsumers } from '#struct/Selec
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
-	public readonly containsSubcommands = false;
 	public readonly interactionOptions: CommandBody<ApplicationCommandType.ChatInput> = {
 		...getLocalizedProp('name', 'commands.logs.name'),
 		...getLocalizedProp('description', 'commands.logs.description'),

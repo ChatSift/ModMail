@@ -6,7 +6,6 @@ import { getLocalizedProp, type CommandBody, type Command } from '#struct/Comman
 
 @singleton()
 export default class implements Command<ApplicationCommandType.Message> {
-	public readonly containsSubcommands = false;
 	public readonly interactionOptions: CommandBody<ApplicationCommandType.Message> = {
 		...getLocalizedProp('name', 'context-menus.expose.name'),
 		type: ApplicationCommandType.Message,

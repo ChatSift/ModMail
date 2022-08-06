@@ -5,7 +5,6 @@ import { handleStaffThreadMessage, HandleStaffThreadMessageAction } from '#util/
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
-	public readonly containsSubcommands = false;
 	public readonly interactionOptions: CommandBody<ApplicationCommandType.ChatInput> = {
 		...getLocalizedProp('name', 'commands.edit.name'),
 		...getLocalizedProp('description', 'commands.edit.description'),

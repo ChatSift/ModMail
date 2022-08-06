@@ -1,19 +1,14 @@
 import {
 	type ApplicationCommandOptionChoiceData,
 	type ApplicationCommandType,
-	type Attachment,
 	type AutocompleteInteraction,
 	type Awaitable,
-	type Channel,
 	type ChatInputCommandInteraction,
-	type GuildMember,
 	Locale,
 	type MessageContextMenuCommandInteraction,
 	type RESTPostAPIApplicationCommandsJSONBody,
-	type Role,
-	type User,
 	type UserContextMenuCommandInteraction,
-	APIApplicationCommandSubcommandOption,
+	type APIApplicationCommandSubcommandOption,
 } from 'discord.js';
 import i18next from 'i18next';
 
@@ -28,7 +23,7 @@ export type CommandBody<Type extends ApplicationCommandType> = RESTPostAPIApplic
 };
 
 export interface Command<Type extends ApplicationCommandType = ApplicationCommandType> {
-	readonly containsSubcommands: false;
+	readonly containsSubcommands?: false;
 	readonly interactionOptions: CommandBody<Type>;
 	handleAutocomplete?: (interaction: AutocompleteInteraction<any>) => Awaitable<ApplicationCommandOptionChoiceData[]>;
 	handle: (interaction: InteractionTypeMapping[Type]) => Awaitable<unknown>;
@@ -40,23 +35,10 @@ export interface CommandWithSubcommands {
 	handleAutocomplete?: (interaction: AutocompleteInteraction<any>) => Awaitable<ApplicationCommandOptionChoiceData[]>;
 }
 
-// As of right now, strict typings for the subcommand parameter requires extending SubcommandData
 export interface Subcommand
 	extends Omit<Command<ApplicationCommandType.ChatInput>, 'interactionOptions' | 'containsSubcommands'> {
 	readonly interactionOptions: Omit<APIApplicationCommandSubcommandOption, 'type'>;
 }
-
-export type SubcommandData = Record<string, AllowedInteractionOptionTypes>;
-
-export type AllowedInteractionOptionTypes =
-	| string
-	| number
-	| boolean
-	| User
-	| Channel
-	| Role
-	| GuildMember
-	| Attachment;
 
 export type CommandConstructor = new (...args: any[]) => Command | CommandWithSubcommands;
 
