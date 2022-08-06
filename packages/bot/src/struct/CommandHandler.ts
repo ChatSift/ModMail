@@ -43,9 +43,9 @@ export class CommandHandler {
 		try {
 			const subcmd = interaction.options.getSubcommand(false);
 			const handleAutocomplete = subcmd
-			? (this.commands.get(`${command.interactionOptions.name}-${subcmd}`)?.handleAutocomplete) ??
-				(command.handleAutocomplete!)
-			: command.handleAutocomplete!;
+				? this.commands.get(`${command.interactionOptions.name}-${subcmd}`)?.handleAutocomplete ??
+				  command.handleAutocomplete!
+				: command.handleAutocomplete!;
 
 			const options = await handleAutocomplete(interaction);
 			return await interaction.respond(options.slice(0, 25));

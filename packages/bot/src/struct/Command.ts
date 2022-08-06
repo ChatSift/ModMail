@@ -43,10 +43,7 @@ export interface CommandWithSubcommands {
 // As of right now, strict typings for the subcommand parameter requires extending SubcommandData
 export interface Subcommand
 	extends Omit<Command<ApplicationCommandType.ChatInput>, 'interactionOptions' | 'containsSubcommands'> {
-	readonly interactionOptions: Omit<
-		APIApplicationCommandSubcommandOption,
-		'type'
-	>;
+	readonly interactionOptions: Omit<APIApplicationCommandSubcommandOption, 'type'>;
 }
 
 export type SubcommandData = Record<string, AllowedInteractionOptionTypes>;
