@@ -209,30 +209,25 @@ export class CommandHandler {
 		const path = join(dirname(fileURLToPath(import.meta.url)), '..', 'commands');
 		const files = readdirRecurse(path, { fileExtensions: ['js'] });
 
+		const subcommands: { rootcmd: string; command: Subcommand }[] = [];
 		for await (const file of files) {
 			const mod = (await import(pathToFileURL(file).toString())) as { default: CommandConstructor };
 			const command = container.resolve(mod.default);
 
-			if (command.containsSubcommands) {
-				const subPath = join(
-					dirname(fileURLToPath(import.meta.url)),
-					'..',
-					'subcommands',
-					command.interactionOptions.name,
-				);
-				const subFiles = readdirRecurse(subPath, { fileExtensions: ['js'] });
+			// check if command is a subcommand via seeing if the directory it's in is a subdirectory of the command directory
+			const directory = dirname(file).split('/').pop()!;
+			const isSubcommand = (cmd: Command | Subcommand | CommandWithSubcommands): cmd is Subcommand =>
+				!['commands', 'context-menus'].includes(directory) && !file.endsWith('index.js');
 
-				for await (const subFile of subFiles) {
-					const subMod = (await import(pathToFileURL(subFile).toString())) as {
-						default: new (...args: any[]) => Subcommand;
-					};
-					const subcommand = container.resolve(subMod.default);
-
-					this.commands.set(`${command.interactionOptions.name}-${subcommand.interactionOptions.name}`, subcommand);
-				}
+			if (isSubcommand(command)) {
+				subcommands.push({ rootcmd: directory, command });
+			} else {
+				this.commands.set(command.interactionOptions.name, command);
 			}
+		}
 
-			this.commands.set(command.interactionOptions.name, command);
+		for (const { rootcmd, command } of subcommands) {
+			this.commands.set(`${rootcmd}-${command.interactionOptions.name}`, command);
 		}
 	}
 

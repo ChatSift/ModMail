@@ -40,7 +40,7 @@ export interface Subcommand
 	readonly interactionOptions: Omit<APIApplicationCommandSubcommandOption, 'type'>;
 }
 
-export type CommandConstructor = new (...args: any[]) => Command | CommandWithSubcommands;
+export type CommandConstructor = new (...args: any[]) => Command | CommandWithSubcommands | Subcommand;
 
 // PropAsIndexSignature and PropAsIndexSignatureLocalizations are separate because
 // TS does not allow 2 index signatures
