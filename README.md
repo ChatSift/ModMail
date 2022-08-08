@@ -48,4 +48,4 @@ figure out something wrong with cron jobs, `DEBUG_JOBS=true`.
 
 ## Licensing
 
-This project is lincensed under the MIT license. View the full file [here](./LICENSE).
+This project is lincensed under the GNU AGPLv3 license. View the full file [here](./LICENSE).
