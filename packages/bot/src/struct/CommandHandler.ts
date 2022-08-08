@@ -2,23 +2,24 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readdirRecurse } from '@chatsift/readdir';
 import { REST } from '@discordjs/rest';
-import { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '@prisma/client';
 import {
 	ApplicationCommandOptionType,
-	AutocompleteInteraction,
-	ChatInputCommandInteraction,
-	CommandInteraction,
+	ApplicationCommandType,
+	type AutocompleteInteraction,
+	type ChatInputCommandInteraction,
+	type CommandInteraction,
 	inlineCode,
-	MessageComponentInteraction,
-	RESTPutAPIApplicationCommandsJSONBody,
+	type MessageComponentInteraction,
+	type RESTPutAPIApplicationCommandsJSONBody,
 	Routes,
-	ThreadChannel,
+	type ThreadChannel,
 } from 'discord.js';
 import i18next from 'i18next';
 import { container, singleton } from 'tsyringe';
 import type { Command, CommandConstructor, CommandWithSubcommands, Subcommand } from '#struct/Command';
-import { Component, ComponentConstructor, getComponentInfo } from '#struct/Component';
-import { Env } from '#struct/Env';
+import { type Component, type ComponentConstructor, getComponentInfo } from '#struct/Component';
+import type { Env } from '#struct/Env';
 import { logger } from '#util/logger';
 import { sendStaffThreadMessage } from '#util/sendStaffThreadMessage';
 
@@ -149,6 +150,7 @@ export class CommandHandler {
 			.filter((cmd) => cmd.containsSubcommands)
 			.map((cmd) => ({
 				...cmd.interactionOptions,
+				type: ApplicationCommandType.ChatInput,
 				options: [...this.commands.entries()]
 					.filter(([key]) => key.startsWith(cmd.interactionOptions.name) && key !== cmd.interactionOptions.name)
 					.map(([, cmd]) => ({ ...cmd.interactionOptions, type: ApplicationCommandOptionType.Subcommand })),

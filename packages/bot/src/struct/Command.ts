@@ -31,7 +31,7 @@ export interface Command<Type extends ApplicationCommandType = ApplicationComman
 
 export interface CommandWithSubcommands {
 	readonly containsSubcommands: true;
-	readonly interactionOptions: Omit<CommandBody<ApplicationCommandType.ChatInput>, 'options'>;
+	readonly interactionOptions: Omit<CommandBody<ApplicationCommandType.ChatInput>, 'options' | 'type'>;
 	handleAutocomplete?: (interaction: AutocompleteInteraction<any>) => Awaitable<ApplicationCommandOptionChoiceData[]>;
 }
 
