@@ -1,4 +1,4 @@
-import type { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import {
 	type APIApplicationCommandSubcommandOption,
 	ApplicationCommandOptionType,
@@ -7,7 +7,7 @@ import {
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type Subcommand } from '#struct/Command';
-import type { CommandHandler } from '#struct/CommandHandler';
+import { CommandHandler } from '#struct/CommandHandler';
 
 @singleton()
 export default class implements Subcommand {

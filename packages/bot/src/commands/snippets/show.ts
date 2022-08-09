@@ -1,4 +1,4 @@
-import type { PrismaClient, Snippet, SnippetUpdates } from '@prisma/client';
+import { PrismaClient, type Snippet, type SnippetUpdates } from '@prisma/client';
 import {
 	type APIApplicationCommandSubcommandOption,
 	ApplicationCommandOptionType,
@@ -13,7 +13,7 @@ import {
 	EmbedBuilder,
 	time,
 	TimestampStyles,
-	type Client,
+	Client,
 } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';

@@ -1,4 +1,4 @@
-import type { PrismaClient, Snippet } from '@prisma/client';
+import { PrismaClient, type Snippet } from '@prisma/client';
 import {
 	type APIApplicationCommandSubcommandOption,
 	type ChatInputCommandInteraction,

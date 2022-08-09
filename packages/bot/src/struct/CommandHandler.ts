@@ -2,7 +2,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readdirRecurse } from '@chatsift/readdir';
 import { REST } from '@discordjs/rest';
-import type { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import {
 	ApplicationCommandOptionType,
 	ApplicationCommandType,
@@ -19,7 +19,7 @@ import i18next from 'i18next';
 import { container, singleton } from 'tsyringe';
 import type { Command, CommandConstructor, CommandWithSubcommands, Subcommand } from '#struct/Command';
 import { type Component, type ComponentConstructor, getComponentInfo } from '#struct/Component';
-import type { Env } from '#struct/Env';
+import { Env } from '#struct/Env';
 import { logger } from '#util/logger';
 import { sendStaffThreadMessage } from '#util/sendStaffThreadMessage';
 
@@ -138,23 +138,20 @@ export class CommandHandler {
 	public async registerInteractions(): Promise<void> {
 		const api = new REST().setToken(this.env.discordToken);
 		const commands = [...this.commands.values()];
-		const commandsWithoutSubcommandInterface = commands.filter((cmd) => 'containsSubcommands' in cmd) as Array<
-			Command | CommandWithSubcommands
-		>;
-
-		const normalCommands = commandsWithoutSubcommandInterface
-			.filter((cmd) => !cmd.containsSubcommands)
+		const commandsWithSubcommands = commands.filter(
+			(cmd) => 'containsSubcommands' in cmd && cmd.containsSubcommands,
+		) as CommandWithSubcommands[];
+		const normalCommands = commands
+			.filter((cmd) => 'type' in cmd.interactionOptions)
 			.map((cmd) => cmd.interactionOptions) as RESTPutAPIApplicationCommandsJSONBody;
 
-		const subcommands = commandsWithoutSubcommandInterface
-			.filter((cmd) => cmd.containsSubcommands)
-			.map((cmd) => ({
-				...cmd.interactionOptions,
-				type: ApplicationCommandType.ChatInput,
-				options: [...this.commands.entries()]
-					.filter(([key]) => key.startsWith(cmd.interactionOptions.name) && key !== cmd.interactionOptions.name)
-					.map(([, cmd]) => ({ ...cmd.interactionOptions, type: ApplicationCommandOptionType.Subcommand })),
-			})) as RESTPutAPIApplicationCommandsJSONBody;
+		const subcommands = commandsWithSubcommands.map((cmd) => ({
+			...cmd.interactionOptions,
+			type: ApplicationCommandType.ChatInput,
+			options: [...this.commands.entries()]
+				.filter(([key]) => key.startsWith(cmd.interactionOptions.name) && key !== cmd.interactionOptions.name)
+				.map(([, cmd]) => ({ ...cmd.interactionOptions, type: ApplicationCommandOptionType.Subcommand })),
+		})) as RESTPutAPIApplicationCommandsJSONBody;
 
 		const options: RESTPutAPIApplicationCommandsJSONBody = normalCommands.concat(subcommands);
 		await api.put(Routes.applicationCommands(this.env.discordClientId), { body: options });
@@ -215,7 +212,7 @@ export class CommandHandler {
 			const mod = (await import(pathToFileURL(file).toString())) as { default: CommandConstructor };
 			const command = container.resolve(mod.default);
 
-			const directory = dirname(file).split('/').pop()!;
+			const directory = dirname(file).split('\\').pop()!;
 			const isSubcommand = (cmd: Command | Subcommand | CommandWithSubcommands): cmd is Subcommand =>
 				!['commands', 'context-menus'].includes(directory) && !file.endsWith('index.js');
 

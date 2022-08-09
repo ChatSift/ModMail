@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { ApplicationCommandType, Client, type ChatInputCommandInteraction } from 'discord.js';
+import { ApplicationCommandType, type ChatInputCommandInteraction } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
@@ -15,7 +15,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		dm_permission: false,
 	};
 
-	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
+	public constructor(private readonly prisma: PrismaClient) {}
 
 	public handleAutocomplete = durationAutoComplete;
 
