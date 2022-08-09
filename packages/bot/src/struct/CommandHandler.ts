@@ -4,33 +4,36 @@ import { readdirRecurse } from '@chatsift/readdir';
 import { REST } from '@discordjs/rest';
 import { PrismaClient } from '@prisma/client';
 import {
-	AutocompleteInteraction,
-	ChatInputCommandInteraction,
-	CommandInteraction,
+	ApplicationCommandOptionType,
+	ApplicationCommandType,
+	type AutocompleteInteraction,
+	type ChatInputCommandInteraction,
+	type CommandInteraction,
 	inlineCode,
-	MessageComponentInteraction,
+	type MessageComponentInteraction,
+	type RESTPutAPIApplicationCommandsJSONBody,
 	Routes,
-	ThreadChannel,
+	type ThreadChannel,
 } from 'discord.js';
 import i18next from 'i18next';
 import { container, singleton } from 'tsyringe';
-import type { Command, CommandConstructor } from '#struct/Command';
-import { Component, ComponentConstructor, getComponentInfo } from '#struct/Component';
+import type { Command, CommandConstructor, CommandWithSubcommands, Subcommand } from '#struct/Command';
+import { type Component, type ComponentConstructor, getComponentInfo } from '#struct/Component';
 import { Env } from '#struct/Env';
 import { logger } from '#util/logger';
 import { sendStaffThreadMessage } from '#util/sendStaffThreadMessage';
 
 @singleton()
 export class CommandHandler {
-	public readonly commands = new Map<string, Command>();
+	public readonly commands = new Map<string, Command | CommandWithSubcommands | Subcommand>();
 	public readonly components = new Map<string, Component>();
 
 	public constructor(private readonly env: Env, private readonly prisma: PrismaClient) {}
 
 	public async handleAutocomplete(interaction: AutocompleteInteraction) {
-		const command = this.commands.get(interaction.commandName);
+		const command = this.commands.get(interaction.commandName) as Command | CommandWithSubcommands | undefined;
 
-		if (!command?.handleAutocomplete) {
+		if (!command?.handleAutocomplete && !command?.containsSubcommands) {
 			return interaction.respond([]);
 		}
 
@@ -39,7 +42,15 @@ export class CommandHandler {
 		}
 
 		try {
-			const options = await command.handleAutocomplete(interaction);
+			const subcommandName = interaction.options.getSubcommand(false);
+			const subcommand = this.commands.get(`${command.interactionOptions.name}-${subcommandName!}`);
+
+			const autocompleteHandler = subcommand?.handleAutocomplete ? subcommand : command;
+			const options = await autocompleteHandler.handleAutocomplete?.(interaction);
+			if (!options) {
+				return await interaction.respond([]);
+			}
+
 			return await interaction.respond(options.slice(0, 25));
 		} catch (err) {
 			logger.error({ err, command: interaction.commandName }, 'Error handling autocomplete');
@@ -72,7 +83,7 @@ export class CommandHandler {
 	}
 
 	public async handleCommand(interaction: CommandInteraction) {
-		const command = this.commands.get(interaction.commandName);
+		const command = this.commands.get(interaction.commandName) as Command | CommandWithSubcommands | undefined;
 		if (!command) {
 			if (interaction.isChatInputCommand()) {
 				return this.handleSnippetCommand(interaction);
@@ -89,9 +100,25 @@ export class CommandHandler {
 		}
 
 		try {
-			// @ts-expect-error - Yet another instance of odd union behavior. Unsure if there's a way to avoid this
+			if (!command.containsSubcommands) {
+				// eslint-disable-next-line @typescript-eslint/return-await
+				return await command.handle(interaction as ChatInputCommandInteraction<'cached'>);
+			}
+
+			if (!interaction.isChatInputCommand()) {
+				return logger.warn(interaction, 'Command interaction with subcommand call was not chatInput');
+			}
+
+			const subcommand = this.commands.get(`${interaction.commandName}-${interaction.options.getSubcommand()}`) as
+				| Subcommand
+				| undefined;
+
+			if (!subcommand) {
+				return logger.warn(interaction, 'Command interaction with subcommands map had no subcommand');
+			}
+
 			// eslint-disable-next-line @typescript-eslint/return-await
-			return await command.handle(interaction);
+			return await subcommand.handle(interaction as ChatInputCommandInteraction<'cached'>);
 		} catch (err) {
 			// TODO(DD): Consider dealing with specific error
 			logger.error({ err, command: interaction.commandName }, 'Error handling command');
@@ -110,7 +137,23 @@ export class CommandHandler {
 
 	public async registerInteractions(): Promise<void> {
 		const api = new REST().setToken(this.env.discordToken);
-		const options = [...this.commands.values()].map((command) => command.interactionOptions);
+		const commands = [...this.commands.values()];
+		const commandsWithSubcommands = commands.filter(
+			(cmd) => 'containsSubcommands' in cmd && cmd.containsSubcommands,
+		) as CommandWithSubcommands[];
+		const normalCommands = commands
+			.filter((cmd) => 'type' in cmd.interactionOptions)
+			.map((cmd) => cmd.interactionOptions) as RESTPutAPIApplicationCommandsJSONBody;
+
+		const subcommands = commandsWithSubcommands.map((cmd) => ({
+			...cmd.interactionOptions,
+			type: ApplicationCommandType.ChatInput,
+			options: [...this.commands.entries()]
+				.filter(([key]) => key.startsWith(cmd.interactionOptions.name) && key !== cmd.interactionOptions.name)
+				.map(([, cmd]) => ({ ...cmd.interactionOptions, type: ApplicationCommandOptionType.Subcommand })),
+		})) as RESTPutAPIApplicationCommandsJSONBody;
+
+		const options: RESTPutAPIApplicationCommandsJSONBody = normalCommands.concat(subcommands);
 		await api.put(Routes.applicationCommands(this.env.discordClientId), { body: options });
 	}
 
@@ -169,7 +212,15 @@ export class CommandHandler {
 			const mod = (await import(pathToFileURL(file).toString())) as { default: CommandConstructor };
 			const command = container.resolve(mod.default);
 
-			this.commands.set(command.interactionOptions.name, command);
+			const directory = dirname(file).split('\\').pop()!;
+			const isSubcommand = (cmd: Command | Subcommand | CommandWithSubcommands): cmd is Subcommand =>
+				!['commands', 'context-menus'].includes(directory) && !file.endsWith('index.js');
+
+			if (isSubcommand(command)) {
+				this.commands.set(`${directory}-${command.interactionOptions.name}`, command);
+			} else {
+				this.commands.set(command.interactionOptions.name, command);
+			}
 		}
 	}
 

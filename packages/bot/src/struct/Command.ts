@@ -1,13 +1,14 @@
 import {
-	ApplicationCommandOptionChoiceData,
-	ApplicationCommandType,
-	AutocompleteInteraction,
-	Awaitable,
-	ChatInputCommandInteraction,
+	type ApplicationCommandOptionChoiceData,
+	type ApplicationCommandType,
+	type AutocompleteInteraction,
+	type Awaitable,
+	type ChatInputCommandInteraction,
 	Locale,
-	MessageContextMenuCommandInteraction,
-	RESTPostAPIApplicationCommandsJSONBody,
-	UserContextMenuCommandInteraction,
+	type MessageContextMenuCommandInteraction,
+	type RESTPostAPIApplicationCommandsJSONBody,
+	type UserContextMenuCommandInteraction,
+	type APIApplicationCommandSubcommandOption,
 } from 'discord.js';
 import i18next from 'i18next';
 
@@ -22,12 +23,24 @@ export type CommandBody<Type extends ApplicationCommandType> = RESTPostAPIApplic
 };
 
 export interface Command<Type extends ApplicationCommandType = ApplicationCommandType> {
+	readonly containsSubcommands?: false;
 	readonly interactionOptions: CommandBody<Type>;
 	handleAutocomplete?: (interaction: AutocompleteInteraction<any>) => Awaitable<ApplicationCommandOptionChoiceData[]>;
 	handle: (interaction: InteractionTypeMapping[Type]) => Awaitable<unknown>;
 }
 
-export type CommandConstructor = new (...args: any[]) => Command;
+export interface CommandWithSubcommands {
+	readonly containsSubcommands: true;
+	readonly interactionOptions: Omit<CommandBody<ApplicationCommandType.ChatInput>, 'options' | 'type'>;
+	handleAutocomplete?: (interaction: AutocompleteInteraction<any>) => Awaitable<ApplicationCommandOptionChoiceData[]>;
+}
+
+export interface Subcommand
+	extends Omit<Command<ApplicationCommandType.ChatInput>, 'interactionOptions' | 'containsSubcommands'> {
+	readonly interactionOptions: Omit<APIApplicationCommandSubcommandOption, 'type'>;
+}
+
+export type CommandConstructor = new (...args: any[]) => Command | CommandWithSubcommands | Subcommand;
 
 // PropAsIndexSignature and PropAsIndexSignatureLocalizations are separate because
 // TS does not allow 2 index signatures
