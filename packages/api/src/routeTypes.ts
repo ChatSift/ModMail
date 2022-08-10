@@ -7,7 +7,10 @@ type RoutesByClassNames = {
 	[K in keyof typeof routes]: ConstructorToType<typeof routes[K]>;
 };
 type RoutesByPaths = {
-	[Path in InferRoutePath<RoutesByClassNames[keyof RoutesByClassNames]>]: RoutesByClassNames[keyof RoutesByClassNames];
+	[Path in InferRoutePath<RoutesByClassNames[keyof RoutesByClassNames]>]: Narrow<
+		RoutesByClassNames[keyof RoutesByClassNames],
+		{ info: { path: Path } }
+	>;
 };
 
 export type ModmailRoutes = {
