@@ -1,4 +1,4 @@
-import { dirname, join } from 'node:path';
+import { dirname, join, sep as pathSep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readdirRecurse } from '@chatsift/readdir';
 import { REST } from '@discordjs/rest';
@@ -138,9 +138,11 @@ export class CommandHandler {
 	public async registerInteractions(): Promise<void> {
 		const api = new REST().setToken(this.env.discordToken);
 		const commands = [...this.commands.values()];
+
 		const commandsWithSubcommands = commands.filter(
 			(cmd) => 'containsSubcommands' in cmd && cmd.containsSubcommands,
 		) as CommandWithSubcommands[];
+
 		const normalCommands = commands
 			.filter((cmd) => 'type' in cmd.interactionOptions)
 			.map((cmd) => cmd.interactionOptions) as RESTPutAPIApplicationCommandsJSONBody;
@@ -212,7 +214,7 @@ export class CommandHandler {
 			const mod = (await import(pathToFileURL(file).toString())) as { default: CommandConstructor };
 			const command = container.resolve(mod.default);
 
-			const directory = dirname(file).split('\\').pop()!;
+			const directory = dirname(file).split(pathSep).pop()!;
 			const isSubcommand = (cmd: Command | Subcommand | CommandWithSubcommands): cmd is Subcommand =>
 				!['commands', 'context-menus'].includes(directory) && !file.endsWith('index.js');
 
