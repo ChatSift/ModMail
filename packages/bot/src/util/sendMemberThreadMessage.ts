@@ -28,16 +28,18 @@ export async function sendMemberThreadMessage({
 
 	const options: Omit<MessageOptions, 'flags'> = {};
 	if (simpleMode) {
-		options.content = `${bold(`${userMessage.author.tag}:`)} ${userMessage.content}${
-			userMessage.stickers.size ? ' <sticker>' : ''
-		}`;
+		if (userMessage.content.length) {
+			options.content = `${bold(`${userMessage.author.tag}:`)} ${userMessage.content}${
+				userMessage.stickers.size ? ' <sticker>' : ''
+			}`;
+		}
 		if (userMessage.attachments.size) {
 			options.files = [userMessage.attachments.first()!];
 		}
 	} else {
 		const embed = new EmbedBuilder()
 			.setColor(Colors.Green)
-			.setDescription(userMessage.content)
+			.setDescription(userMessage.content.length ? userMessage.content : null)
 			.setImage(userMessage.attachments.first()?.url ?? null)
 			.setFooter({ text: `${member.user.tag} (${member.user.id})`, iconURL: member.user.displayAvatarURL() });
 
