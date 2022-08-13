@@ -13,7 +13,7 @@ export default class implements Event<typeof Events.MessageUpdate> {
 	public async handle(old: Message | PartialMessage, message: Message | PartialMessage) {
 		message = await message.fetch();
 
-		if (message.inGuild() || message.author.bot) {
+		if (message.inGuild() || message.author.bot || old.content === message.content) {
 			return;
 		}
 
