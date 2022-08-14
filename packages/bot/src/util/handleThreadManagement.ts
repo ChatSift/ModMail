@@ -105,7 +105,7 @@ export async function openThread(
 			},
 			{
 				name: i18next.t('thread.start.embed.fields.opened_by'),
-				value: user.toString(),
+				value: isMessage ? input.author.toString() : input.user.toString(),
 				inline: true,
 			},
 			{
