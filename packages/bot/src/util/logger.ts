@@ -1,12 +1,45 @@
-import createLogger from 'pino';
+import { join } from 'node:path';
+import type { PinoRotateFileOptions } from '@chatsift/pino-rotate-file';
+import createLogger, { multistream, transport } from 'pino';
+import type { PrettyOptions } from 'pino-pretty';
 
-export const logger = createLogger({
-	transport: {
-		target: 'pino-pretty',
-		options: {
-			colorize: true,
-			levelFirst: true,
-			translateTime: true,
-		},
+const pinoPrettyOptions: PrettyOptions = {
+	colorize: true,
+	levelFirst: true,
+	translateTime: true,
+};
+
+const pinoRotateFileOptions: PinoRotateFileOptions = {
+	dir: join(process.cwd(), 'logs', 'bot'),
+	mkdir: true,
+	maxAgeDays: 14,
+	prettyOptions: {
+		...pinoPrettyOptions,
+		colorize: false,
 	},
-});
+};
+
+export const logger = createLogger(
+	{
+		name: 'API',
+		level: 'trace',
+	},
+	multistream([
+		{
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			stream: transport({
+				target: 'pino-pretty',
+				options: pinoPrettyOptions,
+			}),
+			level: 'trace',
+		},
+		{
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			stream: transport({
+				target: '@chatsift/pino-rotate-file',
+				options: pinoRotateFileOptions,
+			}),
+			level: 'trace',
+		},
+	]),
+);

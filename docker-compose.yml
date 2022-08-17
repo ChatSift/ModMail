@@ -18,17 +18,27 @@ services:
       timeout: 5s
 
   bot:
-    image: chatsift/modmail_bot
+    image: chatsift/modmail
     build:
       context: ./
-      dockerfile: ./packages/bot/Dockerfile
+      dockerfile: ./Dockerfile
     env_file:
       - ./.env
     environment:
       DATABASE_URL: 'postgresql://modmail:admin@postgres:5432/modmail'
     restart: unless-stopped
+    volumes:
+      - ./logs:/usr/modmail/logs
     depends_on:
       - postgres
+    command:
+      [
+        'node',
+        '--es-module-specifier-resolution=node',
+        '--enable-source-maps',
+        '--no-warnings',
+        './packages/bot/dist/index.js',
+      ]
 
 volumes:
   postgres-data:

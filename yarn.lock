@@ -52,6 +52,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@chatsift/modmail-api@workspace:packages/api"
   dependencies:
+    "@chatsift/pino-rotate-file": ^0.1.2
     "@chatsift/readdir": ^0.2.0
     "@chatsift/rest-utils": ^0.6.0
     "@hapi/boom": ^10.0.0
@@ -79,6 +80,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@chatsift/modmail-bot@workspace:packages/bot"
   dependencies:
+    "@chatsift/pino-rotate-file": ^0.1.2
     "@chatsift/readdir": ^0.2.0
     "@discordjs/builders": ^1.1.0
     "@discordjs/rest": ^1.0.1
@@ -128,6 +130,17 @@ __metadata:
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
+
+"@chatsift/pino-rotate-file@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "@chatsift/pino-rotate-file@npm:0.1.2"
+  dependencies:
+    pino: ^8.4.0
+    pino-abstract-transport: ^1.0.0
+    tslib: ^2.4.0
+  checksum: 3e01d5c44ffe6029694e48d8f0721701f6c8d2b95911565d33c74b18fec3fc51a24c743cac1a21ec09f3393295cfaf4cf8214dd2b91600e5da8396383ffa6b01
+  languageName: node
+  linkType: hard
 
 "@chatsift/readdir@npm:^0.2.0":
   version: 0.2.0
@@ -3602,7 +3615,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pino@npm:^8.4.1":
+"pino@npm:^8.4.0, pino@npm:^8.4.1":
   version: 8.4.1
   resolution: "pino@npm:8.4.1"
   dependencies:

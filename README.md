@@ -13,7 +13,7 @@ and if you plan on exposing it to the internet you'll also need an instance of t
 base ChatSift API, which can be found in the [dashboard repo](https://github.com/chatsift/dashboard).
 It only offers CRUD over configuration and basic data as it's mostly intended for our dashboard.
 
-Our Docker images are pushed to DockerHub under the ChatSift org with the format `projectname_microservice`, e.g. `chatsift/modmail_bot`.
+A Docker image that can be used for running anything in this monorepo is available on DockerHub under `chatsift/modmail`.
 
 ---
 

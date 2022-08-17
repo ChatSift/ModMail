@@ -22,6 +22,7 @@
 		"typescript": "^4.7.4"
 	},
 	"dependencies": {
+		"@chatsift/pino-rotate-file": "^0.1.2",
 		"@chatsift/readdir": "^0.2.0",
 		"@chatsift/rest-utils": "^0.6.0",
 		"@hapi/boom": "^10.0.0",
