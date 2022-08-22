@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { AsyncQueue } from '@sapphire/async-queue';
 import {
 	ActionRowBuilder,
 	bold,
@@ -26,6 +27,8 @@ import { templateDataFromMember, templateString } from '#util/templateString';
 @singleton()
 export default class implements Event<typeof Events.MessageCreate> {
 	private readonly recentlyInCache = new Set<string>();
+	private readonly queues = new Map<string, AsyncQueue>();
+	private readonly queueTimeouts = new Map<string, NodeJS.Timeout>();
 
 	public readonly name = Events.MessageCreate;
 
@@ -83,6 +86,25 @@ export default class implements Event<typeof Events.MessageCreate> {
 		return null;
 	}
 
+	private getQueue(userId: string): { queue: AsyncQueue; timeout: NodeJS.Timeout } {
+		const queue = this.queues.get(userId);
+		if (queue) {
+			const timeout = this.queueTimeouts.get(userId)!;
+			return { queue, timeout };
+		}
+
+		const newQueue = new AsyncQueue();
+		this.queues.set(userId, newQueue);
+
+		const timeout = setTimeout(() => {
+			this.queues.delete(userId);
+			this.queueTimeouts.delete(userId);
+		}).unref();
+		this.queueTimeouts.set(userId, timeout);
+
+		return { queue: newQueue, timeout };
+	}
+
 	public async handle(message: Message) {
 		if (message.inGuild() || message.author.bot) {
 			return;
@@ -103,50 +125,60 @@ export default class implements Event<typeof Events.MessageCreate> {
 			return;
 		}
 
-		const threadResults = await openThread(message as Message<false>, guild);
+		const { queue, timeout } = this.getQueue(message.author.id);
+		timeout.refresh();
 
-		if (!('settings' in threadResults)) {
-			return;
-		}
+		try {
+			await queue.wait();
+			const threadResults = await openThread(message as Message<false>, guild);
 
-		const { settings, member, thread, threadChannel, existing } = threadResults;
-
-		await sendMemberThreadMessage({
-			userMessage: message,
-			member,
-			channel: threadChannel,
-			threadId: thread.threadId,
-			simpleMode: settings.simpleMode,
-		});
-
-		if (existing) {
-			return;
-		}
-
-		if (settings.greetingMessage) {
-			const options: MessageOptions = { allowedMentions: { roles: [] } };
-			const templateData = templateDataFromMember(member);
-			if (settings.simpleMode) {
-				options.content = `⚙️ ${bold(`${guild.name} Staff:`)} ${templateString(
-					settings.greetingMessage,
-					templateData,
-				)}`;
-			} else {
-				const greetingEmbed = new EmbedBuilder()
-					.setAuthor({
-						name: i18next.t('thread.greeting.embed.author', {
-							guild: guild.name,
-							iconURL: member.guild.iconURL() ?? undefined,
-						}),
-						iconURL: this.client.user.displayAvatarURL(),
-					})
-					.setDescription(templateString(settings.greetingMessage, templateData))
-					.setColor(Colors.NotQuiteBlack);
-				options.embeds = [greetingEmbed];
+			if (!('settings' in threadResults)) {
+				return;
 			}
 
-			await message.channel.send(options);
-			await threadChannel.send(options);
+			const { settings, member, thread, threadChannel, existing } = threadResults;
+
+			await sendMemberThreadMessage({
+				userMessage: message,
+				member,
+				channel: threadChannel,
+				threadId: thread.threadId,
+				simpleMode: settings.simpleMode,
+			});
+
+			if (existing) {
+				return;
+			}
+
+			if (settings.greetingMessage) {
+				const options: MessageOptions = { allowedMentions: { roles: [] } };
+				const templateData = templateDataFromMember(member);
+				if (settings.simpleMode) {
+					options.content = `⚙️ ${bold(`${guild.name} Staff:`)} ${templateString(
+						settings.greetingMessage,
+						templateData,
+					)}`;
+				} else {
+					const greetingEmbed = new EmbedBuilder()
+						.setAuthor({
+							name: i18next.t('thread.greeting.embed.author', {
+								guild: guild.name,
+								iconURL: member.guild.iconURL() ?? undefined,
+							}),
+							iconURL: this.client.user.displayAvatarURL(),
+						})
+						.setDescription(templateString(settings.greetingMessage, templateData))
+						.setColor(Colors.NotQuiteBlack);
+					options.embeds = [greetingEmbed];
+				}
+
+				await message.channel.send(options);
+				await threadChannel.send(options);
+			}
+		} catch (error) {
+			throw error;
+		} finally {
+			queue.shift();
 		}
 	}
 }
