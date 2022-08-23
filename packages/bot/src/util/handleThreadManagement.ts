@@ -63,17 +63,29 @@ export async function openThread(
 	}
 
 	if (existingThread) {
-		if (isMessage) {
-			return {
-				thread: existingThread,
-				threadChannel: (await client.channels.fetch(existingThread.channelId)) as ThreadChannel,
-				member,
-				settings,
-				existing: true,
-			};
+		const threadChannel = (await client.channels
+			.fetch(existingThread.channelId)
+			.catch(() => null)) as ThreadChannel | null;
+
+		if (threadChannel) {
+			if (isMessage) {
+				return {
+					thread: existingThread,
+					threadChannel,
+					member,
+					settings,
+					existing: true,
+				};
+			}
+
+			return send('common.errors.thread_exists');
 		}
 
-		return send('common.errors.thread_exists');
+		await prisma.thread.delete({
+			where: {
+				threadId: existingThread.threadId,
+			},
+		});
 	}
 
 	const pastModmails = await prisma.thread.findMany({

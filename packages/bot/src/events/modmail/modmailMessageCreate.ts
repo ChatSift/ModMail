@@ -26,7 +26,6 @@ import { templateDataFromMember, templateString } from '#util/templateString';
 
 @singleton()
 export default class implements Event<typeof Events.MessageCreate> {
-	private readonly recentlyInCache = new Set<string>();
 	private readonly queues = new Map<string, AsyncQueue>();
 	private readonly queueTimeouts = new Map<string, NodeJS.Timeout>();
 
@@ -42,9 +41,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 
 		const updateMessagePayload = (consumers: SelectMenuPaginatorConsumers<Guild[]>) => {
 			const { data, currentPage, selectMenu, pageLeftOption, pageRightOption } = consumers.asSelectMenu();
-			content = `${i18next.t(
-				this.recentlyInCache.has(message.author.id) ? 'thread.reprompt' : 'thread.prompt',
-			)} - Page ${currentPage + 1}/${paginator.pageCount}`;
+			content = `${i18next.t('thread.prompt')} - Page ${currentPage + 1}/${paginator.pageCount}`;
 			const options: SelectMenuOptionBuilder[] = [];
 			if (pageLeftOption) {
 				options.push(pageLeftOption);
