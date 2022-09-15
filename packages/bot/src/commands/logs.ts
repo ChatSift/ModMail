@@ -1,9 +1,10 @@
-import { PrismaClient, Thread } from '@prisma/client';
+import type { Thread } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import type { ButtonBuilder } from 'discord.js';
 import {
 	ActionRowBuilder,
 	ApplicationCommandOptionType,
 	ApplicationCommandType,
-	ButtonBuilder,
 	Client,
 	Colors,
 	EmbedBuilder,
@@ -16,7 +17,8 @@ import {
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
-import { SelectMenuPaginator, SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
+import type { SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
+import { SelectMenuPaginator } from '#struct/SelectMenuPaginator';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {

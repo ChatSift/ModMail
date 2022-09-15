@@ -12,7 +12,7 @@ export default class implements Command<ApplicationCommandType.User> {
 		dm_permission: false,
 	};
 
-	public handle(interaction: UserContextMenuCommandInteraction<'cached'>) {
+	public async handle(interaction: UserContextMenuCommandInteraction<'cached'>) {
 		return openThread(interaction);
 	}
 }

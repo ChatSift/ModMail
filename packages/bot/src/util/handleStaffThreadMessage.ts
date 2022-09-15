@@ -11,8 +11,8 @@ export enum HandleStaffThreadMessageAction {
 
 /**
  *
- * @param interaction A received interaction from the edit and reply commands.
- * @param action Which command was used to call this function.
+ * @param interaction - A received interaction from the edit and reply commands.
+ * @param action - Which command was used to call this function.
  */
 export async function handleStaffThreadMessage(
 	interaction: ChatInputCommandInteraction<'cached'>,
@@ -41,6 +41,7 @@ export async function handleStaffThreadMessage(
 	if (!member) {
 		return interaction.reply(i18next.t('common.errors.no_member', { lng: interaction.locale }));
 	}
+
 	options.member = member;
 
 	if (action === HandleStaffThreadMessageAction.Reply) {

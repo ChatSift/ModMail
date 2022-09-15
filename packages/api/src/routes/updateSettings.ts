@@ -1,6 +1,8 @@
-import { Route, RouteMethod, TRequest } from '@chatsift/rest-utils';
+import type { TRequest } from '@chatsift/rest-utils';
+import { Route, RouteMethod } from '@chatsift/rest-utils';
 import { PrismaClient } from '@prisma/client';
-import { BaseValidator, InferType, s } from '@sapphire/shapeshift';
+import type { BaseValidator, InferType } from '@sapphire/shapeshift';
+import { s } from '@sapphire/shapeshift';
 import type { Response } from 'polka';
 import { singleton } from 'tsyringe';
 import type { GuildSettings } from '../util/models';

@@ -1,9 +1,9 @@
 import { PrismaClient, type Snippet } from '@prisma/client';
+import type { ButtonBuilder } from 'discord.js';
 import {
 	type APIApplicationCommandSubcommandOption,
 	type ChatInputCommandInteraction,
 	ActionRowBuilder,
-	ButtonBuilder,
 	Colors,
 	EmbedBuilder,
 	inlineCode,

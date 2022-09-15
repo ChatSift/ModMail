@@ -1,14 +1,15 @@
 import { time } from '@discordjs/builders';
-import { GuildMember, TimestampStyles } from 'discord.js';
+import type { GuildMember } from 'discord.js';
+import { TimestampStyles } from 'discord.js';
 import { getSortedMemberRolesString } from '#util/getSortedMemberRoles';
 
-export interface TemplateData {
-	username: string;
-	userId: string;
+export type TemplateData = {
+	guildName: string;
 	joinDate: string;
 	roles: string;
-	guildName: string;
-}
+	userId: string;
+	username: string;
+};
 
 export function templateDataFromMember(member: GuildMember): TemplateData {
 	return {

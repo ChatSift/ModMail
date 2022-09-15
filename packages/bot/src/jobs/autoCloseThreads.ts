@@ -1,14 +1,17 @@
 import 'reflect-metadata';
 import { on } from 'node:events';
 import { parentPort } from 'node:worker_threads';
-import { PrismaClient, ScheduledThreadClose, Thread } from '@prisma/client';
-import { Payload, PayloadOpCode } from '#struct/JobManager';
+import type { ScheduledThreadClose, Thread } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import type { Payload } from '#struct/JobManager';
+import { PayloadOpCode } from '#struct/JobManager';
 import type { InferArrayT } from '#util/InferArrayT';
 import { i18nInit } from '#util/i18nInit';
+import { exit } from 'node:process';
 
 if (!parentPort) {
 	console.warn('Something went wrong. This script should only be ran in a worker thread.');
-	process.exit(0);
+	exit(0);
 }
 
 const prisma = new PrismaClient();
@@ -29,7 +32,7 @@ async function closeThread(thread: InferArrayT<typeof threads>) {
 	};
 
 	parentPort!.postMessage(payload);
-	for await (const [message] of on(parentPort!, 'message') as AsyncIterableIterator<[string | Payload]>) {
+	for await (const [message] of on(parentPort!, 'message') as AsyncIterableIterator<[Payload | string]>) {
 		if (typeof message !== 'string' && message.op === PayloadOpCode.Done) {
 			break;
 		}
@@ -50,7 +53,7 @@ async function closeThread(thread: InferArrayT<typeof threads>) {
 }
 
 await Promise.all(
-	threads.map((thread) => {
+	threads.map(async (thread) => {
 		if (thread.scheduledClose.closeAt.getTime() < Date.now()) {
 			return closeThread(thread);
 		}
@@ -59,4 +62,4 @@ await Promise.all(
 	}),
 );
 
-parentPort.postMessage('done');
+parentPort?.postMessage('done');

@@ -48,6 +48,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 					await interaction.member.roles.remove(role);
 					return interaction.reply(i18next.t('common.success.no_alert_global', { lng: interaction.locale }));
 				}
+
 				await interaction.member.roles.add(role);
 				return interaction.reply(i18next.t('common.success.alert_global', { lng: interaction.locale }));
 			}

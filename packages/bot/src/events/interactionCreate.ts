@@ -1,4 +1,5 @@
-import { Interaction, Events, InteractionType } from 'discord.js';
+import type { Interaction } from 'discord.js';
+import { Events, InteractionType } from 'discord.js';
 import { singleton } from 'tsyringe';
 import { CommandHandler } from '#struct/CommandHandler';
 import type { Event } from '#struct/Event';

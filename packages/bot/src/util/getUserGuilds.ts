@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { Client, Collection, Guild } from 'discord.js';
+import type { Guild } from 'discord.js';
+import { Client, Collection } from 'discord.js';
 import { container } from 'tsyringe';
 
 export async function getUserGuilds(userId: string): Promise<Collection<string, Guild>> {
@@ -7,7 +8,7 @@ export async function getUserGuilds(userId: string): Promise<Collection<string, 
 	const prisma = container.resolve(PrismaClient);
 
 	const results = await Promise.all(
-		Array.from(client.guilds.cache.values(), (guild) =>
+		Array.from(client.guilds.cache.values(), async (guild) =>
 			guild.members
 				.fetch(userId)
 				.then(async () => {

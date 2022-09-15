@@ -1,11 +1,12 @@
-import { GuildSettings, PrismaClient } from '@prisma/client';
+import type { GuildSettings } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { stripIndents } from 'common-tags';
+import type { TextChannel } from 'discord.js';
 import {
 	ApplicationCommandOptionType,
 	ApplicationCommandType,
 	ChannelType,
 	Client,
-	TextChannel,
 	type ChatInputCommandInteraction,
 } from 'discord.js';
 import { singleton } from 'tsyringe';

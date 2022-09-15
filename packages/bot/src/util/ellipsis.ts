@@ -1,7 +1,7 @@
 /**
  * Cuts off text after the given length - appending "..." at the end
- * @param text The text to cut off
- * @param total The maximum length of the text
+ * @param text - The text to cut off
+ * @param total - The maximum length of the text
  */
 export function ellipsis(text: string, total: number): string {
 	if (text.length <= total) {

@@ -1,8 +1,7 @@
 import { EmbedBuilder, bold, inlineCode } from '@discordjs/builders';
 import { PrismaClient } from '@prisma/client';
-import {
+import type {
 	Attachment,
-	Colors,
 	GuildMember,
 	ChatInputCommandInteraction,
 	MessageEditOptions,
@@ -11,23 +10,25 @@ import {
 	Message,
 	MessageContextMenuCommandInteraction,
 } from 'discord.js';
+import { Colors } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
 import { logger } from './logger';
 import { templateDataFromMember, templateString } from '#util/templateString';
+import { setTimeout } from 'node:timers';
 
-export interface SendStaffThreadMessageOptions {
-	content: string;
-	attachment?: Attachment | null;
-	staff: GuildMember;
-	member: GuildMember;
-	channel: ThreadChannel;
-	threadId: number;
-	simpleMode: boolean;
+export type SendStaffThreadMessageOptions = {
 	anon: boolean;
+	attachment?: Attachment | null;
+	channel: ThreadChannel;
+	content: string;
+	existing?: { guild: Message; replyId: number; user: Message };
 	interaction?: ChatInputCommandInteraction<'cached'> | MessageContextMenuCommandInteraction<'cached'>;
-	existing?: { user: Message; guild: Message; replyId: number };
-}
+	member: GuildMember;
+	simpleMode: boolean;
+	staff: GuildMember;
+	threadId: number;
+};
 
 export async function sendStaffThreadMessage({
 	content,
@@ -72,6 +73,7 @@ export async function sendStaffThreadMessage({
 		if (anon) {
 			embed.setAuthor({ name: `${staff.guild.name} Team`, iconURL: staff.guild.iconURL() ?? undefined });
 		}
+
 		if (staff.nickname && !anon) {
 			embed.setAuthor({ name: staff.displayName, iconURL: staff.displayAvatarURL() });
 		}

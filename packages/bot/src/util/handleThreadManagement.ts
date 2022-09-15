@@ -1,4 +1,5 @@
 import { type GuildSettings, PrismaClient, type Thread } from '@prisma/client';
+import type { ThreadChannel } from 'discord.js';
 import {
 	type ChatInputCommandInteraction,
 	Colors,
@@ -12,19 +13,18 @@ import {
 	type Guild,
 	type GuildMember,
 	Client,
-	ThreadChannel,
 } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
 import { getSortedMemberRolesString } from './getSortedMemberRoles';
 
-export interface MessageOpenThreadReturn {
-	thread: Thread;
-	threadChannel: ThreadChannel;
+export type MessageOpenThreadReturn = {
+	existing: boolean;
 	member: GuildMember;
 	settings: GuildSettings;
-	existing: boolean;
-}
+	thread: Thread;
+	threadChannel: ThreadChannel;
+};
 
 export function openThread(
 	input: ChatInputCommandInteraction<'cached'> | UserContextMenuCommandInteraction<'cached'>,
@@ -33,17 +33,17 @@ export function openThread(
 export function openThread(input: Message<false>, definedGuild: Guild): Promise<MessageOpenThreadReturn>;
 
 export async function openThread(
-	input: ChatInputCommandInteraction<'cached'> | UserContextMenuCommandInteraction<'cached'> | Message<false>,
+	input: ChatInputCommandInteraction<'cached'> | Message<false> | UserContextMenuCommandInteraction<'cached'>,
 	definedGuild?: Guild,
-): Promise<MessageOpenThreadReturn | Message> {
+): Promise<Message | MessageOpenThreadReturn> {
 	const prisma = container.resolve(PrismaClient);
 	const client = container.resolve(Client);
 	const isMessage = input instanceof Message;
 	const guild = isMessage ? definedGuild! : input.guild;
 
 	const send = isMessage
-		? (key: string) => input.channel.send(i18next.t(key, { lng: guild.preferredLocale }))
-		: (key: string) => input.reply(i18next.t(key, { lng: input.locale }));
+		? async (key: string) => input.channel.send(i18next.t(key, { lng: guild.preferredLocale }))
+		: async (key: string) => input.reply(i18next.t(key, { lng: input.locale }));
 	const user =
 		'targetUser' in input ? input.targetUser : isMessage ? input.author : input.options.getUser('user', true);
 

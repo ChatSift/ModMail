@@ -1,32 +1,22 @@
 import { PrismaClient } from '@prisma/client';
 import { AsyncQueue } from '@sapphire/async-queue';
-import {
-	ActionRowBuilder,
-	bold,
-	Client,
-	Collection,
-	Colors,
-	ComponentType,
-	EmbedBuilder,
-	Events,
-	Guild,
-	Message,
-	MessageOptions,
-	SelectMenuBuilder,
-	SelectMenuOptionBuilder,
-} from 'discord.js';
+import type { Collection, ComponentType, Guild, Message, MessageOptions, SelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, bold, Client, Colors, EmbedBuilder, Events, SelectMenuOptionBuilder } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
 import type { Event } from '#struct/Event';
-import { SelectMenuPaginator, SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
+import type { SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
+import { SelectMenuPaginator } from '#struct/SelectMenuPaginator';
 import { getUserGuilds } from '#util/getUserGuilds';
 import { openThread } from '#util/handleThreadManagement';
 import { sendMemberThreadMessage } from '#util/sendMemberThreadMessage';
 import { templateDataFromMember, templateString } from '#util/templateString';
+import { setTimeout } from 'node:timers';
 
 @singleton()
 export default class implements Event<typeof Events.MessageCreate> {
 	private readonly queues = new Map<string, AsyncQueue>();
+
 	private readonly queueTimeouts = new Map<string, NodeJS.Timeout>();
 
 	public readonly name = Events.MessageCreate;

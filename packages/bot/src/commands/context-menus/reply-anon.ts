@@ -1,4 +1,5 @@
-import { ApplicationCommandType, MessageContextMenuCommandInteraction } from 'discord.js';
+import type { MessageContextMenuCommandInteraction } from 'discord.js';
+import { ApplicationCommandType } from 'discord.js';
 import { singleton } from 'tsyringe';
 import ReplyContextMenu from './reply';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';

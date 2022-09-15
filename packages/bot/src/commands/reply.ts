@@ -54,7 +54,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			.slice(0, 5);
 	}
 
-	public handle(interaction: ChatInputCommandInteraction<'cached'>) {
+	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		return handleStaffThreadMessage(interaction, HandleStaffThreadMessageAction.Reply);
 	}
 }

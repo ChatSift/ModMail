@@ -21,7 +21,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		],
 	};
 
-	public handle(interaction: ChatInputCommandInteraction<'cached'>) {
+	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		return openThread(interaction);
 	}
 }

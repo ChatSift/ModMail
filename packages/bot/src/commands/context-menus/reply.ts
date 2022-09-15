@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { ApplicationCommandType, MessageContextMenuCommandInteraction, ThreadChannel } from 'discord.js';
+import type { MessageContextMenuCommandInteraction, ThreadChannel } from 'discord.js';
+import { ApplicationCommandType } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';

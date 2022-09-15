@@ -1,19 +1,21 @@
 import { EmbedBuilder, bold } from '@discordjs/builders';
 import { PrismaClient } from '@prisma/client';
-import { Colors, GuildMember, Message, MessageOptions, ThreadChannel } from 'discord.js';
+import type { GuildMember, Message, MessageOptions, ThreadChannel } from 'discord.js';
+import { Colors } from 'discord.js';
 import { container } from 'tsyringe';
+import { setTimeout } from 'node:timers';
 
 const RECENTLY_ALERTED = new Map<number, Set<string>>();
 
-export interface SendMemberThreadMessageOptions {
-	userMessage: Message;
-	member: GuildMember;
+export type SendMemberThreadMessageOptions = {
 	channel: ThreadChannel;
-	threadId: number;
-	simpleMode: boolean;
-	oldContent?: string | null;
 	existing?: Message;
-}
+	member: GuildMember;
+	oldContent?: string | null;
+	simpleMode: boolean;
+	threadId: number;
+	userMessage: Message;
+};
 
 export async function sendMemberThreadMessage({
 	userMessage,
@@ -33,6 +35,7 @@ export async function sendMemberThreadMessage({
 				userMessage.stickers.size ? ' <sticker>' : ''
 			}`;
 		}
+
 		if (userMessage.attachments.size) {
 			options.files = [userMessage.attachments.first()!];
 		}

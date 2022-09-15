@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { Client, Events, Message, PartialMessage, ThreadChannel } from 'discord.js';
+import type { Message, PartialMessage, ThreadChannel } from 'discord.js';
+import { Client, Events } from 'discord.js';
 import { singleton } from 'tsyringe';
 import type { Event } from '#struct/Event';
 import { sendMemberThreadMessage } from '#util/sendMemberThreadMessage';

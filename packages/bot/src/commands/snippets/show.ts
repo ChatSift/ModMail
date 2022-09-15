@@ -1,10 +1,10 @@
 import { PrismaClient, type Snippet, type SnippetUpdates } from '@prisma/client';
+import type { APIEmbedField } from 'discord.js';
 import {
 	type APIApplicationCommandSubcommandOption,
 	ApplicationCommandOptionType,
 	type ChatInputCommandInteraction,
 	ActionRowBuilder,
-	APIEmbedField,
 	blockQuote,
 	ButtonBuilder,
 	ButtonStyle,

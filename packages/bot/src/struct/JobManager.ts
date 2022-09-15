@@ -1,7 +1,9 @@
-import { fileURLToPath } from 'url';
-import { PrismaClient, ScheduledThreadClose, Thread } from '@prisma/client';
+import { fileURLToPath, URL } from 'node:url';
+import type { ScheduledThreadClose, Thread } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import Bree from 'bree';
-import { Client, ThreadChannel } from 'discord.js';
+import type { ThreadChannel } from 'discord.js';
+import { Client } from 'discord.js';
 import { singleton } from 'tsyringe';
 import { closeThread } from '#util/closeThread';
 
@@ -13,16 +15,16 @@ export enum PayloadOpCode {
 
 export type Payload =
 	| {
-			op: PayloadOpCode.CloseThread;
-			data: Thread & {
-				scheduledClose: ScheduledThreadClose;
-			};
-	  }
-	| {
-			op: PayloadOpCode.UnarchiveThread;
 			data: {
 				channelId: string;
 			};
+			op: PayloadOpCode.UnarchiveThread;
+	  }
+	| {
+			data: Thread & {
+				scheduledClose: ScheduledThreadClose;
+			};
+			op: PayloadOpCode.CloseThread;
 	  }
 	| {
 			op: PayloadOpCode.Done;
@@ -61,7 +63,7 @@ export class JobManager {
 			const worker = this.bree.workers.get(name);
 
 			// eslint-disable-next-line @typescript-eslint/no-misused-promises
-			worker?.on('message', async (message: string | Payload) => {
+			worker?.on('message', async (message: Payload | string) => {
 				if (typeof message === 'string') {
 					return;
 				}
