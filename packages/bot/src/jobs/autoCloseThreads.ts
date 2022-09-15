@@ -7,11 +7,11 @@ import type { Payload } from '#struct/JobManager';
 import { PayloadOpCode } from '#struct/JobManager';
 import type { InferArrayT } from '#util/InferArrayT';
 import { i18nInit } from '#util/i18nInit';
-import { exit } from 'node:process';
+import process from 'node:process';
 
 if (!parentPort) {
 	console.warn('Something went wrong. This script should only be ran in a worker thread.');
-	exit(0);
+	process.exit(0);
 }
 
 const prisma = new PrismaClient();

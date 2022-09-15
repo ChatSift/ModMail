@@ -2,7 +2,7 @@ import { join } from 'node:path';
 import type { PinoRotateFileOptions } from '@chatsift/pino-rotate-file';
 import createLogger, { multistream, transport } from 'pino';
 import type { PrettyOptions } from 'pino-pretty';
-import { cwd } from 'node:process';
+import process from 'node:process';
 
 const pinoPrettyOptions: PrettyOptions = {
 	colorize: true,
@@ -11,7 +11,7 @@ const pinoPrettyOptions: PrettyOptions = {
 };
 
 const pinoRotateFileOptions: PinoRotateFileOptions = {
-	dir: join(cwd(), 'logs', 'bot'),
+	dir: join(process.cwd(), 'logs', 'bot'),
 	mkdir: true,
 	maxAgeDays: 14,
 	prettyOptions: {

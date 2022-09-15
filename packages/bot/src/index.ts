@@ -8,7 +8,7 @@ import { CommandHandler } from '#struct/CommandHandler';
 import { Env } from '#struct/Env';
 import { EventHandler } from '#struct/EventHandler';
 import { i18nInit } from '#util/i18nInit';
-import { exit } from 'node:process';
+import process from 'node:process';
 
 const env = container.resolve(Env);
 
@@ -39,7 +39,7 @@ await i18nInit();
 
 if (env.deploySlashCommands) {
 	await deploySlashCommands();
-	exit(0);
+	process.exit(0);
 }
 
 await container.resolve(CommandHandler).init();
