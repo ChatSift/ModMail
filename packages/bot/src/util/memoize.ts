@@ -1,4 +1,4 @@
-import { setTimeout } from 'node:timers';
+import { setTimeout } from "node:timers";
 
 type MemoizableFunction = (arg: any) => unknown;
 

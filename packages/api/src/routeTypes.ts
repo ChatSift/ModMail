@@ -1,5 +1,5 @@
-import type { InferRoutePath, InferRouteMethod, InferRouteBody, InferRouteResult } from '@chatsift/rest-utils';
-import type * as routes from './routes/index';
+import type { InferRoutePath, InferRouteMethod, InferRouteBody, InferRouteResult } from "@chatsift/rest-utils";
+import type * as routes from "./routes/index";
 
 type Narrow<T, U> = T extends U ? T : never;
 type ConstructorToType<TConstructor> = TConstructor extends new (...args: any[]) => infer T ? T : never;
@@ -29,4 +29,4 @@ export type InferModmailRouteResult<
 	TMethod extends keyof ModmailRoutes[TPath],
 > = InferRouteResult<ModmailRoutes[TPath][TMethod]>;
 
-export * from './util/models';
+export * from "./util/models";

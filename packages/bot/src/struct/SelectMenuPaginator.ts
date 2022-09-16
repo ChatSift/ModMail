@@ -1,17 +1,18 @@
-import { ButtonBuilder, SelectMenuBuilder } from '@discordjs/builders';
-import type { If } from 'discord.js';
-import { ButtonStyle, SelectMenuOptionBuilder } from 'discord.js';
+/* eslint-disable no-extra-parens */
+import { ButtonBuilder, SelectMenuBuilder } from "@discordjs/builders";
+import type { If } from "discord.js";
+import { ButtonStyle, SelectMenuOptionBuilder } from "discord.js";
+
+export type SelectMenuPaginatorState<T> = {
+	currentPage: number;
+	readonly data: T;
+};
 
 export type SelectMenuPaginatorOptions<T = unknown> = {
 	data?: T;
 	key: string;
 	maxPageLength?: number;
 	store?: Map<string, SelectMenuPaginatorState<T>>;
-};
-
-export type SelectMenuPaginatorState<T> = {
-	currentPage: number;
-	readonly data: T;
 };
 
 type BaseSelectMenuPaginatorData<T = unknown> = SelectMenuPaginatorState<T> & {
@@ -44,7 +45,10 @@ export class SelectMenuPaginator<Data extends unknown[], Asserted extends boolea
 
 	public constructor(options: SelectMenuPaginatorOptions<Data> & { data?: Data }) {
 		if (options.data) {
-			(this as SelectMenuPaginator<Data, true>).state = { currentPage: 0, data: options.data };
+			(this as SelectMenuPaginator<Data, true>).state = {
+				currentPage: 0,
+				data: options.data,
+			};
 		} else {
 			(this as SelectMenuPaginator<Data>).state = null;
 		}
@@ -55,18 +59,18 @@ export class SelectMenuPaginator<Data extends unknown[], Asserted extends boolea
 	}
 
 	private isAsserted(): this is SelectMenuPaginator<Data, true> {
-		return this.state != null;
+		return this.state !== null;
 	}
 
 	private makeConsumers(): SelectMenuPaginatorConsumers<Data> {
 		if (!this.isAsserted()) {
-			throw new Error('State not asserted');
+			throw new Error("State not asserted");
 		}
 
 		return {
 			asButtons: () => {
 				if (!this.isAsserted()) {
-					throw new Error('State not asserted');
+					throw new Error("State not asserted");
 				}
 
 				const { currentPage, data } = this.state;
@@ -78,22 +82,22 @@ export class SelectMenuPaginator<Data extends unknown[], Asserted extends boolea
 				return {
 					currentPage,
 					data: slice,
-					selectMenu: new SelectMenuBuilder().setCustomId('select-menu').setMaxValues(slice.length),
+					selectMenu: new SelectMenuBuilder().setCustomId("select-menu").setMaxValues(slice.length),
 					pageLeftButton: new ButtonBuilder()
-						.setCustomId('page-left')
+						.setCustomId("page-left")
 						.setStyle(ButtonStyle.Secondary)
-						.setEmoji({ name: '◀️' })
+						.setEmoji({ name: "◀️" })
 						.setDisabled(currentPage === 0),
 					pageRightButton: new ButtonBuilder()
-						.setCustomId('page-right')
+						.setCustomId("page-right")
 						.setStyle(ButtonStyle.Secondary)
-						.setEmoji({ name: '▶️' })
+						.setEmoji({ name: "▶️" })
 						.setDisabled(currentPage === this.pageCount - 1),
 				};
 			},
 			asSelectMenu: () => {
 				if (!this.isAsserted()) {
-					throw new Error('State not asserted');
+					throw new Error("State not asserted");
 				}
 
 				const { currentPage, data } = this.state;
@@ -113,14 +117,14 @@ export class SelectMenuPaginator<Data extends unknown[], Asserted extends boolea
 					currentPage,
 					data: slice,
 					pageLeftOption:
-						currentPage === 0 && this.pageCount > 1
-							? new SelectMenuOptionBuilder().setEmoji({ name: '◀️' }).setLabel('Page left').setValue('page-left')
-							: undefined,
+						currentPage === 0 && this.pageCount > 1 ?
+							new SelectMenuOptionBuilder().setEmoji({ name: "◀️" }).setLabel("Page left").setValue("page-left") :
+							undefined,
 					pageRightOption:
-						currentPage === this.pageCount - 1 && this.pageCount > 1
-							? new SelectMenuOptionBuilder().setEmoji({ name: '▶️' }).setLabel('Page right').setValue('page-right')
-							: undefined,
-					selectMenu: new SelectMenuBuilder().setCustomId('select-menu').setMinValues(1).setMaxValues(slice.length),
+						currentPage === this.pageCount - 1 && this.pageCount > 1 ?
+							new SelectMenuOptionBuilder().setEmoji({ name: "▶️" }).setLabel("Page right").setValue("page-right") :
+							undefined,
+					selectMenu: new SelectMenuBuilder().setCustomId("select-menu").setMinValues(1).setMaxValues(slice.length),
 				};
 			},
 		};
@@ -128,7 +132,7 @@ export class SelectMenuPaginator<Data extends unknown[], Asserted extends boolea
 
 	public get pageCount(): number {
 		if (!this.isAsserted()) {
-			throw new Error('State not asserted');
+			throw new Error("State not asserted");
 		}
 
 		return Math.ceil(this.state.data.length / this.maxPageLength);
@@ -142,12 +146,12 @@ export class SelectMenuPaginator<Data extends unknown[], Asserted extends boolea
 		}
 
 		if (!this.store) {
-			throw new Error('Either store or data are required');
+			throw new Error("Either store or data are required");
 		}
 
 		const state = this.store.get(this.key);
 		if (!state) {
-			throw new Error('Could not find state');
+			throw new Error("Could not find state");
 		}
 
 		const newThis = this as SelectMenuPaginator<Data, true>;
@@ -157,11 +161,11 @@ export class SelectMenuPaginator<Data extends unknown[], Asserted extends boolea
 
 	public nextPage(): SelectMenuPaginatorConsumers<Data> {
 		if (!this.isAsserted()) {
-			throw new Error('State not asserted');
+			throw new Error("State not asserted");
 		}
 
 		if (this.state.currentPage + 1 === this.pageCount) {
-			throw new Error('No next page');
+			throw new Error("No next page");
 		}
 
 		this.state.currentPage++;
@@ -172,11 +176,11 @@ export class SelectMenuPaginator<Data extends unknown[], Asserted extends boolea
 
 	public previousPage(): SelectMenuPaginatorConsumers<Data> {
 		if (!this.isAsserted()) {
-			throw new Error('State not asserted');
+			throw new Error("State not asserted");
 		}
 
 		if (this.state.currentPage === 0) {
-			throw new Error('No previous page');
+			throw new Error("No previous page");
 		}
 
 		this.state.currentPage--;
@@ -187,11 +191,11 @@ export class SelectMenuPaginator<Data extends unknown[], Asserted extends boolea
 
 	public setPage(page: number): SelectMenuPaginatorConsumers<Data> {
 		if (!this.isAsserted()) {
-			throw new Error('State not asserted');
+			throw new Error("State not asserted");
 		}
 
 		if (page < 0 || page >= this.pageCount) {
-			throw new Error('Page is out of bounds');
+			throw new Error("Page is out of bounds");
 		}
 
 		this.state.currentPage = page;
@@ -202,7 +206,7 @@ export class SelectMenuPaginator<Data extends unknown[], Asserted extends boolea
 
 	public getCurrentPage(): SelectMenuPaginatorConsumers<Data> {
 		if (!this.isAsserted()) {
-			throw new Error('State not asserted');
+			throw new Error("State not asserted");
 		}
 
 		return this.makeConsumers();

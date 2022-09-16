@@ -1,9 +1,10 @@
-import { PrismaClient } from '@prisma/client';
-import type { ChatInputCommandInteraction, ThreadChannel } from 'discord.js';
-import i18next from 'i18next';
-import { container } from 'tsyringe';
-import { sendStaffThreadMessage, type SendStaffThreadMessageOptions } from './sendStaffThreadMessage';
+import { PrismaClient } from "@prisma/client";
+import type { ChatInputCommandInteraction, ThreadChannel } from "discord.js";
+import i18next from "i18next";
+import { container } from "tsyringe";
+import { sendStaffThreadMessage, type SendStaffThreadMessageOptions } from "./sendStaffThreadMessage";
 
+// eslint-disable-next-line no-shadow
 export enum HandleStaffThreadMessageAction {
 	Reply,
 	Edit,
@@ -15,58 +16,69 @@ export enum HandleStaffThreadMessageAction {
  * @param action - Which command was used to call this function.
  */
 export async function handleStaffThreadMessage(
-	interaction: ChatInputCommandInteraction<'cached'>,
+	interaction: ChatInputCommandInteraction<"cached">,
 	action: HandleStaffThreadMessageAction,
 ) {
 	const prisma = container.resolve(PrismaClient);
 
 	const thread = await prisma.thread.findFirst({
-		where: { channelId: interaction.channelId, closedById: null },
+		where: {
+			channelId: interaction.channelId,
+			closedById: null,
+		},
 	});
 	if (!thread) {
-		return interaction.reply(i18next.t('common.errors.no_thread'));
+		return interaction.reply(i18next.t("common.errors.no_thread"));
 	}
 
 	let options: Partial<SendStaffThreadMessageOptions> = {
-		content: interaction.options.getString('content', true),
+		content: interaction.options.getString("content", true),
 		staff: interaction.member,
 		channel: interaction.channel as ThreadChannel,
 		interaction,
 		threadId: thread.threadId,
 	};
 
-	const attachment = interaction.options.getAttachment('attachment');
+	const attachment = interaction.options.getAttachment("attachment");
 
 	const member = await interaction.guild.members.fetch(thread.userId).catch(() => null);
 	if (!member) {
-		return interaction.reply(i18next.t('common.errors.no_member', { lng: interaction.locale }));
+		return interaction.reply(i18next.t("common.errors.no_member", { lng: interaction.locale }));
 	}
 
 	options.member = member;
 
 	if (action === HandleStaffThreadMessageAction.Reply) {
-		options.anon = interaction.options.getBoolean('anon') ?? false;
+		options.anon = interaction.options.getBoolean("anon") ?? false;
 		options.attachment = attachment;
 	} else {
-		const id = interaction.options.getInteger('id', true);
-		const threadMessage = await prisma.threadMessage.findFirst({ where: { thread, localThreadMessageId: id } });
+		const id = interaction.options.getInteger("id", true);
+		const threadMessage = await prisma.threadMessage.findFirst({
+			where: {
+				thread,
+				localThreadMessageId: id,
+			},
+		});
 		if (!threadMessage) {
 			return interaction.reply(
-				i18next.t('common.errors.resource_not_found', { resource: 'message', lng: interaction.locale }),
+				i18next.t("common.errors.resource_not_found", {
+					resource: "message",
+					lng: interaction.locale,
+				}),
 			);
 		}
 
 		if (threadMessage.staffId !== interaction.user.id) {
-			return interaction.reply(i18next.t('common.errors.not_own_message', { lng: interaction.locale }));
+			return interaction.reply(i18next.t("common.errors.not_own_message", { lng: interaction.locale }));
 		}
 
-		const clearAttachment = interaction.options.getBoolean('clear-attachment');
+		const clearAttachment = interaction.options.getBoolean("clear-attachment");
 
 		if (attachment && clearAttachment) {
 			return interaction.reply(
-				i18next.t('common.errors.arg_conflict', {
-					first: 'attachment',
-					second: 'clear-attachment',
+				i18next.t("common.errors.arg_conflict", {
+					first: "attachment",
+					second: "clear-attachment",
 					lng: interaction.locale,
 				}),
 			);

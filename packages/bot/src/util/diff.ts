@@ -1,13 +1,14 @@
+/* eslint-disable no-param-reassign */
 export function diff(oldContent: string, newContent: string) {
 	oldContent = oldContent
-		.split('\n')
+		.split("\n")
 		.map((line) => `- ${line}`)
-		.join('\n');
+		.join("\n");
 
 	newContent = newContent
-		.split('\n')
+		.split("\n")
 		.map((line) => `+ ${line}`)
-		.join('\n');
+		.join("\n");
 
 	return `${oldContent}\n\n${newContent}`;
 }
