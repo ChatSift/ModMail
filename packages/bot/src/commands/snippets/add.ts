@@ -37,15 +37,21 @@ export default class implements Subcommand {
 		const content = interaction.options.getString('content', true);
 
 		if (this.commandHandler.commands.has(name)) {
-			return interaction.reply({
-				content: i18next.t('common.errors.reserved_name', { lng: interaction.locale }),
-			});
+			return interaction.reply({ content: i18next.t('common.errors.reserved_name', { lng: interaction.locale }) });
 		}
 
-		const existing = await this.prisma.snippet.findFirst({ where: { guildId: interaction.guild.id, name } });
+		const existing = await this.prisma.snippet.findFirst({
+			where: {
+				guildId: interaction.guild.id,
+				name,
+			},
+		});
 		if (existing) {
 			return interaction.reply({
-				content: i18next.t('common.errors.resource_exists', { resource: 'snippet', lng: interaction.locale }),
+				content: i18next.t('common.errors.resource_exists', {
+					resource: 'snippet',
+					lng: interaction.locale,
+				}),
 			});
 		}
 
@@ -60,7 +66,7 @@ export default class implements Subcommand {
 			});
 		}
 
-		const maxLen = 1900;
+		const maxLen = 1_900;
 		if (content.length > maxLen) {
 			return interaction.reply({
 				content: i18next.t('common.errors.resource_too_long', {
@@ -105,7 +111,10 @@ export default class implements Subcommand {
 		});
 
 		return interaction.editReply({
-			content: i18next.t('common.success.resource_creation', { resource: 'snippet', lng: interaction.locale }),
+			content: i18next.t('common.success.resource_creation', {
+				resource: 'snippet',
+				lng: interaction.locale,
+			}),
 		});
 	}
 }

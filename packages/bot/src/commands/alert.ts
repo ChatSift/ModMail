@@ -21,14 +21,20 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		const thread = await this.prisma.thread.findFirst({
-			where: { channelId: interaction.channelId, closedById: null },
+			where: {
+				channelId: interaction.channelId,
+				closedById: null,
+			},
 		});
 		// Local alerts
 		if (thread) {
-			const params = { threadId: thread.threadId, userId: interaction.user.id };
-			const existingAlert = await this.prisma.threadReplyAlert.findFirst({
-				where: params,
-			});
+			// eslint-disable-next-line no-shadow
+			const params = {
+				threadId: thread.threadId,
+				userId: interaction.user.id,
+			};
+			// eslint-disable-next-line no-shadow
+			const existingAlert = await this.prisma.threadReplyAlert.findFirst({ where: params });
 
 			if (existingAlert) {
 				await this.prisma.threadReplyAlert.delete({ where: { threadId_userId: params } });
@@ -48,15 +54,17 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 					await interaction.member.roles.remove(role);
 					return interaction.reply(i18next.t('common.success.no_alert_global', { lng: interaction.locale }));
 				}
+
 				await interaction.member.roles.add(role);
 				return interaction.reply(i18next.t('common.success.alert_global', { lng: interaction.locale }));
 			}
 		}
 
-		const params = { guildId: interaction.guild.id, userId: interaction.user.id };
-		const existingAlert = await this.prisma.threadOpenAlert.findFirst({
-			where: params,
-		});
+		const params = {
+			guildId: interaction.guild.id,
+			userId: interaction.user.id,
+		};
+		const existingAlert = await this.prisma.threadOpenAlert.findFirst({ where: params });
 
 		if (existingAlert) {
 			await this.prisma.threadOpenAlert.delete({ where: { guildId_userId: params } });

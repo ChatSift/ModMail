@@ -1,56 +1,65 @@
+/* eslint-disable no-extra-parens */
 import { ButtonBuilder, SelectMenuBuilder } from '@discordjs/builders';
-import { ButtonStyle, If, SelectMenuOptionBuilder } from 'discord.js';
+import type { If } from 'discord.js';
+import { ButtonStyle, SelectMenuOptionBuilder } from 'discord.js';
 
-export interface SelectMenuPaginatorOptions<T = unknown> {
-	key: string;
-	data?: T;
-	store?: Map<string, SelectMenuPaginatorState<T>>;
-	maxPageLength?: number;
-}
-
-export interface SelectMenuPaginatorState<T> {
+export type SelectMenuPaginatorState<T> = {
 	currentPage: number;
 	readonly data: T;
-}
+};
 
-interface BaseSelectMenuPaginatorData<T = unknown> extends SelectMenuPaginatorState<T> {
+export type SelectMenuPaginatorOptions<T = unknown> = {
+	data?: T;
+	key: string;
+	maxPageLength?: number;
+	store?: Map<string, SelectMenuPaginatorState<T>>;
+};
+
+type BaseSelectMenuPaginatorData<T = unknown> = SelectMenuPaginatorState<T> & {
 	selectMenu: SelectMenuBuilder;
-}
+};
 
-interface SelectMenuOptionsSelectMenuPaginatorData<T = unknown> extends BaseSelectMenuPaginatorData<T> {
+type SelectMenuOptionsSelectMenuPaginatorData<T = unknown> = BaseSelectMenuPaginatorData<T> & {
 	pageLeftOption?: SelectMenuOptionBuilder;
 	pageRightOption?: SelectMenuOptionBuilder;
-}
+};
 
-interface ButtonsSelectMenuPaginatorData<T = unknown> extends BaseSelectMenuPaginatorData<T> {
+type ButtonsSelectMenuPaginatorData<T = unknown> = BaseSelectMenuPaginatorData<T> & {
 	pageLeftButton: ButtonBuilder;
 	pageRightButton: ButtonBuilder;
-}
+};
 
-export interface SelectMenuPaginatorConsumers<T = unknown> {
-	asSelectMenu: () => SelectMenuOptionsSelectMenuPaginatorData<T>;
-	asButtons: () => ButtonsSelectMenuPaginatorData<T>;
-}
+export type SelectMenuPaginatorConsumers<T = unknown> = {
+	asButtons(): ButtonsSelectMenuPaginatorData<T>;
+	asSelectMenu(): SelectMenuOptionsSelectMenuPaginatorData<T>;
+};
 
 export class SelectMenuPaginator<Data extends unknown[], Asserted extends boolean = false> {
 	private readonly key: string;
+
 	private state!: If<Asserted, SelectMenuPaginatorState<Data>>;
+
 	private readonly store?: Map<string, SelectMenuPaginatorState<Data>>;
+
 	private readonly maxPageLength: number;
 
 	public constructor(options: SelectMenuPaginatorOptions<Data> & { data?: Data }) {
 		if (options.data) {
-			(this as SelectMenuPaginator<Data, true>).state = { currentPage: 0, data: options.data };
+			(this as SelectMenuPaginator<Data, true>).state = {
+				currentPage: 0,
+				data: options.data,
+			};
 		} else {
 			(this as SelectMenuPaginator<Data>).state = null;
 		}
+
 		this.key = options.key;
 		this.store = options.store;
 		this.maxPageLength = options.maxPageLength ?? 25;
 	}
 
 	private isAsserted(): this is SelectMenuPaginator<Data, true> {
-		return this.state != null;
+		return this.state !== null;
 	}
 
 	private makeConsumers(): SelectMenuPaginatorConsumers<Data> {

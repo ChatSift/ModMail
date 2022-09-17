@@ -38,11 +38,19 @@ export default class implements Subcommand {
 
 		try {
 			const snippet = await this.prisma.snippet.findFirst({
-				where: { guildId: interaction.guildId, name },
+				where: {
+					guildId: interaction.guildId,
+					name,
+				},
 				rejectOnNotFound: true,
 			});
 			await this.prisma.snippet.update({
-				where: { guildId_name: { guildId: interaction.guildId, name } },
+				where: {
+					guildId_name: {
+						guildId: interaction.guildId,
+						name,
+					},
+				},
 				data: { content },
 			});
 
@@ -55,12 +63,18 @@ export default class implements Subcommand {
 			});
 
 			return await interaction.reply({
-				content: i18next.t('common.success.resource_update', { resource: 'snippet', lng: interaction.locale }),
+				content: i18next.t('common.success.resource_update', {
+					resource: 'snippet',
+					lng: interaction.locale,
+				}),
 			});
 		} catch (error) {
 			if (error instanceof Error && error.name === 'NotFoundError') {
 				return interaction.reply({
-					content: i18next.t('common.errors.resource_not_found', { resource: 'snippet', lng: interaction.locale }),
+					content: i18next.t('common.errors.resource_not_found', {
+						resource: 'snippet',
+						lng: interaction.locale,
+					}),
 				});
 			}
 

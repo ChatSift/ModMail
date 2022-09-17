@@ -1,10 +1,10 @@
 import { PrismaClient, type Snippet, type SnippetUpdates } from '@prisma/client';
+import type { APIEmbedField } from 'discord.js';
 import {
 	type APIApplicationCommandSubcommandOption,
 	ApplicationCommandOptionType,
 	type ChatInputCommandInteraction,
 	ActionRowBuilder,
-	APIEmbedField,
 	blockQuote,
 	ButtonBuilder,
 	ButtonStyle,
@@ -43,53 +43,65 @@ export default class implements Subcommand {
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		const name = interaction.options.getString('name', true);
 		const snippet = await this.prisma.snippet.findFirst({
-			where: { guildId: interaction.guildId, name },
+			where: {
+				guildId: interaction.guildId,
+				name,
+			},
 			include: { updates: { orderBy: { snippetUpdateId: 'asc' } } },
 		});
 
 		if (!snippet) {
-			return interaction.reply({
-				content: i18next.t('common.errors.resource_not_found', { resource: 'snippet', lng: interaction.locale }),
+			await interaction.reply({
+				content: i18next.t('common.errors.resource_not_found', {
+					resource: 'snippet',
+					lng: interaction.locale,
+				}),
 			});
+			return;
 		}
 
-		const getShowEmbed = async (snippet: Snippet): Promise<EmbedBuilder> => {
+		const getShowEmbed = async (embedSnippet: Snippet): Promise<EmbedBuilder> => {
 			const fields: APIEmbedField[] = [];
-			const createdBy = await this.client.users.fetch(snippet.createdById).catch(() => null);
+			const createdBy = await this.client.users.fetch(embedSnippet.createdById).catch(() => null);
 
 			fields.push({
 				name: i18next.t('commands.snippets.show.embed.fields.created_by', { lng: interaction.locale }),
-				value: createdBy?.toString() ?? `Unknown user: ${snippet.createdById}`,
+				value: createdBy?.toString() ?? `Unknown user: ${embedSnippet.createdById}`,
 			});
 
 			fields.push({
 				name: i18next.t('commands.snippets.show.embed.fields.created_at', { lng: interaction.locale }),
-				value: time(snippet.createdAt, TimestampStyles.ShortDateTime),
+				value: time(embedSnippet.createdAt, TimestampStyles.ShortDateTime),
 				inline: true,
 			});
 
 			fields.push({
 				name: i18next.t('commands.snippets.show.embed.fields.last_updated_at', { lng: interaction.locale }),
-				value: time(snippet.lastUpdatedAt, TimestampStyles.ShortDateTime),
+				value: time(embedSnippet.lastUpdatedAt, TimestampStyles.ShortDateTime),
 				inline: true,
 			});
 
-			if (snippet.lastUsedAt) {
+			if (embedSnippet.lastUsedAt) {
 				fields.push({
 					name: i18next.t('commands.snippets.show.embed.fields.last_used_at', { lng: interaction.locale }),
-					value: time(snippet.lastUsedAt, TimestampStyles.ShortDateTime),
+					value: time(embedSnippet.lastUsedAt, TimestampStyles.ShortDateTime),
 				});
 			}
 
 			return new EmbedBuilder()
-				.setTitle(i18next.t('commands.snippets.show.embed.title', { name: snippet.name, lng: interaction.locale }))
-				.setDescription(blockQuote(ellipsis(snippet.content, 4000)))
+				.setTitle(
+					i18next.t('commands.snippets.show.embed.title', {
+						name: embedSnippet.name,
+						lng: interaction.locale,
+					}),
+				)
+				.setDescription(blockQuote(ellipsis(embedSnippet.content, 4_000)))
 				.setColor(Colors.Blurple)
 				.addFields(fields)
 				.setFooter({
 					text: i18next.t('commands.snippets.show.embed.footer', {
 						lng: interaction.locale,
-						uses: snippet.timesUsed,
+						uses: embedSnippet.timesUsed,
 					}),
 				});
 		};
@@ -150,6 +162,7 @@ export default class implements Subcommand {
 
 			await updateMessagePayload(paginator.getCurrentPage());
 
+			// eslint-disable-next-line no-shadow
 			const reply = await component.reply({
 				embeds: [embed],
 				components: [actionRow],
@@ -160,9 +173,14 @@ export default class implements Subcommand {
 				const isRestore = pageComponent.customId.startsWith('restore');
 				if (isRestore) {
 					const [, idx] = pageComponent.customId.split('|') as [string, string];
-					const update = updates[parseInt(idx, 10)]!;
+					const update = updates[Number.parseInt(idx, 10)]!;
 					const updatedSnippet = await this.prisma.snippet.update({
-						where: { guildId_name: { guildId: interaction.guildId, name } },
+						where: {
+							guildId_name: {
+								guildId: interaction.guildId,
+								name,
+							},
+						},
 						data: { content: update.oldContent },
 					});
 					await this.prisma.snippetUpdates.create({
@@ -180,7 +198,10 @@ export default class implements Subcommand {
 
 				const isLeft = pageComponent.customId === 'page-left';
 				await updateMessagePayload(isLeft ? paginator.previousPage() : paginator.nextPage());
-				await pageComponent.update({ embeds: [embed], components: [actionRow] });
+				await pageComponent.update({
+					embeds: [embed],
+					components: [actionRow],
+				});
 			}
 
 			await reply.edit({ components: [] }).catch(() => null);

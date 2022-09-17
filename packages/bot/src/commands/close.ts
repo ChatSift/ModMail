@@ -1,11 +1,7 @@
 import { ms } from '@naval-base/ms';
 import { PrismaClient } from '@prisma/client';
-import {
-	ApplicationCommandOptionType,
-	ApplicationCommandType,
-	ThreadChannel,
-	type ChatInputCommandInteraction,
-} from 'discord.js';
+import type { ThreadChannel } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, type ChatInputCommandInteraction } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
@@ -46,46 +42,48 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		const thread = await this.prisma.thread.findFirst({
-			where: { channelId: interaction.channelId, closedById: null },
-			include: {
-				scheduledClose: true,
+			where: {
+				channelId: interaction.channelId,
+				closedById: null,
 			},
+			include: { scheduledClose: true },
 		});
 		if (!thread) {
-			return interaction.reply(i18next.t('common.errors.no_thread'));
+			await interaction.reply(i18next.t('common.errors.no_thread'));
+			return;
 		}
 
 		const cancel = interaction.options.getBoolean('cancel') ?? false;
 		if (cancel) {
 			if (!thread.scheduledClose) {
-				return interaction.reply(i18next.t('commands.close.no_scheduled_close', { lng: interaction.locale }));
+				await interaction.reply(i18next.t('commands.close.no_scheduled_close', { lng: interaction.locale }));
+				return;
 			}
 
-			await this.prisma.scheduledThreadClose.delete({
-				where: {
-					threadId: thread.threadId,
-				},
-			});
+			await this.prisma.scheduledThreadClose.delete({ where: { threadId: thread.threadId } });
 
-			return interaction.reply(i18next.t('commands.close.successfully_canceled', { lng: interaction.locale }));
+			await interaction.reply(i18next.t('commands.close.successfully_canceled', { lng: interaction.locale }));
+			return;
 		}
 
 		const rawTime = interaction.options.getString('time');
 		let time: number | null = null;
 
 		if (rawTime) {
-			if (isNaN(Number(rawTime))) {
+			if (Number.isNaN(Number(rawTime))) {
 				try {
 					time = ms(rawTime);
 				} catch {
-					return interaction.reply(i18next.t('common.errors.invalid_time', { lng: interaction.locale }));
+					await interaction.reply(i18next.t('common.errors.invalid_time', { lng: interaction.locale }));
+					return;
 				}
 			} else {
 				time = ms(`${rawTime}m`);
 			}
 
 			if (time <= 0) {
-				return interaction.reply(i18next.t('common.errors.invalid_time', { lng: interaction.locale }));
+				await interaction.reply(i18next.t('common.errors.invalid_time', { lng: interaction.locale }));
+				return;
 			}
 		}
 
@@ -112,16 +110,18 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 				where: { threadId: thread.threadId },
 			});
 		} else {
-			await closeThread({ thread, channel: reply.channel as ThreadChannel, silent });
+			await closeThread({
+				thread,
+				channel: reply.channel as ThreadChannel,
+				silent,
+			});
 
 			await this.prisma.thread.update({
 				data: {
 					closedById: interaction.user.id,
 					closedAt: new Date(),
 				},
-				where: {
-					threadId: thread.threadId,
-				},
+				where: { threadId: thread.threadId },
 			});
 
 			await this.prisma.scheduledThreadClose.delete({ where: { threadId: thread.threadId } }).catch(() => null);

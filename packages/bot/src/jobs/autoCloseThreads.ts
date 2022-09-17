@@ -1,8 +1,11 @@
 import 'reflect-metadata';
 import { on } from 'node:events';
+import process from 'node:process';
 import { parentPort } from 'node:worker_threads';
-import { PrismaClient, ScheduledThreadClose, Thread } from '@prisma/client';
-import { Payload, PayloadOpCode } from '#struct/JobManager';
+import type { ScheduledThreadClose, Thread } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import type { Payload } from '#struct/JobManager';
+import { PayloadOpCode } from '#struct/JobManager';
 import type { InferArrayT } from '#util/InferArrayT';
 import { i18nInit } from '#util/i18nInit';
 
@@ -29,7 +32,7 @@ async function closeThread(thread: InferArrayT<typeof threads>) {
 	};
 
 	parentPort!.postMessage(payload);
-	for await (const [message] of on(parentPort!, 'message') as AsyncIterableIterator<[string | Payload]>) {
+	for await (const [message] of on(parentPort!, 'message') as AsyncIterableIterator<[Payload | string]>) {
 		if (typeof message !== 'string' && message.op === PayloadOpCode.Done) {
 			break;
 		}
@@ -39,24 +42,18 @@ async function closeThread(thread: InferArrayT<typeof threads>) {
 		data: {
 			closedById: thread.scheduledClose.scheduledById,
 			closedAt: new Date(),
-			scheduledClose: {
-				delete: true,
-			},
+			scheduledClose: { delete: true },
 		},
-		where: {
-			threadId: thread.threadId,
-		},
+		where: { threadId: thread.threadId },
 	});
 }
 
 await Promise.all(
-	threads.map((thread) => {
+	threads.map(async (thread) => {
 		if (thread.scheduledClose.closeAt.getTime() < Date.now()) {
-			return closeThread(thread);
+			await closeThread(thread);
 		}
-
-		return Promise.resolve();
 	}),
 );
 
-parentPort.postMessage('done');
+parentPort?.postMessage('done');

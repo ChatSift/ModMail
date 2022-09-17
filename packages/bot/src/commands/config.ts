@@ -1,11 +1,12 @@
-import { GuildSettings, PrismaClient } from '@prisma/client';
+import type { GuildSettings } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { stripIndents } from 'common-tags';
+import type { TextChannel } from 'discord.js';
 import {
 	ApplicationCommandOptionType,
 	ApplicationCommandType,
 	ChannelType,
 	Client,
-	TextChannel,
 	type ChatInputCommandInteraction,
 } from 'discord.js';
 import { singleton } from 'tsyringe';
@@ -76,7 +77,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			settings.farewellMessage = farewell;
 		}
 
-		if (simple != null) {
+		if (simple !== null) {
 			settings.simpleMode = simple;
 		}
 
@@ -85,7 +86,10 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		}
 
 		const configured = await this.prisma.guildSettings.upsert({
-			create: { guildId: interaction.guild.id, ...settings },
+			create: {
+				guildId: interaction.guild.id,
+				...settings,
+			},
 			update: settings,
 			where: { guildId: interaction.guild.id },
 		});

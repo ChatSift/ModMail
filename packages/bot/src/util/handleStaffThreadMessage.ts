@@ -4,6 +4,7 @@ import i18next from 'i18next';
 import { container } from 'tsyringe';
 import { sendStaffThreadMessage, type SendStaffThreadMessageOptions } from './sendStaffThreadMessage';
 
+// eslint-disable-next-line no-shadow
 export enum HandleStaffThreadMessageAction {
 	Reply,
 	Edit,
@@ -11,8 +12,8 @@ export enum HandleStaffThreadMessageAction {
 
 /**
  *
- * @param interaction A received interaction from the edit and reply commands.
- * @param action Which command was used to call this function.
+ * @param interaction - A received interaction from the edit and reply commands.
+ * @param action - Which command was used to call this function.
  */
 export async function handleStaffThreadMessage(
 	interaction: ChatInputCommandInteraction<'cached'>,
@@ -21,7 +22,10 @@ export async function handleStaffThreadMessage(
 	const prisma = container.resolve(PrismaClient);
 
 	const thread = await prisma.thread.findFirst({
-		where: { channelId: interaction.channelId, closedById: null },
+		where: {
+			channelId: interaction.channelId,
+			closedById: null,
+		},
 	});
 	if (!thread) {
 		return interaction.reply(i18next.t('common.errors.no_thread'));
@@ -41,6 +45,7 @@ export async function handleStaffThreadMessage(
 	if (!member) {
 		return interaction.reply(i18next.t('common.errors.no_member', { lng: interaction.locale }));
 	}
+
 	options.member = member;
 
 	if (action === HandleStaffThreadMessageAction.Reply) {
@@ -48,10 +53,18 @@ export async function handleStaffThreadMessage(
 		options.attachment = attachment;
 	} else {
 		const id = interaction.options.getInteger('id', true);
-		const threadMessage = await prisma.threadMessage.findFirst({ where: { thread, localThreadMessageId: id } });
+		const threadMessage = await prisma.threadMessage.findFirst({
+			where: {
+				thread,
+				localThreadMessageId: id,
+			},
+		});
 		if (!threadMessage) {
 			return interaction.reply(
-				i18next.t('common.errors.resource_not_found', { resource: 'message', lng: interaction.locale }),
+				i18next.t('common.errors.resource_not_found', {
+					resource: 'message',
+					lng: interaction.locale,
+				}),
 			);
 		}
 

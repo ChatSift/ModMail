@@ -2,12 +2,14 @@ import 'reflect-metadata';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readdirRecurse } from '@chatsift/readdir';
-import { attachHttpUtils, Route, sendBoom } from '@chatsift/rest-utils';
+import type { Route } from '@chatsift/rest-utils';
+import { attachHttpUtils, sendBoom } from '@chatsift/rest-utils';
 import { Boom, isBoom, notFound } from '@hapi/boom';
 import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 import helmet from 'helmet';
-import polka, { Middleware } from 'polka';
+import type { Middleware } from 'polka';
+import polka from 'polka';
 import { container } from 'tsyringe';
 import { Env } from './util/env';
 import { logger } from './util/logger';
@@ -16,9 +18,9 @@ const env = container.resolve(Env);
 container.register(PrismaClient, { useValue: new PrismaClient() });
 
 const app = polka({
-	onError(e, _, res) {
+	onError(err, _, res) {
 		res.setHeader('content-type', 'application/json');
-		const boom = isBoom(e) ? e : new Boom(e);
+		const boom = isBoom(err) ? err : new Boom(err);
 
 		if (boom.output.statusCode === 500) {
 			logger.error(boom, boom.message);

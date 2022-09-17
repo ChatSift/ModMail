@@ -12,33 +12,35 @@ import {
 } from 'discord.js';
 import i18next from 'i18next';
 
-interface InteractionTypeMapping {
+type InteractionTypeMapping = {
 	[ApplicationCommandType.ChatInput]: ChatInputCommandInteraction<'cached'>;
 	[ApplicationCommandType.User]: UserContextMenuCommandInteraction<'cached'>;
 	[ApplicationCommandType.Message]: MessageContextMenuCommandInteraction<'cached'>;
-}
+};
 
 export type CommandBody<Type extends ApplicationCommandType> = RESTPostAPIApplicationCommandsJSONBody & {
 	type: Type;
 };
 
-export interface Command<Type extends ApplicationCommandType = ApplicationCommandType> {
+export type Command<Type extends ApplicationCommandType = ApplicationCommandType> = {
 	readonly containsSubcommands?: false;
+	handle(interaction: InteractionTypeMapping[Type]): Awaitable<unknown>;
+	handleAutocomplete?(interaction: AutocompleteInteraction<any>): Awaitable<ApplicationCommandOptionChoiceData[]>;
 	readonly interactionOptions: CommandBody<Type>;
-	handleAutocomplete?: (interaction: AutocompleteInteraction<any>) => Awaitable<ApplicationCommandOptionChoiceData[]>;
-	handle: (interaction: InteractionTypeMapping[Type]) => Awaitable<unknown>;
-}
+};
 
-export interface CommandWithSubcommands {
+export type CommandWithSubcommands = {
 	readonly containsSubcommands: true;
+	handleAutocomplete?(interaction: AutocompleteInteraction<any>): Awaitable<ApplicationCommandOptionChoiceData[]>;
 	readonly interactionOptions: Omit<CommandBody<ApplicationCommandType.ChatInput>, 'options' | 'type'>;
-	handleAutocomplete?: (interaction: AutocompleteInteraction<any>) => Awaitable<ApplicationCommandOptionChoiceData[]>;
-}
+};
 
-export interface Subcommand
-	extends Omit<Command<ApplicationCommandType.ChatInput>, 'interactionOptions' | 'containsSubcommands'> {
+export type Subcommand = Omit<
+	Command<ApplicationCommandType.ChatInput>,
+	'containsSubcommands' | 'interactionOptions'
+> & {
 	readonly interactionOptions: Omit<APIApplicationCommandSubcommandOption, 'type'>;
-}
+};
 
 export type CommandConstructor = new (...args: any[]) => Command | CommandWithSubcommands | Subcommand;
 

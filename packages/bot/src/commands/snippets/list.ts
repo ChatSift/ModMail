@@ -1,9 +1,9 @@
 import { PrismaClient, type Snippet } from '@prisma/client';
+import type { ButtonBuilder } from 'discord.js';
 import {
 	type APIApplicationCommandSubcommandOption,
 	type ChatInputCommandInteraction,
 	ActionRowBuilder,
-	ButtonBuilder,
 	Colors,
 	EmbedBuilder,
 	inlineCode,
@@ -27,7 +27,10 @@ export default class implements Subcommand {
 		const snippets = await this.prisma.snippet.findMany({ where: { guildId: interaction.guildId } });
 		if (!snippets.length) {
 			return interaction.reply({
-				content: i18next.t('common.errors.no_resources', { resource: 'snippet', lng: interaction.locale }),
+				content: i18next.t('common.errors.no_resources', {
+					resource: 'snippet',
+					lng: interaction.locale,
+				}),
 			});
 		}
 
@@ -38,11 +41,7 @@ export default class implements Subcommand {
 		});
 
 		const embed = new EmbedBuilder()
-			.setTitle(
-				i18next.t('commands.snippets.list.embed.title', {
-					lng: interaction.locale,
-				}),
-			)
+			.setTitle(i18next.t('commands.snippets.list.embed.title', { lng: interaction.locale }))
 			.setColor(Colors.Blurple);
 
 		const actionRow = new ActionRowBuilder<ButtonBuilder>();
@@ -71,7 +70,10 @@ export default class implements Subcommand {
 		for await (const [component] of reply.createMessageComponentCollector({ idle: 30_000 })) {
 			const isLeft = component.customId === 'page-left';
 			updateMessagePayload(isLeft ? paginator.previousPage() : paginator.nextPage());
-			await component.update({ embeds: [embed], components: [actionRow] });
+			await component.update({
+				embeds: [embed],
+				components: [actionRow],
+			});
 		}
 
 		return reply.edit({ components: [] });

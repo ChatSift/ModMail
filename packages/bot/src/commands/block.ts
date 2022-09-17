@@ -35,7 +35,10 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		const thread = await this.prisma.thread.findFirst({
-			where: { channelId: interaction.channelId, closedById: null },
+			where: {
+				channelId: interaction.channelId,
+				closedById: null,
+			},
 		});
 		if (!thread) {
 			return interaction.reply(i18next.t('common.errors.no_thread'));
@@ -45,7 +48,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		let time: number | null = null;
 
 		if (rawTime) {
-			if (isNaN(Number(rawTime))) {
+			if (Number.isNaN(Number(rawTime))) {
 				try {
 					time = ms(rawTime);
 				} catch {
@@ -76,12 +79,8 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 				...base,
 				expiresAt,
 			},
-			update: {
-				expiresAt,
-			},
-			where: {
-				userId_guildId: base,
-			},
+			update: { expiresAt },
+			where: { userId_guildId: base },
 		});
 
 		return interaction.reply(i18next.t('common.success.blocked', { lng: interaction.locale }));

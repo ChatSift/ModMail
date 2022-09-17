@@ -4,79 +4,79 @@
 // Because otherwise we would need to somehow share our prisma.schema (and 2 others) with the frontend
 // Which would NOT work. Absolutely make sure to use the types below and to cast away any types from @prsisma/client
 
-export interface GuildSettings {
+export type GuildSettings = {
+	alertRoleId: string | null;
+	farewellMessage: string | null;
+	greetingMessage: string | null;
 	guildId: string;
 	modmailChannelId: string | null;
-	greetingMessage: string | null;
-	farewellMessage: string | null;
 	simpleMode: boolean;
-	alertRoleId: string | null;
-}
+};
 
-export interface SnippetUpdates {
-	snippetUpdateId: number;
+export type SnippetUpdates = {
+	oldContent: string;
 	snippetId: number;
+	snippetUpdateId: number;
 	updatedAt: Date;
 	updatedBy: string;
-	oldContent: string;
-}
+};
 
-export interface Snippet {
-	snippetId: number;
-	guildId: string;
+export type Snippet = {
 	commandId: string;
-	createdById: string;
-	name: string;
 	content: string;
-	timesUsed: number;
-	lastUsedAt: Date | null;
 	createdAt: Date;
+	createdById: string;
+	guildId: string;
 	lastUpdatedAt: Date;
-}
+	lastUsedAt: Date | null;
+	name: string;
+	snippetId: number;
+	timesUsed: number;
+};
 
-export interface ScheduledThreadClose {
-	threadId: number;
+export type ScheduledThreadClose = {
+	closeAt: Date;
 	scheduledById: string;
 	silent: boolean;
-	closeAt: Date;
-}
-
-export interface ThreadMessage {
-	threadMessageId: number;
-	localThreadMessageId: number;
-	guildId: string;
 	threadId: number;
+};
+
+export type ThreadMessage = {
+	anon: boolean;
+	guildId: string;
+	guildMessageId: string;
+	localThreadMessageId: number;
+	staffId: string | null;
+	threadId: number;
+	threadMessageId: number;
 	userId: string;
 	userMessageId: string;
-	staffId: string | null;
-	guildMessageId: string;
-	anon: boolean;
-}
+};
 
-export interface Thread {
-	threadId: number;
-	guildId: string;
+export type Thread = {
 	channelId: string;
-	userId: string;
-	createdById: string;
-	createdAt: Date;
-	closedById: string | null;
 	closedAt: Date | null;
+	closedById: string | null;
+	createdAt: Date;
+	createdById: string;
+	guildId: string;
 	lastLocalThreadMessageId: number;
-}
-
-export interface Block {
-	userId: string;
-	guildId: string;
-	expiresAt: Date | null;
-}
-
-export interface ThreadOpenAlert {
-	guildId: string;
-	userId: string;
-}
-
-export interface ThreadReplyAlert {
 	threadId: number;
 	userId: string;
-}
+};
+
+export type Block = {
+	expiresAt: Date | null;
+	guildId: string;
+	userId: string;
+};
+
+export type ThreadOpenAlert = {
+	guildId: string;
+	userId: string;
+};
+
+export type ThreadReplyAlert = {
+	threadId: number;
+	userId: string;
+};

@@ -1,4 +1,5 @@
 import { join } from 'node:path';
+import process from 'node:process';
 import type { PinoRotateFileOptions } from '@chatsift/pino-rotate-file';
 import createLogger, { multistream, transport } from 'pino';
 import type { PrettyOptions } from 'pino-pretty';

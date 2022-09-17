@@ -1,3 +1,5 @@
+import { setTimeout } from 'node:timers';
+
 type MemoizableFunction = (arg: any) => unknown;
 
 const CACHE = new WeakMap<MemoizableFunction, Map<any, unknown>>();

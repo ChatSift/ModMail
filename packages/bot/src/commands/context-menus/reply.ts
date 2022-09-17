@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { ApplicationCommandType, MessageContextMenuCommandInteraction, ThreadChannel } from 'discord.js';
+import type { MessageContextMenuCommandInteraction, ThreadChannel } from 'discord.js';
+import { ApplicationCommandType } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
@@ -18,23 +19,30 @@ export default class implements Command<ApplicationCommandType.Message> {
 
 	public async handle(interaction: MessageContextMenuCommandInteraction<'cached'>, anon = false) {
 		const thread = await this.prisma.thread.findFirst({
-			where: { channelId: interaction.channelId, closedById: null },
+			where: {
+				channelId: interaction.channelId,
+				closedById: null,
+			},
 		});
 		if (!thread) {
-			return interaction.reply(i18next.t('common.errors.no_thread'));
+			await interaction.reply(i18next.t('common.errors.no_thread'));
+			return;
 		}
 
 		if (interaction.targetMessage.author.id !== interaction.user.id) {
-			return interaction.reply(i18next.t('common.errors.not_own_message'));
+			await interaction.reply(i18next.t('common.errors.not_own_message'));
+			return;
 		}
 
 		const member = await interaction.guild.members.fetch(thread.userId).catch(() => null);
 		if (!member) {
-			return i18next.t('common.errors.no_member', { lng: interaction.locale });
+			await interaction.reply(i18next.t('common.errors.no_member', { lng: interaction.locale }));
+			return;
 		}
 
 		if (!interaction.targetMessage.content) {
-			return interaction.reply(i18next.t('common.errors.no_content', { lng: interaction.locale }));
+			await interaction.reply(i18next.t('common.errors.no_content', { lng: interaction.locale }));
+			return;
 		}
 
 		const settings = await this.prisma.guildSettings.findFirst({ where: { guildId: interaction.guild.id } });

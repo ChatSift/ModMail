@@ -1,24 +1,13 @@
+import { setTimeout } from 'node:timers';
 import { PrismaClient } from '@prisma/client';
 import { AsyncQueue } from '@sapphire/async-queue';
-import {
-	ActionRowBuilder,
-	bold,
-	Client,
-	Collection,
-	Colors,
-	ComponentType,
-	EmbedBuilder,
-	Events,
-	Guild,
-	Message,
-	MessageOptions,
-	SelectMenuBuilder,
-	SelectMenuOptionBuilder,
-} from 'discord.js';
+import type { Collection, ComponentType, Guild, Message, MessageOptions, SelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, bold, Client, Colors, EmbedBuilder, Events, SelectMenuOptionBuilder } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
 import type { Event } from '#struct/Event';
-import { SelectMenuPaginator, SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
+import type { SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
+import { SelectMenuPaginator } from '#struct/SelectMenuPaginator';
 import { getUserGuilds } from '#util/getUserGuilds';
 import { openThread } from '#util/handleThreadManagement';
 import { sendMemberThreadMessage } from '#util/sendMemberThreadMessage';
@@ -27,6 +16,7 @@ import { templateDataFromMember, templateString } from '#util/templateString';
 @singleton()
 export default class implements Event<typeof Events.MessageCreate> {
 	private readonly queues = new Map<string, AsyncQueue>();
+
 	private readonly queueTimeouts = new Map<string, NodeJS.Timeout>();
 
 	public readonly name = Events.MessageCreate;
@@ -34,7 +24,10 @@ export default class implements Event<typeof Events.MessageCreate> {
 	public constructor(private readonly prisma: PrismaClient, private readonly client: Client<true>) {}
 
 	private async promptUser(message: Message, guilds: Collection<string, Guild>): Promise<Guild | null> {
-		const paginator = new SelectMenuPaginator({ key: 'user-guild-selector', data: [...guilds.values()] });
+		const paginator = new SelectMenuPaginator({
+			key: 'user-guild-selector',
+			data: [...guilds.values()],
+		});
 
 		const actionRow = new ActionRowBuilder<SelectMenuBuilder>();
 		let content = '';
@@ -54,13 +47,16 @@ export default class implements Event<typeof Events.MessageCreate> {
 			}
 
 			// Shouldn't need to map - waiting for upstream fix https://github.com/discordjs/discord.js/pull/8174
-			selectMenu.setMaxValues(1).setOptions(options.map((o) => o.toJSON()));
+			selectMenu.setMaxValues(1).setOptions(options.map((opt) => opt.toJSON()));
 			actionRow.setComponents([selectMenu]);
 		};
 
 		updateMessagePayload(paginator.getCurrentPage());
 
-		const prompt = await message.channel.send({ content, components: [actionRow] });
+		const prompt = await message.channel.send({
+			content,
+			components: [actionRow],
+		});
 
 		for await (const [selectMenu] of prompt.createMessageComponentCollector<ComponentType.SelectMenu>({
 			idle: 30_000,
@@ -71,7 +67,10 @@ export default class implements Event<typeof Events.MessageCreate> {
 
 			if (isPageBack || isPageRight) {
 				updateMessagePayload(isPageBack ? paginator.previousPage() : paginator.nextPage());
-				await selectMenu.update({ content, components: [actionRow] });
+				await selectMenu.update({
+					content,
+					components: [actionRow],
+				});
 				continue;
 			}
 
@@ -79,15 +78,22 @@ export default class implements Event<typeof Events.MessageCreate> {
 			return guilds.get(value)!;
 		}
 
-		await prompt.edit({ content: 'Timed out...', embeds: [], components: [] });
+		await prompt.edit({
+			content: 'Timed out...',
+			embeds: [],
+			components: [],
+		});
 		return null;
 	}
 
 	private getQueue(userId: string): { queue: AsyncQueue; timeout: NodeJS.Timeout } {
 		const queue = this.queues.get(userId);
 		if (queue) {
-			const timeout = this.queueTimeouts.get(userId)!;
-			return { queue, timeout };
+			const queueTimeout = this.queueTimeouts.get(userId)!;
+			return {
+				queue,
+				timeout: queueTimeout,
+			};
 		}
 
 		const newQueue = new AsyncQueue();
@@ -99,7 +105,10 @@ export default class implements Event<typeof Events.MessageCreate> {
 		}).unref();
 		this.queueTimeouts.set(userId, timeout);
 
-		return { queue: newQueue, timeout };
+		return {
+			queue: newQueue,
+			timeout,
+		};
 	}
 
 	public async handle(message: Message) {
@@ -109,7 +118,8 @@ export default class implements Event<typeof Events.MessageCreate> {
 
 		const guilds = await getUserGuilds(message.author.id);
 		if (!guilds.size) {
-			return message.channel.send(i18next.t('common.errors.no_guilds'));
+			await message.channel.send(i18next.t('common.errors.no_guilds'));
+			return;
 		}
 
 		const guild = guilds.size === 1 ? guilds.first() : await this.promptUser(message, guilds);
@@ -117,7 +127,12 @@ export default class implements Event<typeof Events.MessageCreate> {
 			return;
 		}
 
-		const block = await this.prisma.block.findFirst({ where: { guildId: guild.id, userId: message.author.id } });
+		const block = await this.prisma.block.findFirst({
+			where: {
+				guildId: guild.id,
+				userId: message.author.id,
+			},
+		});
 		if (block) {
 			return;
 		}
@@ -172,6 +187,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 				await message.channel.send(options);
 				await threadChannel.send(options);
 			}
+			// eslint-disable-next-line no-useless-catch
 		} catch (error) {
 			throw error;
 		} finally {

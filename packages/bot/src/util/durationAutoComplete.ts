@@ -3,6 +3,7 @@ import type { ApplicationCommandOptionChoiceData, AutocompleteInteraction } from
 
 export function durationAutoComplete(interaction: AutocompleteInteraction): ApplicationCommandOptionChoiceData[] {
 	const commonOptions = ['1min', '5min', '30min', '1h', '1d', '7d'].map((time) => {
+		// eslint-disable-next-line no-shadow
 		const parsed = ms(ms(time), true);
 		return {
 			name: parsed,
@@ -14,7 +15,7 @@ export function durationAutoComplete(interaction: AutocompleteInteraction): Appl
 	const raw = commonOptions.filter((option) => option.name.includes(input));
 
 	let parsedMs: number;
-	if (isNaN(Number(input))) {
+	if (Number.isNaN(Number(input))) {
 		try {
 			parsedMs = ms(input);
 		} catch {

@@ -43,18 +43,19 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 	public async handleAutocomplete(
 		interaction: AutocompleteInteraction<'cached'>,
 	): Promise<ApplicationCommandOptionChoiceData[]> {
-		const snippets = await this.prisma.snippet.findMany({
-			where: { guildId: interaction.guild.id },
-		});
+		const snippets = await this.prisma.snippet.findMany({ where: { guildId: interaction.guild.id } });
 
 		const input = interaction.options.getFocused();
 		return snippets
 			.filter((snippet) => snippet.name.includes(input) || snippet.content.includes(input))
-			.map((snippet) => ({ name: snippet.content, value: snippet.content }))
+			.map((snippet) => ({
+				name: snippet.content,
+				value: snippet.content,
+			}))
 			.slice(0, 5);
 	}
 
-	public handle(interaction: ChatInputCommandInteraction<'cached'>) {
+	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		return handleStaffThreadMessage(interaction, HandleStaffThreadMessageAction.Reply);
 	}
 }

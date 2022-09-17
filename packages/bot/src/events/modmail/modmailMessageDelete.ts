@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { Client, Events, Message, PartialMessage, ThreadChannel } from 'discord.js';
+import type { Message, PartialMessage, ThreadChannel } from 'discord.js';
+import { Client, Events } from 'discord.js';
 import { singleton } from 'tsyringe';
 import type { Event } from '#struct/Event';
 
@@ -32,6 +33,9 @@ export default class implements Event<typeof Events.MessageDelete> {
 		}
 
 		const existing = await channel.messages.fetch(threadMessage.guildMessageId);
-		await channel.send({ content: 'User deleted their message', reply: { messageReference: existing } });
+		await channel.send({
+			content: 'User deleted their message',
+			reply: { messageReference: existing },
+		});
 	}
 }

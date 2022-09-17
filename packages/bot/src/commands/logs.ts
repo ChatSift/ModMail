@@ -1,9 +1,10 @@
-import { PrismaClient, Thread } from '@prisma/client';
+import type { Thread } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import type { ButtonBuilder } from 'discord.js';
 import {
 	ActionRowBuilder,
 	ApplicationCommandOptionType,
 	ApplicationCommandType,
-	ButtonBuilder,
 	Client,
 	Colors,
 	EmbedBuilder,
@@ -16,7 +17,8 @@ import {
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
-import { SelectMenuPaginator, SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
+import type { SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
+import { SelectMenuPaginator } from '#struct/SelectMenuPaginator';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
@@ -42,7 +44,10 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 		if (!user) {
 			const thread = await this.prisma.thread.findFirst({
-				where: { channelId: interaction.channelId, closedById: null },
+				where: {
+					channelId: interaction.channelId,
+					closedById: null,
+				},
 			});
 			if (!thread) {
 				return interaction.reply(i18next.t('common.errors.no_thread', { lng: interaction.locale }));
@@ -57,7 +62,12 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 		const threads = await this.prisma.thread.findMany({ where: { userId: user.id } });
 		if (!threads.length) {
-			return interaction.reply(i18next.t('common.errors.no_resources', { resource: 'logs', lng: interaction.locale }));
+			return interaction.reply(
+				i18next.t('common.errors.no_resources', {
+					resource: 'logs',
+					lng: interaction.locale,
+				}),
+			);
 		}
 
 		const paginator = new SelectMenuPaginator({
@@ -67,11 +77,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		});
 
 		const embed = new EmbedBuilder()
-			.setTitle(
-				i18next.t('commands.logs.embed.title', {
-					lng: interaction.locale,
-				}),
-			)
+			.setTitle(i18next.t('commands.logs.embed.title', { lng: interaction.locale }))
 			.setColor(Colors.Blurple);
 
 		const actionRow = new ActionRowBuilder<ButtonBuilder>();
@@ -83,7 +89,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 					.map(
 						(thread) =>
 							`• ${inlineCode(thread.threadId.toString())} ${time(
-								Math.round(thread.createdAt.getTime() / 1000),
+								Math.round(thread.createdAt.getTime() / 1_000),
 								TimestampStyles.ShortDate,
 							)}: ${hyperlink('Jump', `https://discordapp.com/channels/${interaction.guildId}/${thread.channelId}/0`)}`,
 					)
@@ -103,7 +109,10 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		for await (const [component] of reply.createMessageComponentCollector({ idle: 30_000 })) {
 			const isLeft = component.customId === 'page-left';
 			updateMessagePayload(isLeft ? paginator.previousPage() : paginator.nextPage());
-			await component.update({ embeds: [embed], components: [actionRow] });
+			await component.update({
+				embeds: [embed],
+				components: [actionRow],
+			});
 		}
 
 		return reply.edit({ components: [] });

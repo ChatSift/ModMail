@@ -1,9 +1,11 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readdirRecurse } from '@chatsift/readdir';
-import { Client, ClientEvents } from 'discord.js';
+import type { ClientEvents } from 'discord.js';
+import { Client } from 'discord.js';
 import { container, singleton } from 'tsyringe';
-import { EventConstructor, getEventInfo } from '#struct/Event';
+import type { EventConstructor } from '#struct/Event';
+import { getEventInfo } from '#struct/Event';
 
 @singleton()
 export class EventHandler {

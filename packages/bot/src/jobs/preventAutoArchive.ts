@@ -1,8 +1,10 @@
 import 'reflect-metadata';
 import { on } from 'node:events';
+import process from 'node:process';
 import { parentPort } from 'node:worker_threads';
 import { PrismaClient } from '@prisma/client';
-import { Payload, PayloadOpCode } from '#struct/JobManager';
+import type { Payload } from '#struct/JobManager';
+import { PayloadOpCode } from '#struct/JobManager';
 
 if (!parentPort) {
 	console.warn('Something went wrong. This script should only be ran in a worker thread.');
@@ -11,9 +13,7 @@ if (!parentPort) {
 
 const prisma = new PrismaClient();
 
-const threads = await prisma.thread.findMany({
-	where: { closedById: null },
-});
+const threads = await prisma.thread.findMany({ where: { closedById: null } });
 
 await Promise.all(
 	threads.map(async (thread) => {
@@ -23,7 +23,7 @@ await Promise.all(
 		};
 
 		parentPort!.postMessage(payload);
-		for await (const [message] of on(parentPort!, 'message') as AsyncIterableIterator<[string | Payload]>) {
+		for await (const [message] of on(parentPort!, 'message') as AsyncIterableIterator<[Payload | string]>) {
 			if (typeof message !== 'string' && message.op === PayloadOpCode.Done) {
 				break;
 			}
@@ -31,4 +31,4 @@ await Promise.all(
 	}),
 );
 
-parentPort.postMessage('done');
+parentPort?.postMessage('done');

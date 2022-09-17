@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import { dirname, join, sep as pathSep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readdirRecurse } from '@chatsift/readdir';
@@ -26,6 +27,7 @@ import { sendStaffThreadMessage } from '#util/sendStaffThreadMessage';
 @singleton()
 export class CommandHandler {
 	public readonly commands = new Map<string, Command | CommandWithSubcommands | Subcommand>();
+
 	public readonly components = new Map<string, Component>();
 
 	public constructor(private readonly env: Env, private readonly prisma: PrismaClient) {}
@@ -48,12 +50,20 @@ export class CommandHandler {
 			const autocompleteHandler = subcommand?.handleAutocomplete ? subcommand : command;
 			const options = await autocompleteHandler.handleAutocomplete?.(interaction);
 			if (!options) {
-				return await interaction.respond([]);
+				await interaction.respond([]);
+				return;
 			}
 
-			return await interaction.respond(options.slice(0, 25));
-		} catch (err) {
-			logger.error({ err, command: interaction.commandName }, 'Error handling autocomplete');
+			await interaction.respond(options.slice(0, 25));
+			return;
+		} catch (error) {
+			logger.error(
+				{
+					err: error,
+					command: interaction.commandName,
+				},
+				'Error handling autocomplete',
+			);
 			return interaction.respond([
 				{
 					name: 'Something went wrong fetching auto complete options. Please report this bug.',
@@ -70,10 +80,16 @@ export class CommandHandler {
 		try {
 			// eslint-disable-next-line @typescript-eslint/return-await
 			return await component?.handle(interaction, ...args);
-		} catch (err) {
-			logger.error({ err, component: name }, 'Error handling message component');
+		} catch (error) {
+			logger.error(
+				{
+					err: error,
+					component: name,
+				},
+				'Error handling message component',
+			);
 			const content = `Something went wrong running component. Please report this bug.\n\n${inlineCode(
-				(err as Error).message,
+				error as Error['message'],
 			)}`;
 
 			// Try to display something to the user. We don't actually know what our component has done response wise, though
@@ -89,14 +105,19 @@ export class CommandHandler {
 				return this.handleSnippetCommand(interaction);
 			}
 
-			return logger.warn(interaction, 'Command interaction not registered locally was not chatInput');
+			logger.warn(interaction, 'Command interaction not registered locally was not chatInput');
+			return;
 		}
 
 		if (!command.interactionOptions.dm_permission && !interaction.inCachedGuild()) {
-			return logger.warn(
-				{ interaction, command },
+			logger.warn(
+				{
+					interaction,
+					command,
+				},
 				'Command interaction had dm_permission off and was not in cached guild',
 			);
+			return;
 		}
 
 		try {
@@ -106,7 +127,8 @@ export class CommandHandler {
 			}
 
 			if (!interaction.isChatInputCommand()) {
-				return logger.warn(interaction, 'Command interaction with subcommand call was not chatInput');
+				logger.warn(interaction, 'Command interaction with subcommand call was not chatInput');
+				return;
 			}
 
 			const subcommand = this.commands.get(`${interaction.commandName}-${interaction.options.getSubcommand()}`) as
@@ -114,16 +136,23 @@ export class CommandHandler {
 				| undefined;
 
 			if (!subcommand) {
-				return logger.warn(interaction, 'Command interaction with subcommands map had no subcommand');
+				logger.warn(interaction, 'Command interaction with subcommands map had no subcommand');
+				return;
 			}
 
 			// eslint-disable-next-line @typescript-eslint/return-await
 			return await subcommand.handle(interaction as ChatInputCommandInteraction<'cached'>);
-		} catch (err) {
+		} catch (error) {
 			// TODO(DD): Consider dealing with specific error
-			logger.error({ err, command: interaction.commandName }, 'Error handling command');
+			logger.error(
+				{
+					err: error,
+					command: interaction.commandName,
+				},
+				'Error handling command',
+			);
 			const content = `Something went wrong running command. This could be a bug, or it could be related to your permissions.\n\n${inlineCode(
-				(err as Error).message,
+				error as Error['message'],
 			)}`;
 
 			// Try to display something to the user.
@@ -131,7 +160,8 @@ export class CommandHandler {
 		}
 	}
 
-	public init(): Promise<void[]> {
+	// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+	public async init(): Promise<void[]> {
 		return Promise.all([this.registerCommands(), this.registerComponents()]);
 	}
 
@@ -152,7 +182,10 @@ export class CommandHandler {
 			type: ApplicationCommandType.ChatInput,
 			options: [...this.commands.entries()]
 				.filter(([key]) => key.startsWith(cmd.interactionOptions.name) && key !== cmd.interactionOptions.name)
-				.map(([, cmd]) => ({ ...cmd.interactionOptions, type: ApplicationCommandOptionType.Subcommand })),
+				.map(([, subcmd]) => ({
+					...subcmd.interactionOptions,
+					type: ApplicationCommandOptionType.Subcommand,
+				})),
 		})) as RESTPutAPIApplicationCommandsJSONBody;
 
 		const options: RESTPutAPIApplicationCommandsJSONBody = normalCommands.concat(subcommands);
@@ -165,18 +198,27 @@ export class CommandHandler {
 		}
 
 		const thread = await this.prisma.thread.findFirst({
-			where: { channelId: interaction.channelId, closedById: null },
+			where: {
+				channelId: interaction.channelId,
+				closedById: null,
+			},
 		});
 		if (!thread) {
 			return interaction.reply(i18next.t('common.errors.no_thread'));
 		}
 
 		const snippet = await this.prisma.snippet.findFirst({
-			where: { name: interaction.commandName, guildId: interaction.guild.id },
+			where: {
+				name: interaction.commandName,
+				guildId: interaction.guild.id,
+			},
 		});
 		if (!snippet) {
 			return interaction.reply(
-				i18next.t('common.errors.resource_not_found', { resource: 'snippet', lng: interaction.locale }),
+				i18next.t('common.errors.resource_not_found', {
+					resource: 'snippet',
+					lng: interaction.locale,
+				}),
 			);
 		}
 
@@ -201,7 +243,10 @@ export class CommandHandler {
 		});
 
 		await this.prisma.snippet.update({
-			data: { lastUsedAt: new Date(), timesUsed: { increment: 1 } },
+			data: {
+				lastUsedAt: new Date(),
+				timesUsed: { increment: 1 },
+			},
 			where: { snippetId: snippet.snippetId },
 		});
 	}
@@ -215,7 +260,7 @@ export class CommandHandler {
 			const command = container.resolve(mod.default);
 
 			const directory = dirname(file).split(pathSep).pop()!;
-			const isSubcommand = (cmd: Command | Subcommand | CommandWithSubcommands): cmd is Subcommand =>
+			const isSubcommand = (cmd: Command | CommandWithSubcommands | Subcommand): cmd is Subcommand =>
 				!['commands', 'context-menus'].includes(directory) && !file.endsWith('index.js');
 
 			if (isSubcommand(command)) {

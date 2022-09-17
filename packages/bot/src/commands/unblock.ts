@@ -34,7 +34,10 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 		if (!user) {
 			const thread = await this.prisma.thread.findFirst({
-				where: { channelId: interaction.channelId, closedById: null },
+				where: {
+					channelId: interaction.channelId,
+					closedById: null,
+				},
 			});
 			if (!thread) {
 				return interaction.reply(i18next.t('common.errors.no_thread', { lng: interaction.locale }));
@@ -56,14 +59,10 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 					},
 				},
 			});
-			return await interaction.reply({
-				content: i18next.t('common.success.unblocked', { lng: interaction.locale }),
-			});
+			return await interaction.reply({ content: i18next.t('common.success.unblocked', { lng: interaction.locale }) });
 		} catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === PrismaError.RecordsNotFound) {
-				return interaction.reply({
-					content: i18next.t('common.errors.not_blocked', { lng: interaction.locale }),
-				});
+				return interaction.reply({ content: i18next.t('common.errors.not_blocked', { lng: interaction.locale }) });
 			}
 
 			throw error;

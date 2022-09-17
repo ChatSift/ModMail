@@ -1,19 +1,21 @@
+import { setTimeout } from 'node:timers';
 import { EmbedBuilder, bold } from '@discordjs/builders';
 import { PrismaClient } from '@prisma/client';
-import { Colors, GuildMember, Message, MessageOptions, ThreadChannel } from 'discord.js';
+import type { GuildMember, Message, MessageOptions, ThreadChannel } from 'discord.js';
+import { Colors } from 'discord.js';
 import { container } from 'tsyringe';
 
 const RECENTLY_ALERTED = new Map<number, Set<string>>();
 
-export interface SendMemberThreadMessageOptions {
-	userMessage: Message;
-	member: GuildMember;
+export type SendMemberThreadMessageOptions = {
 	channel: ThreadChannel;
-	threadId: number;
-	simpleMode: boolean;
-	oldContent?: string | null;
 	existing?: Message;
-}
+	member: GuildMember;
+	oldContent?: string | null;
+	simpleMode: boolean;
+	threadId: number;
+	userMessage: Message;
+};
 
 export async function sendMemberThreadMessage({
 	userMessage,
@@ -33,6 +35,7 @@ export async function sendMemberThreadMessage({
 				userMessage.stickers.size ? ' <sticker>' : ''
 			}`;
 		}
+
 		if (userMessage.attachments.size) {
 			options.files = [userMessage.attachments.first()!];
 		}
@@ -41,10 +44,16 @@ export async function sendMemberThreadMessage({
 			.setColor(Colors.Green)
 			.setDescription(userMessage.content.length ? userMessage.content : null)
 			.setImage(userMessage.attachments.first()?.url ?? null)
-			.setFooter({ text: `${member.user.tag} (${member.user.id})`, iconURL: member.user.displayAvatarURL() });
+			.setFooter({
+				text: `${member.user.tag} (${member.user.id})`,
+				iconURL: member.user.displayAvatarURL(),
+			});
 
 		if (member.nickname) {
-			embed.setAuthor({ name: member.nickname, iconURL: member.displayAvatarURL() });
+			embed.setAuthor({
+				name: member.nickname,
+				iconURL: member.displayAvatarURL(),
+			});
 		}
 
 		options.content = userMessage.stickers.size ? 'This message also included a sticker' : null;
@@ -58,15 +67,14 @@ export async function sendMemberThreadMessage({
 			}\n\`Edited message\`: ${userMessage.content}`,
 			reply: { messageReference: existing },
 		});
-		return existing.edit(options);
+		await existing.edit(options);
+		return;
 	}
 
 	const guildMessage = await channel.send(options);
 
 	const { lastLocalThreadMessageId: localThreadMessageId } = await prisma.thread.update({
-		data: {
-			lastLocalThreadMessageId: { increment: 1 },
-		},
+		data: { lastLocalThreadMessageId: { increment: 1 } },
 		where: { threadId },
 	});
 
