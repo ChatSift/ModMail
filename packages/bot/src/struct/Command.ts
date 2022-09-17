@@ -9,13 +9,13 @@ import {
 	type RESTPostAPIApplicationCommandsJSONBody,
 	type UserContextMenuCommandInteraction,
 	type APIApplicationCommandSubcommandOption,
-} from "discord.js";
-import i18next from "i18next";
+} from 'discord.js';
+import i18next from 'i18next';
 
 type InteractionTypeMapping = {
-	[ApplicationCommandType.ChatInput]: ChatInputCommandInteraction<"cached">;
-	[ApplicationCommandType.User]: UserContextMenuCommandInteraction<"cached">;
-	[ApplicationCommandType.Message]: MessageContextMenuCommandInteraction<"cached">;
+	[ApplicationCommandType.ChatInput]: ChatInputCommandInteraction<'cached'>;
+	[ApplicationCommandType.User]: UserContextMenuCommandInteraction<'cached'>;
+	[ApplicationCommandType.Message]: MessageContextMenuCommandInteraction<'cached'>;
 };
 
 export type CommandBody<Type extends ApplicationCommandType> = RESTPostAPIApplicationCommandsJSONBody & {
@@ -32,14 +32,14 @@ export type Command<Type extends ApplicationCommandType = ApplicationCommandType
 export type CommandWithSubcommands = {
 	readonly containsSubcommands: true;
 	handleAutocomplete?(interaction: AutocompleteInteraction<any>): Awaitable<ApplicationCommandOptionChoiceData[]>;
-	readonly interactionOptions: Omit<CommandBody<ApplicationCommandType.ChatInput>, "options" | "type">;
+	readonly interactionOptions: Omit<CommandBody<ApplicationCommandType.ChatInput>, 'options' | 'type'>;
 };
 
 export type Subcommand = Omit<
 	Command<ApplicationCommandType.ChatInput>,
-	"containsSubcommands" | "interactionOptions"
+	'containsSubcommands' | 'interactionOptions'
 > & {
-	readonly interactionOptions: Omit<APIApplicationCommandSubcommandOption, "type">;
+	readonly interactionOptions: Omit<APIApplicationCommandSubcommandOption, 'type'>;
 };
 
 export type CommandConstructor = new (...args: any[]) => Command | CommandWithSubcommands | Subcommand;

@@ -1,9 +1,9 @@
-import { setTimeout } from "node:timers";
-import { EmbedBuilder, bold } from "@discordjs/builders";
-import { PrismaClient } from "@prisma/client";
-import type { GuildMember, Message, MessageOptions, ThreadChannel } from "discord.js";
-import { Colors } from "discord.js";
-import { container } from "tsyringe";
+import { setTimeout } from 'node:timers';
+import { EmbedBuilder, bold } from '@discordjs/builders';
+import { PrismaClient } from '@prisma/client';
+import type { GuildMember, Message, MessageOptions, ThreadChannel } from 'discord.js';
+import { Colors } from 'discord.js';
+import { container } from 'tsyringe';
 
 const RECENTLY_ALERTED = new Map<number, Set<string>>();
 
@@ -28,11 +28,11 @@ export async function sendMemberThreadMessage({
 }: SendMemberThreadMessageOptions) {
 	const prisma = container.resolve(PrismaClient);
 
-	const options: Omit<MessageOptions, "flags"> = {};
+	const options: Omit<MessageOptions, 'flags'> = {};
 	if (simpleMode) {
 		if (userMessage.content.length) {
 			options.content = `${bold(`${userMessage.author.tag}:`)} ${userMessage.content}${
-				userMessage.stickers.size ? " <sticker>" : ""
+				userMessage.stickers.size ? ' <sticker>' : ''
 			}`;
 		}
 
@@ -56,14 +56,14 @@ export async function sendMemberThreadMessage({
 			});
 		}
 
-		options.content = userMessage.stickers.size ? "This message also included a sticker" : null;
+		options.content = userMessage.stickers.size ? 'This message also included a sticker' : null;
 		options.embeds = [embed];
 	}
 
 	if (existing) {
 		await channel.send({
 			content: `**User edited their message:**\n\`Original message\`: ${
-				oldContent ?? "[failed to resolve]"
+				oldContent ?? '[failed to resolve]'
 			}\n\`Edited message\`: ${userMessage.content}`,
 			reply: { messageReference: existing },
 		});
@@ -107,7 +107,7 @@ export async function sendMemberThreadMessage({
 		}
 
 		if (toAlert.length) {
-			await channel.send(`📢 ${toAlert.join(", ")}`);
+			await channel.send(`📢 ${toAlert.join(', ')}`);
 		}
 	}
 }

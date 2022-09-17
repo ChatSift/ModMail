@@ -1,14 +1,14 @@
-import { Route, RouteMethod } from "@chatsift/rest-utils";
-import { PrismaClient } from "@prisma/client";
-import type { Middleware, Request, Response } from "polka";
-import { singleton } from "tsyringe";
-import type { GuildSettings } from "../util/models";
+import { Route, RouteMethod } from '@chatsift/rest-utils';
+import { PrismaClient } from '@prisma/client';
+import type { Middleware, Request, Response } from 'polka';
+import { singleton } from 'tsyringe';
+import type { GuildSettings } from '../util/models';
 
 @singleton()
 export default class extends Route<GuildSettings, never> {
 	public info = {
 		method: RouteMethod.get,
-		path: "/modmail/v1/guilds/:guildId/settings/",
+		path: '/modmail/v1/guilds/:guildId/settings/',
 	} as const;
 
 	public override middleware: Middleware[] = [];
@@ -26,7 +26,7 @@ export default class extends Route<GuildSettings, never> {
 		});
 
 		res.statusCode = 200;
-		res.setHeader("Content-Type", "application/json");
+		res.setHeader('Content-Type', 'application/json');
 		res.end(JSON.stringify(guildSettings));
 	}
 }

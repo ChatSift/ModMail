@@ -1,36 +1,36 @@
-import { ms } from "@naval-base/ms";
-import { PrismaClient } from "@prisma/client";
-import type { ThreadChannel } from "discord.js";
-import { ApplicationCommandOptionType, ApplicationCommandType, type ChatInputCommandInteraction } from "discord.js";
-import i18next from "i18next";
-import { singleton } from "tsyringe";
-import { getLocalizedProp, type CommandBody, type Command } from "#struct/Command";
-import { closeThread } from "#util/closeThread";
-import { durationAutoComplete } from "#util/durationAutoComplete";
+import { ms } from '@naval-base/ms';
+import { PrismaClient } from '@prisma/client';
+import type { ThreadChannel } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, type ChatInputCommandInteraction } from 'discord.js';
+import i18next from 'i18next';
+import { singleton } from 'tsyringe';
+import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
+import { closeThread } from '#util/closeThread';
+import { durationAutoComplete } from '#util/durationAutoComplete';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
 	public readonly interactionOptions: CommandBody<ApplicationCommandType.ChatInput> = {
-		...getLocalizedProp("name", "commands.close.name"),
-		...getLocalizedProp("description", "commands.close.description"),
+		...getLocalizedProp('name', 'commands.close.name'),
+		...getLocalizedProp('description', 'commands.close.description'),
 		type: ApplicationCommandType.ChatInput,
-		default_member_permissions: "0",
+		default_member_permissions: '0',
 		dm_permission: false,
 		options: [
 			{
-				...getLocalizedProp("name", "commands.close.options.time.name"),
-				...getLocalizedProp("description", "commands.close.options.time.description"),
+				...getLocalizedProp('name', 'commands.close.options.time.name'),
+				...getLocalizedProp('description', 'commands.close.options.time.description'),
 				type: ApplicationCommandOptionType.String,
 				autocomplete: true,
 			},
 			{
-				...getLocalizedProp("name", "commands.close.options.silent.name"),
-				...getLocalizedProp("description", "commands.close.options.silent.description"),
+				...getLocalizedProp('name', 'commands.close.options.silent.name'),
+				...getLocalizedProp('description', 'commands.close.options.silent.description'),
 				type: ApplicationCommandOptionType.Boolean,
 			},
 			{
-				...getLocalizedProp("name", "commands.close.options.cancel.name"),
-				...getLocalizedProp("description", "commands.close.options.cancel.description"),
+				...getLocalizedProp('name', 'commands.close.options.cancel.name'),
+				...getLocalizedProp('description', 'commands.close.options.cancel.description'),
 				type: ApplicationCommandOptionType.Boolean,
 			},
 		],
@@ -40,7 +40,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 	public handleAutocomplete = durationAutoComplete;
 
-	public async handle(interaction: ChatInputCommandInteraction<"cached">) {
+	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		const thread = await this.prisma.thread.findFirst({
 			where: {
 				channelId: interaction.channelId,
@@ -49,24 +49,24 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			include: { scheduledClose: true },
 		});
 		if (!thread) {
-			await interaction.reply(i18next.t("common.errors.no_thread"));
+			await interaction.reply(i18next.t('common.errors.no_thread'));
 			return;
 		}
 
-		const cancel = interaction.options.getBoolean("cancel") ?? false;
+		const cancel = interaction.options.getBoolean('cancel') ?? false;
 		if (cancel) {
 			if (!thread.scheduledClose) {
-				await interaction.reply(i18next.t("commands.close.no_scheduled_close", { lng: interaction.locale }));
+				await interaction.reply(i18next.t('commands.close.no_scheduled_close', { lng: interaction.locale }));
 				return;
 			}
 
 			await this.prisma.scheduledThreadClose.delete({ where: { threadId: thread.threadId } });
 
-			await interaction.reply(i18next.t("commands.close.successfully_canceled", { lng: interaction.locale }));
+			await interaction.reply(i18next.t('commands.close.successfully_canceled', { lng: interaction.locale }));
 			return;
 		}
 
-		const rawTime = interaction.options.getString("time");
+		const rawTime = interaction.options.getString('time');
 		let time: number | null = null;
 
 		if (rawTime) {
@@ -74,7 +74,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 				try {
 					time = ms(rawTime);
 				} catch {
-					await interaction.reply(i18next.t("common.errors.invalid_time", { lng: interaction.locale }));
+					await interaction.reply(i18next.t('common.errors.invalid_time', { lng: interaction.locale }));
 					return;
 				}
 			} else {
@@ -82,15 +82,15 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			}
 
 			if (time <= 0) {
-				await interaction.reply(i18next.t("common.errors.invalid_time", { lng: interaction.locale }));
+				await interaction.reply(i18next.t('common.errors.invalid_time', { lng: interaction.locale }));
 				return;
 			}
 		}
 
-		const silent = interaction.options.getBoolean("silent") ?? false;
+		const silent = interaction.options.getBoolean('silent') ?? false;
 
 		const reply = await interaction.reply({
-			content: `Closing thread${time ? ` in ${ms(time, true)}` : ""}...`,
+			content: `Closing thread${time ? ` in ${ms(time, true)}` : ''}...`,
 			fetchReply: true,
 		});
 

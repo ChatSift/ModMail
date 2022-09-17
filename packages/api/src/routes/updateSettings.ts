@@ -1,12 +1,12 @@
-import type { TRequest } from "@chatsift/rest-utils";
-import { Route, RouteMethod } from "@chatsift/rest-utils";
-import { PrismaClient } from "@prisma/client";
-import type { BaseValidator, InferType } from "@sapphire/shapeshift";
-import { s } from "@sapphire/shapeshift";
-import type { Response } from "polka";
-import { singleton } from "tsyringe";
-import type { GuildSettings } from "../util/models";
-import { snowflakeSchema } from "../util/snowflakeSchema";
+import type { TRequest } from '@chatsift/rest-utils';
+import { Route, RouteMethod } from '@chatsift/rest-utils';
+import { PrismaClient } from '@prisma/client';
+import type { BaseValidator, InferType } from '@sapphire/shapeshift';
+import { s } from '@sapphire/shapeshift';
+import type { Response } from 'polka';
+import { singleton } from 'tsyringe';
+import type { GuildSettings } from '../util/models';
+import { snowflakeSchema } from '../util/snowflakeSchema';
 
 const schema = s.object({
 	modMailChannelId: snowflakeSchema.nullish,
@@ -21,7 +21,7 @@ type Body = InferType<typeof schema>;
 export default class extends Route<GuildSettings, Body> {
 	public info = {
 		method: RouteMethod.patch,
-		path: "/modmail/v1/guilds/:guildId/settings/",
+		path: '/modmail/v1/guilds/:guildId/settings/',
 	} as const;
 
 	public override readonly bodyValidationSchema: BaseValidator<Body> = schema;
@@ -44,7 +44,7 @@ export default class extends Route<GuildSettings, Body> {
 		});
 
 		res.statusCode = 200;
-		res.setHeader("Content-Type", "application/json");
+		res.setHeader('Content-Type', 'application/json');
 		res.end(JSON.stringify(guildSettings));
 	}
 }

@@ -1,5 +1,5 @@
-import { PrismaClient, type Snippet, type SnippetUpdates } from "@prisma/client";
-import type { APIEmbedField } from "discord.js";
+import { PrismaClient, type Snippet, type SnippetUpdates } from '@prisma/client';
+import type { APIEmbedField } from 'discord.js';
 import {
 	type APIApplicationCommandSubcommandOption,
 	ApplicationCommandOptionType,
@@ -14,23 +14,23 @@ import {
 	time,
 	TimestampStyles,
 	Client,
-} from "discord.js";
-import i18next from "i18next";
-import { singleton } from "tsyringe";
-import { getLocalizedProp, type Subcommand } from "#struct/Command";
-import { SelectMenuPaginator, type SelectMenuPaginatorConsumers } from "#struct/SelectMenuPaginator";
-import { diff } from "#util/diff";
-import { ellipsis } from "#util/ellipsis";
+} from 'discord.js';
+import i18next from 'i18next';
+import { singleton } from 'tsyringe';
+import { getLocalizedProp, type Subcommand } from '#struct/Command';
+import { SelectMenuPaginator, type SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
+import { diff } from '#util/diff';
+import { ellipsis } from '#util/ellipsis';
 
 @singleton()
 export default class implements Subcommand {
-	public readonly interactionOptions: Omit<APIApplicationCommandSubcommandOption, "type"> = {
-		...getLocalizedProp("name", "commands.snippets.show.name"),
-		...getLocalizedProp("description", "commands.snippets.show.description"),
+	public readonly interactionOptions: Omit<APIApplicationCommandSubcommandOption, 'type'> = {
+		...getLocalizedProp('name', 'commands.snippets.show.name'),
+		...getLocalizedProp('description', 'commands.snippets.show.description'),
 		options: [
 			{
-				...getLocalizedProp("name", "commands.snippets.show.options.name.name"),
-				...getLocalizedProp("description", "commands.snippets.show.options.name.description"),
+				...getLocalizedProp('name', 'commands.snippets.show.options.name.name'),
+				...getLocalizedProp('description', 'commands.snippets.show.options.name.description'),
 				type: ApplicationCommandOptionType.String,
 				required: true,
 				autocomplete: true,
@@ -40,20 +40,20 @@ export default class implements Subcommand {
 
 	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
 
-	public async handle(interaction: ChatInputCommandInteraction<"cached">) {
-		const name = interaction.options.getString("name", true);
+	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
+		const name = interaction.options.getString('name', true);
 		const snippet = await this.prisma.snippet.findFirst({
 			where: {
 				guildId: interaction.guildId,
 				name,
 			},
-			include: { updates: { orderBy: { snippetUpdateId: "asc" } } },
+			include: { updates: { orderBy: { snippetUpdateId: 'asc' } } },
 		});
 
 		if (!snippet) {
 			await interaction.reply({
-				content: i18next.t("common.errors.resource_not_found", {
-					resource: "snippet",
+				content: i18next.t('common.errors.resource_not_found', {
+					resource: 'snippet',
 					lng: interaction.locale,
 				}),
 			});
@@ -65,39 +65,41 @@ export default class implements Subcommand {
 			const createdBy = await this.client.users.fetch(embedSnippet.createdById).catch(() => null);
 
 			fields.push({
-				name: i18next.t("commands.snippets.show.embed.fields.created_by", { lng: interaction.locale }),
+				name: i18next.t('commands.snippets.show.embed.fields.created_by', { lng: interaction.locale }),
 				value: createdBy?.toString() ?? `Unknown user: ${embedSnippet.createdById}`,
 			});
 
 			fields.push({
-				name: i18next.t("commands.snippets.show.embed.fields.created_at", { lng: interaction.locale }),
+				name: i18next.t('commands.snippets.show.embed.fields.created_at', { lng: interaction.locale }),
 				value: time(embedSnippet.createdAt, TimestampStyles.ShortDateTime),
 				inline: true,
 			});
 
 			fields.push({
-				name: i18next.t("commands.snippets.show.embed.fields.last_updated_at", { lng: interaction.locale }),
+				name: i18next.t('commands.snippets.show.embed.fields.last_updated_at', { lng: interaction.locale }),
 				value: time(embedSnippet.lastUpdatedAt, TimestampStyles.ShortDateTime),
 				inline: true,
 			});
 
 			if (embedSnippet.lastUsedAt) {
 				fields.push({
-					name: i18next.t("commands.snippets.show.embed.fields.last_used_at", { lng: interaction.locale }),
+					name: i18next.t('commands.snippets.show.embed.fields.last_used_at', { lng: interaction.locale }),
 					value: time(embedSnippet.lastUsedAt, TimestampStyles.ShortDateTime),
 				});
 			}
 
 			return new EmbedBuilder()
-				.setTitle(i18next.t("commands.snippets.show.embed.title", {
-					name: embedSnippet.name,
-					lng: interaction.locale,
-				}))
+				.setTitle(
+					i18next.t('commands.snippets.show.embed.title', {
+						name: embedSnippet.name,
+						lng: interaction.locale,
+					}),
+				)
 				.setDescription(blockQuote(ellipsis(embedSnippet.content, 4_000)))
 				.setColor(Colors.Blurple)
 				.addFields(fields)
 				.setFooter({
-					text: i18next.t("commands.snippets.show.embed.footer", {
+					text: i18next.t('commands.snippets.show.embed.footer', {
 						lng: interaction.locale,
 						uses: embedSnippet.timesUsed,
 					}),
@@ -106,16 +108,16 @@ export default class implements Subcommand {
 
 		const reply = await interaction.reply({
 			embeds: [await getShowEmbed(snippet)],
-			components: snippet.updates.length ?
-				[
-					new ActionRowBuilder<ButtonBuilder>().addComponents([
-						new ButtonBuilder()
-							.setStyle(ButtonStyle.Secondary)
-							.setLabel(i18next.t("commands.snippets.show.buttons.view_history", { lng: interaction.locale }))
-							.setCustomId("snippet-history"),
-					]),
-				] :
-				undefined,
+			components: snippet.updates.length
+				? [
+						new ActionRowBuilder<ButtonBuilder>().addComponents([
+							new ButtonBuilder()
+								.setStyle(ButtonStyle.Secondary)
+								.setLabel(i18next.t('commands.snippets.show.buttons.view_history', { lng: interaction.locale }))
+								.setCustomId('snippet-history'),
+						]),
+				  ]
+				: undefined,
 			fetchReply: true,
 		});
 
@@ -125,7 +127,7 @@ export default class implements Subcommand {
 		if (component) {
 			const { updates } = snippet;
 			const paginator = new SelectMenuPaginator({
-				key: "snippet-history",
+				key: 'snippet-history',
 				data: updates,
 				maxPageLength: 1,
 			});
@@ -134,7 +136,7 @@ export default class implements Subcommand {
 
 			const actionRow = new ActionRowBuilder<ButtonBuilder>();
 			const restoreButton = new ButtonBuilder()
-				.setLabel(i18next.t("commands.snippets.show.buttons.restore", { lng: interaction.locale }))
+				.setLabel(i18next.t('commands.snippets.show.buttons.restore', { lng: interaction.locale }))
 				.setStyle(ButtonStyle.Danger);
 
 			const updateMessagePayload = async (consumers: SelectMenuPaginatorConsumers<SnippetUpdates[]>) => {
@@ -145,11 +147,11 @@ export default class implements Subcommand {
 				const after = updates[currentPage + 1];
 				embed
 					.setTitle(`Update ${currentPage + 1}/${paginator.pageCount}`)
-					.setDescription(codeBlock("diff", diff(before.oldContent, after?.oldContent ?? snippet.content)))
+					.setDescription(codeBlock('diff', diff(before.oldContent, after?.oldContent ?? snippet.content)))
 					.setFooter({
-						text: i18next.t("commands.snippets.show.history.embed.footer", {
+						text: i18next.t('commands.snippets.show.history.embed.footer', {
 							lng: interaction.locale,
-							user: updatedBy?.tag ?? "Unknown User#0000",
+							user: updatedBy?.tag ?? 'Unknown User#0000',
 						}),
 						iconURL: updatedBy?.displayAvatarURL(),
 					})
@@ -168,9 +170,9 @@ export default class implements Subcommand {
 			});
 
 			for await (const [pageComponent] of reply.createMessageComponentCollector({ idle: 30_000 })) {
-				const isRestore = pageComponent.customId.startsWith("restore");
+				const isRestore = pageComponent.customId.startsWith('restore');
 				if (isRestore) {
-					const [, idx] = pageComponent.customId.split("|") as [string, string];
+					const [, idx] = pageComponent.customId.split('|') as [string, string];
 					const update = updates[Number.parseInt(idx, 10)]!;
 					const updatedSnippet = await this.prisma.snippet.update({
 						where: {
@@ -194,7 +196,7 @@ export default class implements Subcommand {
 					break;
 				}
 
-				const isLeft = pageComponent.customId === "page-left";
+				const isLeft = pageComponent.customId === 'page-left';
 				await updateMessagePayload(isLeft ? paginator.previousPage() : paginator.nextPage());
 				await pageComponent.update({
 					embeds: [embed],

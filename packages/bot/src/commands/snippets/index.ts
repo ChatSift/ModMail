@@ -1,17 +1,17 @@
-import { PrismaClient } from "@prisma/client";
-import type { ApplicationCommandType } from "discord.js";
-import { PermissionsBitField, type ApplicationCommandOptionChoiceData, type AutocompleteInteraction } from "discord.js";
-import { singleton } from "tsyringe";
-import type { CommandWithSubcommands } from "#struct/Command";
-import { getLocalizedProp, type CommandBody } from "#struct/Command";
+import { PrismaClient } from '@prisma/client';
+import type { ApplicationCommandType } from 'discord.js';
+import { PermissionsBitField, type ApplicationCommandOptionChoiceData, type AutocompleteInteraction } from 'discord.js';
+import { singleton } from 'tsyringe';
+import type { CommandWithSubcommands } from '#struct/Command';
+import { getLocalizedProp, type CommandBody } from '#struct/Command';
 
 @singleton()
 export default class implements CommandWithSubcommands {
 	public readonly containsSubcommands = true;
 
-	public readonly interactionOptions: Omit<CommandBody<ApplicationCommandType.ChatInput>, "options" | "type"> = {
-		...getLocalizedProp("name", "commands.snippets.name"),
-		...getLocalizedProp("description", "commands.snippets.description"),
+	public readonly interactionOptions: Omit<CommandBody<ApplicationCommandType.ChatInput>, 'options' | 'type'> = {
+		...getLocalizedProp('name', 'commands.snippets.name'),
+		...getLocalizedProp('description', 'commands.snippets.description'),
 		dm_permission: false,
 		default_member_permissions: new PermissionsBitField(PermissionsBitField.Flags.ManageGuild).toJSON(),
 	};
@@ -19,7 +19,7 @@ export default class implements CommandWithSubcommands {
 	public constructor(private readonly prisma: PrismaClient) {}
 
 	public async handleAutocomplete(
-		interaction: AutocompleteInteraction<"cached">,
+		interaction: AutocompleteInteraction<'cached'>,
 	): Promise<ApplicationCommandOptionChoiceData[]> {
 		const snippets = await this.prisma.snippet.findMany({ where: { guildId: interaction.guild.id } });
 

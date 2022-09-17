@@ -1,23 +1,23 @@
-import { PrismaClient } from "@prisma/client";
-import type { MessageContextMenuCommandInteraction, ThreadChannel } from "discord.js";
-import { ApplicationCommandType } from "discord.js";
-import i18next from "i18next";
-import { singleton } from "tsyringe";
-import { getLocalizedProp, type CommandBody, type Command } from "#struct/Command";
-import { sendStaffThreadMessage } from "#util/sendStaffThreadMessage";
+import { PrismaClient } from '@prisma/client';
+import type { MessageContextMenuCommandInteraction, ThreadChannel } from 'discord.js';
+import { ApplicationCommandType } from 'discord.js';
+import i18next from 'i18next';
+import { singleton } from 'tsyringe';
+import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
+import { sendStaffThreadMessage } from '#util/sendStaffThreadMessage';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.Message> {
 	public readonly interactionOptions: CommandBody<ApplicationCommandType.Message> = {
-		...getLocalizedProp("name", "context-menus.reply.name"),
+		...getLocalizedProp('name', 'context-menus.reply.name'),
 		type: ApplicationCommandType.Message,
-		default_member_permissions: "0",
+		default_member_permissions: '0',
 		dm_permission: false,
 	};
 
 	public constructor(private readonly prisma: PrismaClient) {}
 
-	public async handle(interaction: MessageContextMenuCommandInteraction<"cached">, anon = false) {
+	public async handle(interaction: MessageContextMenuCommandInteraction<'cached'>, anon = false) {
 		const thread = await this.prisma.thread.findFirst({
 			where: {
 				channelId: interaction.channelId,
@@ -25,23 +25,23 @@ export default class implements Command<ApplicationCommandType.Message> {
 			},
 		});
 		if (!thread) {
-			await interaction.reply(i18next.t("common.errors.no_thread"));
+			await interaction.reply(i18next.t('common.errors.no_thread'));
 			return;
 		}
 
 		if (interaction.targetMessage.author.id !== interaction.user.id) {
-			await interaction.reply(i18next.t("common.errors.not_own_message"));
+			await interaction.reply(i18next.t('common.errors.not_own_message'));
 			return;
 		}
 
 		const member = await interaction.guild.members.fetch(thread.userId).catch(() => null);
 		if (!member) {
-			await interaction.reply(i18next.t("common.errors.no_member", { lng: interaction.locale }));
+			await interaction.reply(i18next.t('common.errors.no_member', { lng: interaction.locale }));
 			return;
 		}
 
 		if (!interaction.targetMessage.content) {
-			await interaction.reply(i18next.t("common.errors.no_content", { lng: interaction.locale }));
+			await interaction.reply(i18next.t('common.errors.no_content', { lng: interaction.locale }));
 			return;
 		}
 

@@ -1,1 +1,1 @@
-export const tokens = { logger: Symbol("logger") } as const;
+export const tokens = { logger: Symbol('logger') } as const;

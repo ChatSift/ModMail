@@ -1,17 +1,17 @@
-import { setTimeout } from "node:timers";
-import { PrismaClient } from "@prisma/client";
-import { AsyncQueue } from "@sapphire/async-queue";
-import type { Collection, ComponentType, Guild, Message, MessageOptions, SelectMenuBuilder } from "discord.js";
-import { ActionRowBuilder, bold, Client, Colors, EmbedBuilder, Events, SelectMenuOptionBuilder } from "discord.js";
-import i18next from "i18next";
-import { singleton } from "tsyringe";
-import type { Event } from "#struct/Event";
-import type { SelectMenuPaginatorConsumers } from "#struct/SelectMenuPaginator";
-import { SelectMenuPaginator } from "#struct/SelectMenuPaginator";
-import { getUserGuilds } from "#util/getUserGuilds";
-import { openThread } from "#util/handleThreadManagement";
-import { sendMemberThreadMessage } from "#util/sendMemberThreadMessage";
-import { templateDataFromMember, templateString } from "#util/templateString";
+import { setTimeout } from 'node:timers';
+import { PrismaClient } from '@prisma/client';
+import { AsyncQueue } from '@sapphire/async-queue';
+import type { Collection, ComponentType, Guild, Message, MessageOptions, SelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, bold, Client, Colors, EmbedBuilder, Events, SelectMenuOptionBuilder } from 'discord.js';
+import i18next from 'i18next';
+import { singleton } from 'tsyringe';
+import type { Event } from '#struct/Event';
+import type { SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
+import { SelectMenuPaginator } from '#struct/SelectMenuPaginator';
+import { getUserGuilds } from '#util/getUserGuilds';
+import { openThread } from '#util/handleThreadManagement';
+import { sendMemberThreadMessage } from '#util/sendMemberThreadMessage';
+import { templateDataFromMember, templateString } from '#util/templateString';
 
 @singleton()
 export default class implements Event<typeof Events.MessageCreate> {
@@ -25,16 +25,16 @@ export default class implements Event<typeof Events.MessageCreate> {
 
 	private async promptUser(message: Message, guilds: Collection<string, Guild>): Promise<Guild | null> {
 		const paginator = new SelectMenuPaginator({
-			key: "user-guild-selector",
+			key: 'user-guild-selector',
 			data: [...guilds.values()],
 		});
 
 		const actionRow = new ActionRowBuilder<SelectMenuBuilder>();
-		let content = "";
+		let content = '';
 
 		const updateMessagePayload = (consumers: SelectMenuPaginatorConsumers<Guild[]>) => {
 			const { data, currentPage, selectMenu, pageLeftOption, pageRightOption } = consumers.asSelectMenu();
-			content = `${i18next.t("thread.prompt")} - Page ${currentPage + 1}/${paginator.pageCount}`;
+			content = `${i18next.t('thread.prompt')} - Page ${currentPage + 1}/${paginator.pageCount}`;
 			const options: SelectMenuOptionBuilder[] = [];
 			if (pageLeftOption) {
 				options.push(pageLeftOption);
@@ -58,10 +58,12 @@ export default class implements Event<typeof Events.MessageCreate> {
 			components: [actionRow],
 		});
 
-		for await (const [selectMenu] of prompt.createMessageComponentCollector<ComponentType.SelectMenu>({ idle: 30_000 })) {
+		for await (const [selectMenu] of prompt.createMessageComponentCollector<ComponentType.SelectMenu>({
+			idle: 30_000,
+		})) {
 			const [value] = selectMenu.values as [string];
-			const isPageBack = value === "page-left";
-			const isPageRight = value === "page-right";
+			const isPageBack = value === 'page-left';
+			const isPageRight = value === 'page-right';
 
 			if (isPageBack || isPageRight) {
 				updateMessagePayload(isPageBack ? paginator.previousPage() : paginator.nextPage());
@@ -77,7 +79,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 		}
 
 		await prompt.edit({
-			content: "Timed out...",
+			content: 'Timed out...',
 			embeds: [],
 			components: [],
 		});
@@ -116,7 +118,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 
 		const guilds = await getUserGuilds(message.author.id);
 		if (!guilds.size) {
-			await message.channel.send(i18next.t("common.errors.no_guilds"));
+			await message.channel.send(i18next.t('common.errors.no_guilds'));
 			return;
 		}
 
@@ -142,7 +144,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 			await queue.wait();
 			const threadResults = await openThread(message as Message<false>, guild);
 
-			if (!("settings" in threadResults)) {
+			if (!('settings' in threadResults)) {
 				return;
 			}
 
@@ -171,7 +173,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 				} else {
 					const greetingEmbed = new EmbedBuilder()
 						.setAuthor({
-							name: i18next.t("thread.greeting.embed.author", {
+							name: i18next.t('thread.greeting.embed.author', {
 								guild: guild.name,
 								iconURL: member.guild.iconURL() ?? undefined,
 							}),
@@ -185,7 +187,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 				await message.channel.send(options);
 				await threadChannel.send(options);
 			}
-		// eslint-disable-next-line no-useless-catch
+			// eslint-disable-next-line no-useless-catch
 		} catch (error) {
 			throw error;
 		} finally {

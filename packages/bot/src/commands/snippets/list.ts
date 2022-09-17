@@ -1,5 +1,5 @@
-import { PrismaClient, type Snippet } from "@prisma/client";
-import type { ButtonBuilder } from "discord.js";
+import { PrismaClient, type Snippet } from '@prisma/client';
+import type { ButtonBuilder } from 'discord.js';
 import {
 	type APIApplicationCommandSubcommandOption,
 	type ChatInputCommandInteraction,
@@ -7,43 +7,41 @@ import {
 	Colors,
 	EmbedBuilder,
 	inlineCode,
-} from "discord.js";
-import i18next from "i18next";
-import { singleton } from "tsyringe";
-import { getLocalizedProp, type Subcommand } from "#struct/Command";
-import { SelectMenuPaginator, type SelectMenuPaginatorConsumers } from "#struct/SelectMenuPaginator";
-import { ellipsis } from "#util/ellipsis";
+} from 'discord.js';
+import i18next from 'i18next';
+import { singleton } from 'tsyringe';
+import { getLocalizedProp, type Subcommand } from '#struct/Command';
+import { SelectMenuPaginator, type SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
+import { ellipsis } from '#util/ellipsis';
 
 @singleton()
 export default class implements Subcommand {
-	public readonly interactionOptions: Omit<APIApplicationCommandSubcommandOption, "type"> = {
-		...getLocalizedProp("name", "commands.snippets.list.name"),
-		...getLocalizedProp("description", "commands.snippets.list.description"),
+	public readonly interactionOptions: Omit<APIApplicationCommandSubcommandOption, 'type'> = {
+		...getLocalizedProp('name', 'commands.snippets.list.name'),
+		...getLocalizedProp('description', 'commands.snippets.list.description'),
 	};
 
 	public constructor(private readonly prisma: PrismaClient) {}
 
-	public async handle(interaction: ChatInputCommandInteraction<"cached">) {
+	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		const snippets = await this.prisma.snippet.findMany({ where: { guildId: interaction.guildId } });
 		if (!snippets.length) {
 			return interaction.reply({
-				content: i18next.t("common.errors.no_resources", {
-					resource: "snippet",
+				content: i18next.t('common.errors.no_resources', {
+					resource: 'snippet',
 					lng: interaction.locale,
 				}),
 			});
 		}
 
 		const paginator = new SelectMenuPaginator({
-			key: "snippet-list",
+			key: 'snippet-list',
 			data: snippets,
 			maxPageLength: 40,
 		});
 
 		const embed = new EmbedBuilder()
-			.setTitle(
-				i18next.t("commands.snippets.list.embed.title", { lng: interaction.locale }),
-			)
+			.setTitle(i18next.t('commands.snippets.list.embed.title', { lng: interaction.locale }))
 			.setColor(Colors.Blurple);
 
 		const actionRow = new ActionRowBuilder<ButtonBuilder>();
@@ -53,9 +51,10 @@ export default class implements Subcommand {
 			embed.setDescription(
 				data
 					.map(
-						(snippet) => `• ${inlineCode(snippet.name)}: ${inlineCode(ellipsis(snippet.content.replace("`", "\\`"), 100))}`,
+						(snippet) =>
+							`• ${inlineCode(snippet.name)}: ${inlineCode(ellipsis(snippet.content.replace('`', '\\`'), 100))}`,
 					)
-					.join("\n"),
+					.join('\n'),
 			);
 			actionRow.setComponents([pageLeftButton, pageRightButton]);
 		};
@@ -69,7 +68,7 @@ export default class implements Subcommand {
 		});
 
 		for await (const [component] of reply.createMessageComponentCollector({ idle: 30_000 })) {
-			const isLeft = component.customId === "page-left";
+			const isLeft = component.customId === 'page-left';
 			updateMessagePayload(isLeft ? paginator.previousPage() : paginator.nextPage());
 			await component.update({
 				embeds: [embed],
