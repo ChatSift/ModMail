@@ -42,7 +42,7 @@ export default class extends Route<Snippet, Body> {
 	public async handle(req: TRequest<Body>, res: Response) {
 		const { guildId } = req.params as { guildId: string };
 
-		const snipptetCommandData: RESTPostAPIApplicationGuildCommandsJSONBody = {
+		const snippetCommandData: RESTPostAPIApplicationGuildCommandsJSONBody = {
 			name: req.body.name,
 			description: 'This is a local snippet',
 			default_member_permissions: '0',
@@ -57,7 +57,7 @@ export default class extends Route<Snippet, Body> {
 		const snippetCommand = (await this.discordRest.post(
 			Routes.applicationGuildCommands(this.env.discordClientId, guildId),
 			{
-				body: snipptetCommandData,
+				body: snippetCommandData,
 			},
 		)) as RESTPostAPIApplicationCommandsResult;
 
