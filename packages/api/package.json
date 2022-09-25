@@ -16,10 +16,10 @@
 	},
 	"devDependencies": {
 		"@types/cors": "^2.8.12",
-		"@types/node": "^16.11.48",
+		"@types/node": "^16.11.60",
 		"@types/pino": "^7.0.5",
 		"prisma": "^4.2.1",
-		"typescript": "^4.7.4"
+		"typescript": "^4.8.3"
 	},
 	"dependencies": {
 		"@chatsift/pino-rotate-file": "^0.1.2",
@@ -29,7 +29,7 @@
 		"@prisma/client": "^4.2.1",
 		"@sapphire/shapeshift": "^3.4.1",
 		"cors": "^2.8.5",
-		"discord-api-types": "^0.37.2",
+		"discord-api-types": "^0.37.10",
 		"helmet": "^5.1.1",
 		"pino": "^8.4.1",
 		"pino-pretty": "^8.1.0",

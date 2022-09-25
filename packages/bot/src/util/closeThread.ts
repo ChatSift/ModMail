@@ -1,7 +1,7 @@
 import { EmbedBuilder, bold } from '@discordjs/builders';
 import type { Thread } from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
-import type { MessageOptions, ThreadChannel } from 'discord.js';
+import type { MessageCreateOptions, ThreadChannel } from 'discord.js';
 import { Colors } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
@@ -26,7 +26,7 @@ export async function closeThread({ thread, channel, silent }: CloseThreadOption
 			? templateString(baseFarewellMessage, templateDataFromMember(member))
 			: baseFarewellMessage;
 
-		const options: MessageOptions = { allowedMentions: { roles: [] } };
+		const options: MessageCreateOptions = { allowedMentions: { roles: [] } };
 		if (settings?.simpleMode) {
 			options.content = `⚙️ ${bold(`${channel.guild.name} Staff:`)} ${farewellMessage}`;
 		} else {
