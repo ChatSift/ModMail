@@ -10,7 +10,7 @@ import {
 	TimestampStyles,
 	type UserContextMenuCommandInteraction,
 	Message,
-	type MessageOptions,
+	type MessageCreateOptions,
 	type Guild,
 	type GuildMember,
 	Client,
@@ -142,7 +142,7 @@ export async function openThread(
 		});
 	}
 
-	const startMessageOptions: MessageOptions = { embeds: [embed] };
+	const startMessageOptions: MessageCreateOptions = { embeds: [embed] };
 
 	if (isMessage) {
 		embed.spliceFields(3, 1);

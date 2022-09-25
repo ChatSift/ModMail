@@ -1,7 +1,7 @@
 import { setTimeout } from 'node:timers';
 import { EmbedBuilder, bold } from '@discordjs/builders';
 import { PrismaClient } from '@prisma/client';
-import type { GuildMember, Message, MessageOptions, ThreadChannel } from 'discord.js';
+import type { GuildMember, Message, MessageCreateOptions, ThreadChannel } from 'discord.js';
 import { Colors } from 'discord.js';
 import { container } from 'tsyringe';
 
@@ -28,7 +28,7 @@ export async function sendMemberThreadMessage({
 }: SendMemberThreadMessageOptions) {
 	const prisma = container.resolve(PrismaClient);
 
-	const options: Omit<MessageOptions, 'flags'> = {};
+	const options: Omit<MessageCreateOptions, 'flags'> = {};
 	if (simpleMode) {
 		if (userMessage.content.length) {
 			options.content = `${bold(`${userMessage.author.tag}:`)} ${userMessage.content}${
@@ -56,7 +56,7 @@ export async function sendMemberThreadMessage({
 			});
 		}
 
-		options.content = userMessage.stickers.size ? 'This message also included a sticker' : null;
+		options.content = userMessage.stickers.size ? 'This message also included a sticker' : undefined;
 		options.embeds = [embed];
 	}
 

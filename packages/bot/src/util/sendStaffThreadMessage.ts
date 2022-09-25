@@ -6,10 +6,10 @@ import type {
 	GuildMember,
 	ChatInputCommandInteraction,
 	MessageEditOptions,
-	MessageOptions,
 	ThreadChannel,
 	Message,
 	MessageContextMenuCommandInteraction,
+	MessageCreateOptions,
 } from 'discord.js';
 import { Colors } from 'discord.js';
 import i18next from 'i18next';
@@ -46,7 +46,7 @@ export async function sendStaffThreadMessage({
 	// eslint-disable-next-line no-param-reassign
 	content = templateString(content, templateDataFromMember(member));
 
-	const options: Omit<MessageOptions, 'flags'> = { allowedMentions: { roles: [] } };
+	const options: Omit<MessageEditOptions, 'flags'> = { allowedMentions: { roles: [] } };
 	if (simpleMode) {
 		options.content = `${bold(
 			`${existing ? `${inlineCode(existing.replyId.toString())} ` : ''}${anon ? '(Anonymous) ' : ''}(${
@@ -114,7 +114,7 @@ export async function sendStaffThreadMessage({
 		return existing.user.edit(userOptions);
 	}
 
-	const guildMessage = await channel.send(options);
+	const guildMessage = await channel.send(options as MessageCreateOptions);
 	await interaction?.reply({ content: 'Successfully posted your message' });
 	setTimeout(async () => {
 		try {
@@ -126,7 +126,7 @@ export async function sendStaffThreadMessage({
 
 	let userMessage: Message;
 	try {
-		userMessage = await member.send(userOptions);
+		userMessage = await member.send(userOptions as MessageCreateOptions);
 	} catch {
 		return channel.send(i18next.t('common.errors.dm_fail'));
 	}
