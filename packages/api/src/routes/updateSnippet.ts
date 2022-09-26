@@ -54,12 +54,9 @@ export default class extends Route<Snippet, Body> {
 			throw notFound('Snippet not found');
 		}
 
-		(await this.discordRest.patch(
-			Routes.applicationGuildCommand(this.env.discordClientId, guildId, snippet.commandId),
-			{
-				body: req.body as RESTPatchAPIApplicationGuildCommandJSONBody,
-			},
-		)) as RESTPatchAPIApplicationGuildCommandJSONBody;
+		await this.discordRest.patch(Routes.applicationGuildCommand(this.env.discordClientId, guildId, snippet.commandId), {
+			body: req.body as RESTPatchAPIApplicationGuildCommandJSONBody,
+		});
 
 		const [updatedSnippet] = await this.prisma.$transaction([
 			this.prisma.snippet.update({
