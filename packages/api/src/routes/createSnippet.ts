@@ -1,6 +1,7 @@
 import type { TRequest } from '@chatsift/rest-utils';
 import { Route, RouteMethod } from '@chatsift/rest-utils';
 import { REST } from '@discordjs/rest';
+import { badRequest } from '@hapi/boom';
 import { PrismaClient } from '@prisma/client';
 import type { BaseValidator, InferType } from '@sapphire/shapeshift';
 import { s } from '@sapphire/shapeshift';
@@ -41,6 +42,16 @@ export default class extends Route<Snippet, Body> {
 
 	public async handle(req: TRequest<Body>, res: Response) {
 		const { guildId } = req.params as { guildId: string };
+
+		const snippetAlreadyExists = await this.prisma.snippet.findFirst({
+			where: {
+				name: req.body.name,
+				guildId,
+			},
+		});
+		if (snippetAlreadyExists) {
+			throw badRequest('A snippet with this name already exists in the guild');
+		}
 
 		const snippetCommandData: RESTPostAPIApplicationGuildCommandsJSONBody = {
 			name: req.body.name,
