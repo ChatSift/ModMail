@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readdirRecurse } from '@chatsift/readdir';
 import type { Route } from '@chatsift/rest-utils';
-import { jsonParser, attachHttpUtils, sendBoom } from '@chatsift/rest-utils';
+import { attachHttpUtils, sendBoom } from '@chatsift/rest-utils';
 import { REST } from '@discordjs/rest';
 import { Boom, isBoom, notFound } from '@hapi/boom';
 import { PrismaClient } from '@prisma/client';
