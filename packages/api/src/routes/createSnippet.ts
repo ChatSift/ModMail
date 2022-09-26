@@ -1,5 +1,5 @@
 import type { TRequest } from '@chatsift/rest-utils';
-import { Route, RouteMethod } from '@chatsift/rest-utils';
+import { jsonParser, Route, RouteMethod } from '@chatsift/rest-utils';
 import { REST } from '@discordjs/rest';
 import { badRequest } from '@hapi/boom';
 import { PrismaClient } from '@prisma/client';
@@ -10,7 +10,7 @@ import type {
 	RESTPostAPIApplicationGuildCommandsJSONBody,
 } from 'discord-api-types/v9';
 import { ApplicationCommandOptionType, Routes } from 'discord-api-types/v9';
-import type { Response } from 'polka';
+import type { Middleware, Response } from 'polka';
 import { singleton } from 'tsyringe';
 import { Env } from '../util/env';
 import type { Snippet } from '../util/models';
@@ -31,6 +31,8 @@ export default class extends Route<Snippet, Body> {
 	} as const;
 
 	public override readonly bodyValidationSchema: BaseValidator<Body> = schema;
+
+	public override middleware: Middleware[] = [jsonParser()];
 
 	public constructor(
 		private readonly prisma: PrismaClient,

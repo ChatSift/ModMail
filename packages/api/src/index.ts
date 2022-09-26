@@ -41,7 +41,6 @@ const app = polka({
 	}),
 	helmet({ contentSecurityPolicy: env.isProd ? undefined : false }) as Middleware,
 	attachHttpUtils(),
-	jsonParser(),
 );
 
 const path = join(dirname(fileURLToPath(import.meta.url)), 'routes');
