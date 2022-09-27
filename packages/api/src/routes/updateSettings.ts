@@ -1,9 +1,9 @@
 import type { TRequest } from '@chatsift/rest-utils';
-import { jsonParser, Route, RouteMethod } from '@chatsift/rest-utils';
+import { Route, RouteMethod } from '@chatsift/rest-utils';
 import { PrismaClient } from '@prisma/client';
 import type { BaseValidator, InferType } from '@sapphire/shapeshift';
 import { s } from '@sapphire/shapeshift';
-import type { Middleware, Response } from 'polka';
+import type { Response } from 'polka';
 import { singleton } from 'tsyringe';
 import type { GuildSettings } from '../util/models';
 import { snowflakeSchema } from '../util/snowflakeSchema';
@@ -25,8 +25,6 @@ export default class extends Route<GuildSettings, Body> {
 	} as const;
 
 	public override readonly bodyValidationSchema: BaseValidator<Body> = schema;
-
-	public override middleware: Middleware[] = [jsonParser()];
 
 	public constructor(private readonly prisma: PrismaClient) {
 		super();
