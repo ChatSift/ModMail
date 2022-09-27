@@ -17,7 +17,7 @@ import { logger } from './util/logger';
 
 const env = container.resolve(Env);
 container.register(PrismaClient, { useValue: new PrismaClient() });
-container.register(REST, { useValue: new REST({ version: '9' }).setToken(env.discordToken) });
+container.register(REST, { useValue: new REST().setToken(env.discordToken) });
 
 const app = polka({
 	onError(err, _, res) {

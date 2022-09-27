@@ -8,8 +8,8 @@ import { s } from '@sapphire/shapeshift';
 import type {
 	RESTPostAPIApplicationCommandsResult,
 	RESTPostAPIApplicationGuildCommandsJSONBody,
-} from 'discord-api-types/v9';
-import { ApplicationCommandOptionType, Routes } from 'discord-api-types/v9';
+} from 'discord-api-types/v10';
+import { ApplicationCommandOptionType, Routes } from 'discord-api-types/v10';
 import type { Middleware, Response } from 'polka';
 import { singleton } from 'tsyringe';
 import { Env } from '../util/env';

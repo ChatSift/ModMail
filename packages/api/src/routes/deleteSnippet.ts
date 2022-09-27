@@ -5,7 +5,7 @@ import { badRequest, notFound } from '@hapi/boom';
 import { PrismaClient } from '@prisma/client';
 import type { BaseValidator, InferType } from '@sapphire/shapeshift';
 import { s } from '@sapphire/shapeshift';
-import { Routes } from 'discord-api-types/v9';
+import { Routes } from 'discord-api-types/v10';
 import type { Middleware, Response } from 'polka';
 import { singleton } from 'tsyringe';
 import { Env } from '../util/env';
