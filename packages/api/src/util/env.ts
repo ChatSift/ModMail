@@ -13,7 +13,7 @@ export class Env {
 
 	public readonly cors = process.env.CORS?.split(',') ?? [];
 
-	private readonly KEYS: string[] = [];
+	private readonly KEYS: string[] = ['DISCORD_TOKEN', 'DISCORD_CLIENT_ID'];
 
 	public constructor() {
 		for (const key of this.KEYS) {
