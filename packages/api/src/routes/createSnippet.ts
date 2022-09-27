@@ -10,7 +10,7 @@ import type {
 	RESTPostAPIApplicationGuildCommandsJSONBody,
 } from 'discord-api-types/v10';
 import { ApplicationCommandOptionType, Routes } from 'discord-api-types/v10';
-import type { Response } from 'polka';
+import type { NextHandler, Response } from 'polka';
 import { singleton } from 'tsyringe';
 import { Env } from '../util/env';
 import type { Snippet } from '../util/models';
@@ -40,7 +40,7 @@ export default class extends Route<Snippet, Body> {
 		super();
 	}
 
-	public async handle(req: TRequest<Body>, res: Response) {
+	public async handle(req: TRequest<Body>, res: Response, next: NextHandler) {
 		const { guildId } = req.params as { guildId: string };
 
 		const snippetAlreadyExists = await this.prisma.snippet.findFirst({
@@ -50,7 +50,7 @@ export default class extends Route<Snippet, Body> {
 			},
 		});
 		if (snippetAlreadyExists) {
-			throw badRequest('A snippet with this name already exists in the guild');
+			return next(badRequest('A snippet with this name already exists in the guild'));
 		}
 
 		const snippetCommandData: RESTPostAPIApplicationGuildCommandsJSONBody = {

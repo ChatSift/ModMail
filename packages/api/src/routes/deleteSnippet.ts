@@ -6,7 +6,7 @@ import { PrismaClient } from '@prisma/client';
 import type { BaseValidator, InferType } from '@sapphire/shapeshift';
 import { s } from '@sapphire/shapeshift';
 import { Routes } from 'discord-api-types/v10';
-import type { Response } from 'polka';
+import type { NextHandler, Response } from 'polka';
 import { singleton } from 'tsyringe';
 import { Env } from '../util/env';
 import type { Snippet } from '../util/models';
@@ -36,12 +36,12 @@ export default class extends Route<Snippet, Body> {
 		super();
 	}
 
-	public async handle(req: TRequest<Body>, res: Response) {
+	public async handle(req: TRequest<Body>, res: Response, next: NextHandler) {
 		const { guildId, snippetId } = req.params as { guildId: string; snippetId: string };
 
 		const snippetIdNum = Number.parseInt(snippetId, 10);
 		if (Number.isNaN(snippetIdNum)) {
-			throw badRequest('Invalid snippet ID');
+			return next(badRequest('Invalid snippet ID'));
 		}
 
 		const snippet = await this.prisma.snippet.findFirst({
@@ -50,7 +50,7 @@ export default class extends Route<Snippet, Body> {
 			},
 		});
 		if (!snippet) {
-			throw notFound('Snippet not found');
+			return next(notFound('Snippet not found'));
 		}
 
 		await this.discordRest.delete(Routes.applicationGuildCommand(this.env.discordClientId, guildId, snippet.commandId));

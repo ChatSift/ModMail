@@ -1,7 +1,7 @@
 import { Route, RouteMethod } from '@chatsift/rest-utils';
 import { badRequest, notFound } from '@hapi/boom';
 import { PrismaClient } from '@prisma/client';
-import type { Middleware, Request, Response } from 'polka';
+import type { Middleware, NextHandler, Request, Response } from 'polka';
 import { singleton } from 'tsyringe';
 import type { Snippet } from '../util/models';
 
@@ -18,12 +18,12 @@ export default class extends Route<Snippet, never> {
 		super();
 	}
 
-	public async handle(req: Request, res: Response) {
+	public async handle(req: Request, res: Response, next: NextHandler) {
 		const { guildId, snippetId } = req.params as { guildId: string; snippetId: string };
 
 		const snippetIdNum = Number.parseInt(snippetId, 10);
 		if (Number.isNaN(snippetIdNum)) {
-			throw badRequest('Invalid snippet ID');
+			return next(badRequest('Invalid snippet ID'));
 		}
 
 		const snippet = await this.prisma.snippet.findFirst({
@@ -33,7 +33,7 @@ export default class extends Route<Snippet, never> {
 			},
 		});
 		if (!snippet) {
-			throw notFound('Snippet not found');
+			return next(notFound('Snippet not found'));
 		}
 
 		res.statusCode = 200;
