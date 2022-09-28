@@ -4,6 +4,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readdirRecurse } from '@chatsift/readdir';
 import type { Route } from '@chatsift/rest-utils';
 import { attachHttpUtils, sendBoom } from '@chatsift/rest-utils';
+import { REST } from '@discordjs/rest';
 import { Boom, isBoom, notFound } from '@hapi/boom';
 import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
@@ -16,6 +17,7 @@ import { logger } from './util/logger';
 
 const env = container.resolve(Env);
 container.register(PrismaClient, { useValue: new PrismaClient() });
+container.register(REST, { useValue: new REST().setToken(env.discordToken) });
 
 const app = polka({
 	onError(err, _, res) {
