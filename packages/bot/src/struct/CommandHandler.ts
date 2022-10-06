@@ -156,7 +156,7 @@ export class CommandHandler {
 			)}`;
 
 			// Try to display something to the user.
-			await interaction.reply({ content }).catch(() => null);
+			await interaction.followUp({ content, ephemeral: true });
 		}
 	}
 
