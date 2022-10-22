@@ -49,7 +49,7 @@ export type CommandConstructor = new (...args: any[]) => Command | CommandWithSu
 type PropAsIndexSignature<T extends string> = {
 	[P in T]: string;
 };
-// This needs to be is own type, otherwise TS does not allow applying this within an index signature
+// This needs to be its own type, otherwise TS does not allow applying this within an index signature
 type StringAsLocalizations<T extends string> = `${T}_localizations`;
 type PropAsIndexSignatureLocalizations<T extends string> = {
 	[P in StringAsLocalizations<T>]: Record<Locale, string>;
