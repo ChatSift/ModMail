@@ -316,6 +316,9 @@
 		"open": {
 			"name": "Open"
 		},
+		"create-snippet": {
+			"name": "Create Snippet"
+		},
 		"expose": {
 			"name": "Expose Link"
 		},

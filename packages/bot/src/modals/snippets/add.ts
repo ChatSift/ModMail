@@ -121,9 +121,20 @@ function construct(content?: string): ModalBuilder {
 	return addModal;
 }
 
-export default async function promptSnippetAdd(parentInteraction: CommandInteraction, content?: string) {
+export default async function promptSnippetAdd(parentInteraction: CommandInteraction<'cached'>, content?: string) {
 	const prisma = container.resolve(PrismaClient);
 	const commandHandler = container.resolve(CommandHandler);
+
+	const list = await prisma.snippet.findMany({ where: { guildId: parentInteraction.guild.id } });
+	if (list.length >= 50) {
+		return parentInteraction.reply({
+			content: i18next.t('common.errors.resource_limit_reached', {
+				resource: 'snippet',
+				limit: 50,
+				lng: parentInteraction.locale,
+			}),
+		});
+	}
 
 	const modal = construct(content);
 	await parentInteraction.showModal(modal);
@@ -139,7 +150,7 @@ export default async function promptSnippetAdd(parentInteraction: CommandInterac
 
 		return await handle(prisma, commandHandler, result);
 	} catch {
-		return parentInteraction.reply({
+		return parentInteraction.followUp({
 			content: 'Response window expired.',
 			ephemeral: true,
 		});
