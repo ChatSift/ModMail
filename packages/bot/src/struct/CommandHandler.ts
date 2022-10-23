@@ -4,6 +4,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readdirRecurse } from '@chatsift/readdir';
 import { REST } from '@discordjs/rest';
 import { PrismaClient } from '@prisma/client';
+import type { PermissionResolvable } from 'discord.js';
 import {
 	ApplicationCommandOptionType,
 	ApplicationCommandType,
@@ -15,6 +16,7 @@ import {
 	type RESTPutAPIApplicationCommandsJSONBody,
 	Routes,
 	type ThreadChannel,
+	PermissionsBitField,
 } from 'discord.js';
 import i18next from 'i18next';
 import { container, singleton } from 'tsyringe';
@@ -122,6 +124,21 @@ export class CommandHandler {
 
 		try {
 			if (!command.containsSubcommands) {
+				if (!command.interactionOptions.dm_permission && command.requiredClientPermissions) {
+					const missingRequiredBotPermissions = this.checkForBotMissingPermissions(
+						interaction.appPermissions!,
+						command.requiredClientPermissions,
+					);
+					if (missingRequiredBotPermissions.length) {
+						return await interaction.reply({
+							content: `The bot is missing the following permissions to run this command: ${inlineCode(
+								missingRequiredBotPermissions.join(', '),
+							)}`,
+							ephemeral: true,
+						});
+					}
+				}
+
 				// eslint-disable-next-line @typescript-eslint/return-await
 				return await command.handle(interaction as ChatInputCommandInteraction<'cached'>);
 			}
@@ -138,6 +155,21 @@ export class CommandHandler {
 			if (!subcommand) {
 				logger.warn(interaction, 'Command interaction with subcommands map had no subcommand');
 				return;
+			}
+
+			if (!command.interactionOptions.dm_permission && subcommand.requiredClientPermissions) {
+				const missingRequiredBotPermissions = this.checkForBotMissingPermissions(
+					interaction.appPermissions!,
+					subcommand.requiredClientPermissions,
+				);
+				if (missingRequiredBotPermissions.length) {
+					return await interaction.reply({
+						content: `The bot is missing the following permissions to run this command: ${inlineCode(
+							missingRequiredBotPermissions.join(', '),
+						)}`,
+						ephemeral: true,
+					});
+				}
 			}
 
 			// eslint-disable-next-line @typescript-eslint/return-await
@@ -168,6 +200,18 @@ export class CommandHandler {
 	// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 	public async init(): Promise<void[]> {
 		return Promise.all([this.registerCommands(), this.registerComponents()]);
+	}
+
+	public checkForBotMissingPermissions(botPermissions: PermissionsBitField, clientPermissions: PermissionResolvable) {
+		const requiredClientPermissions = new PermissionsBitField(clientPermissions);
+		if (requiredClientPermissions.bitfield) {
+			const missingClientPermissions = botPermissions.missing(requiredClientPermissions);
+			if (missingClientPermissions.length) {
+				return missingClientPermissions;
+			}
+		}
+
+		return [];
 	}
 
 	public async registerInteractions(): Promise<void> {
