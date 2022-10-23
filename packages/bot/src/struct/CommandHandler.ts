@@ -125,14 +125,14 @@ export class CommandHandler {
 		try {
 			if (!command.containsSubcommands) {
 				if (!command.interactionOptions.dm_permission && command.requiredClientPermissions) {
-					const missingRequiredBotPermissions = this.checkForBotMissingPermissions(
+					const missingRequiredClientPermissions = this.checkForMissingClientPermissions(
 						interaction.appPermissions!,
 						command.requiredClientPermissions,
 					);
-					if (missingRequiredBotPermissions.length) {
+					if (missingRequiredClientPermissions.length) {
 						return await interaction.reply({
 							content: `The bot is missing the following permissions to run this command: ${inlineCode(
-								missingRequiredBotPermissions.join(', '),
+								missingRequiredClientPermissions.join(', '),
 							)}`,
 							ephemeral: true,
 						});
@@ -158,14 +158,14 @@ export class CommandHandler {
 			}
 
 			if (!command.interactionOptions.dm_permission && subcommand.requiredClientPermissions) {
-				const missingRequiredBotPermissions = this.checkForBotMissingPermissions(
+				const missingRequiredClientPermissions = this.checkForMissingClientPermissions(
 					interaction.appPermissions!,
 					subcommand.requiredClientPermissions,
 				);
-				if (missingRequiredBotPermissions.length) {
+				if (missingRequiredClientPermissions.length) {
 					return await interaction.reply({
 						content: `The bot is missing the following permissions to run this command: ${inlineCode(
-							missingRequiredBotPermissions.join(', '),
+							missingRequiredClientPermissions.join(', '),
 						)}`,
 						ephemeral: true,
 					});
@@ -202,10 +202,13 @@ export class CommandHandler {
 		return Promise.all([this.registerCommands(), this.registerComponents()]);
 	}
 
-	public checkForBotMissingPermissions(botPermissions: PermissionsBitField, clientPermissions: PermissionResolvable) {
-		const requiredClientPermissions = new PermissionsBitField(clientPermissions);
-		if (requiredClientPermissions.bitfield) {
-			const missingClientPermissions = botPermissions.missing(requiredClientPermissions);
+	public checkForMissingClientPermissions(
+		clientPermissions: PermissionsBitField,
+		requiredClientPermissions: PermissionResolvable,
+	) {
+		const requiredClientPermissionsBitField = new PermissionsBitField(clientPermissions);
+		if (requiredClientPermissionsBitField.bitfield) {
+			const missingClientPermissions = clientPermissions.missing(requiredClientPermissions);
 			if (missingClientPermissions.length) {
 				return missingClientPermissions;
 			}
