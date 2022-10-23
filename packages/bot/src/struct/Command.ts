@@ -1,3 +1,4 @@
+import type { PermissionResolvable } from 'discord.js';
 import {
 	type ApplicationCommandOptionChoiceData,
 	type ApplicationCommandType,
@@ -27,12 +28,14 @@ export type Command<Type extends ApplicationCommandType = ApplicationCommandType
 	handle(interaction: InteractionTypeMapping[Type]): Awaitable<unknown>;
 	handleAutocomplete?(interaction: AutocompleteInteraction<any>): Awaitable<ApplicationCommandOptionChoiceData[]>;
 	readonly interactionOptions: CommandBody<Type>;
+	readonly requiredClientPermissions?: PermissionResolvable;
 };
 
 export type CommandWithSubcommands = {
 	readonly containsSubcommands: true;
 	handleAutocomplete?(interaction: AutocompleteInteraction<any>): Awaitable<ApplicationCommandOptionChoiceData[]>;
 	readonly interactionOptions: Omit<CommandBody<ApplicationCommandType.ChatInput>, 'options' | 'type'>;
+	readonly requiredClientPermissions?: PermissionResolvable;
 };
 
 export type Subcommand = Omit<

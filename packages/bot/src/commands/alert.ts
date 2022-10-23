@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import type { PermissionResolvable } from 'discord.js';
 import { ApplicationCommandType, type ChatInputCommandInteraction } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
@@ -14,6 +15,8 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		default_member_permissions: '0',
 		dm_permission: false,
 	};
+
+	public requiredClientPermissions: PermissionResolvable = 'SendMessages';
 
 	public constructor(private readonly prisma: PrismaClient) {}
 

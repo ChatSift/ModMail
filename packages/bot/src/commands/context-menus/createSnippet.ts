@@ -1,4 +1,4 @@
-import type { MessageContextMenuCommandInteraction } from 'discord.js';
+import type { MessageContextMenuCommandInteraction, PermissionResolvable } from 'discord.js';
 import { ApplicationCommandType } from 'discord.js';
 import { singleton } from 'tsyringe';
 import promptSnippetAdd from '../../modals/snippets/add';
@@ -13,6 +13,8 @@ export default class implements Command<ApplicationCommandType.Message> {
 		default_member_permissions: '0',
 		dm_permission: false,
 	};
+
+	public requiredClientPermissions: PermissionResolvable = 'SendMessages';
 
 	public async handle(interaction: MessageContextMenuCommandInteraction<'cached'>) {
 		const targetMessageContent = interaction.targetMessage.content;
