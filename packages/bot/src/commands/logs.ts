@@ -37,7 +37,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 		],
 	};
 
-	public requiredClientPermissions: PermissionResolvable = ["SendMessages", "EmbedLinks"];
+	public requiredClientPermissions: PermissionResolvable = ['SendMessages', 'EmbedLinks'];
 
 	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
 
