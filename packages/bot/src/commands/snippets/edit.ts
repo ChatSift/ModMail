@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import type { PermissionResolvable } from 'discord.js';
 import {
 	type APIApplicationCommandSubcommandOption,
 	ApplicationCommandOptionType,
@@ -29,6 +30,8 @@ export default class implements Subcommand {
 			},
 		],
 	};
+
+	public requiredClientPermissions: PermissionResolvable = 'SendMessages';
 
 	public constructor(private readonly prisma: PrismaClient) {}
 

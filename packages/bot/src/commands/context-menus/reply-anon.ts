@@ -1,4 +1,4 @@
-import type { MessageContextMenuCommandInteraction } from 'discord.js';
+import type { MessageContextMenuCommandInteraction, PermissionResolvable } from 'discord.js';
 import { ApplicationCommandType } from 'discord.js';
 import { singleton } from 'tsyringe';
 import ReplyContextMenu from './reply';
@@ -12,6 +12,8 @@ export default class implements Command<ApplicationCommandType.Message> {
 		default_member_permissions: '0',
 		dm_permission: false,
 	};
+
+	public requiredClientPermissions: PermissionResolvable = ['SendMessagesInThreads', 'EmbedLinks'];
 
 	public constructor(private readonly replyContextMenu: ReplyContextMenu) {}
 

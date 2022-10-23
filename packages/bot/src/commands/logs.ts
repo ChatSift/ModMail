@@ -1,6 +1,6 @@
 import type { Thread } from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
-import type { ButtonBuilder } from 'discord.js';
+import type { ButtonBuilder, PermissionResolvable } from 'discord.js';
 import {
 	ActionRowBuilder,
 	ApplicationCommandOptionType,
@@ -36,6 +36,8 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			},
 		],
 	};
+
+	public requiredClientPermissions: PermissionResolvable = ["SendMessages", "EmbedLinks"];
 
 	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
 

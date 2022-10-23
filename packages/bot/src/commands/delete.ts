@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import type { ThreadChannel } from 'discord.js';
+import type { PermissionResolvable, ThreadChannel } from 'discord.js';
 import {
 	ApplicationCommandOptionType,
 	ApplicationCommandType,
@@ -27,6 +27,8 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			},
 		],
 	};
+
+	public requiredClientPermissions: PermissionResolvable = ['ManageThreads'];
 
 	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
 

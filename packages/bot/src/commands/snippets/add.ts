@@ -1,4 +1,8 @@
-import type { APIApplicationCommandSubcommandOption, ChatInputCommandInteraction } from 'discord.js';
+import type {
+	APIApplicationCommandSubcommandOption,
+	ChatInputCommandInteraction,
+	PermissionResolvable,
+} from 'discord.js';
 import { singleton } from 'tsyringe';
 import promptSnippetAdd from '../../modals/snippets/add';
 import { getLocalizedProp, type Subcommand } from '#struct/Command';
@@ -10,6 +14,8 @@ export default class implements Subcommand {
 		...getLocalizedProp('description', 'commands.snippets.add.description'),
 		options: [],
 	};
+
+	public requiredClientPermissions: PermissionResolvable = 'SendMessages';
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		return promptSnippetAdd(interaction);
