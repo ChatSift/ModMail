@@ -46,8 +46,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 				options.push(pageRightOption);
 			}
 
-			// Shouldn't need to map - waiting for upstream fix https://github.com/discordjs/discord.js/pull/8174
-			selectMenu.setMaxValues(1).setOptions(options.map((opt) => opt.toJSON()));
+			selectMenu.setMaxValues(1).setOptions(options);
 			actionRow.setComponents([selectMenu]);
 		};
 

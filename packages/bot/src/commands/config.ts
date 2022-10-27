@@ -25,7 +25,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 				...getLocalizedProp('name', 'commands.config.options.modmail_channel.name'),
 				...getLocalizedProp('description', 'commands.config.options.modmail_channel.description'),
 				type: ApplicationCommandOptionType.Channel,
-				channel_types: [ChannelType.GuildText],
+				channel_types: [ChannelType.GuildForum],
 			},
 			{
 				...getLocalizedProp('name', 'commands.config.options.greeting.name'),

@@ -56,6 +56,7 @@
 		"user_rejoin": "User has rejoiend the server",
 		"prompt": "Please select a guild",
 		"reprompt": "Just to make sure you don't get it wrong, please select the guild this message is meant to go to once more",
+		"tag_prompt": "Please select a tag",
 		"start": {
 			"embed": {
 				"fields": {

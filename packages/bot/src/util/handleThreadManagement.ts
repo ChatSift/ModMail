@@ -1,16 +1,18 @@
 /* eslint-disable no-redeclare */
 import { type GuildSettings, PrismaClient, type Thread } from '@prisma/client';
-import type { ThreadChannel } from 'discord.js';
+import type { Collection, ContextMenuCommandInteraction, ForumChannel, GuildForumTag, GuildForumThreadCreateOptions, ThreadChannel } from 'discord.js';
 import {
+	ComponentType,
+	SelectMenuBuilder,
+	ActionRowBuilder,
+	SelectMenuOptionBuilder,
 	type ChatInputCommandInteraction,
 	Colors,
 	EmbedBuilder,
-	type TextChannel,
 	time,
 	TimestampStyles,
 	type UserContextMenuCommandInteraction,
 	Message,
-	type MessageCreateOptions,
 	type Guild,
 	type GuildMember,
 	Client,
@@ -18,6 +20,47 @@ import {
 import i18next from 'i18next';
 import { container } from 'tsyringe';
 import { getSortedMemberRolesString } from './getSortedMemberRoles';
+
+const promptTags = async (input: ChatInputCommandInteraction | ContextMenuCommandInteraction | Message, tags: GuildForumTag[]): Promise<GuildForumTag | null> => {
+	const actionRow = new ActionRowBuilder<SelectMenuBuilder>().setComponents(
+		new SelectMenuBuilder().setCustomId('user-tag-selector').addOptions(
+			[...tags.values()].map((tag) =>
+				new SelectMenuOptionBuilder()
+					.setLabel(tag.name)
+					// this looks a bit quirky, but oh well
+					.setEmoji({ name: tag.emoji?.name as string, id: tag.emoji?.id as string })
+					.setValue(tag.id),
+			),
+		),
+	);
+
+	const isMessage = input instanceof Message;
+	const options = {
+		content: i18next.t('thread.tag_prompt'),
+		components: [actionRow],
+	};
+
+	const prompt = await input.channel?.send(options);
+
+	if (!prompt) {
+		return null;
+	}
+
+	const selectMenu = await prompt.awaitMessageComponent({ idle: 30_000, componentType: ComponentType.SelectMenu });
+
+	if (!selectMenu) {
+		await prompt.edit({
+			content: 'Timed out...',
+			embeds: [],
+			components: [],
+		});
+		return null;
+	}
+
+	await prompt.delete();
+
+	return tags.find((tag) => tag.id === selectMenu.values.at(0)) ?? null;
+};
 
 export type MessageOpenThreadReturn = {
 	existing: boolean;
@@ -53,7 +96,7 @@ export async function openThread(
 		return send('common.errors.thread_creation');
 	}
 
-	const modmail = guild.channels.cache.get(settings.modmailChannelId) as TextChannel;
+	const modmail = guild.channels.cache.get(settings.modmailChannelId) as ForumChannel;
 	const existingThread = await prisma.thread.findFirst({
 		where: {
 			guildId: guild.id,
@@ -101,6 +144,12 @@ export async function openThread(
 		await input.deferReply();
 	}
 
+	const tags = modmail.availableTags.filter((tag) => !tag.moderated);
+	let tag: GuildForumTag | null = null;
+	if (tags.length > 0) {
+		tag = await promptTags(input, tags);
+	}
+
 	const embed = new EmbedBuilder()
 		.setFooter({
 			text: `${member.user.tag} (${member.user.id})`,
@@ -142,7 +191,11 @@ export async function openThread(
 		});
 	}
 
-	const startMessageOptions: MessageCreateOptions = { embeds: [embed] };
+	const startMessageOptions: GuildForumThreadCreateOptions = {
+		name: `${member.user.username}-${member.user.discriminator}`,
+		message: { embeds: [embed] },
+		appliedTags: tag ? [tag.id] : [],
+	};
 
 	if (isMessage) {
 		embed.spliceFields(3, 1);
@@ -158,16 +211,14 @@ export async function openThread(
 			alert = alerts.length ? `Alerts: ${alerts.map((a) => `<@${a.userId}>`).join(' ')}` : null;
 		}
 
-		startMessageOptions.content = `${member.toString()}${alert ? `\n${alert}` : ''}`;
+		// @ts-expect-error - I don't know what drugs this thing is taking, but it's acting like content isn't supposed to be here
+		startMessageOptions.message.content = `${member.toString()}${alert ? `\n${alert}` : ''}`;
 	} else {
-		startMessageOptions.content = member.toString();
+		// @ts-expect-error - I don't know what drugs this thing is taking, but it's acting like content isn't supposed to be here
+		startMessageOptions.message.content = member.toString();
 	}
 
-	const startMessage = await modmail.send(startMessageOptions);
-
-	const threadChannel = await startMessage.startThread({
-		name: `${member.user.username}-${member.user.discriminator}`,
-	});
+	const threadChannel = await modmail.threads.create(startMessageOptions);
 
 	const thread = await prisma.thread.create({
 		data: {
