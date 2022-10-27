@@ -1,3 +1,4 @@
+import type { PermissionResolvable } from 'discord.js';
 import { ApplicationCommandOptionType, ApplicationCommandType, type ChatInputCommandInteraction } from 'discord.js';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
@@ -20,6 +21,14 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			},
 		],
 	};
+
+	public readonly requiredClientPermissions: PermissionResolvable = [
+		'CreatePublicThreads',
+		'CreatePrivateThreads',
+		'SendMessages',
+		'SendMessagesInThreads',
+		'EmbedLinks',
+	];
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		return openThread(interaction);

@@ -10,7 +10,8 @@
 	},
 	"scripts": {
 		"lint": "eslint src --ext .ts",
-		"build": "tsc"
+		"build": "tsc",
+		"dev-build": "tsc --watch"
 	},
 	"engines": {
 		"node": ">=16.9.0"
