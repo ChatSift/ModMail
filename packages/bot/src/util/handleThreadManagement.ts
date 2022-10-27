@@ -1,6 +1,13 @@
 /* eslint-disable no-redeclare */
 import { type GuildSettings, PrismaClient, type Thread } from '@prisma/client';
-import type { Collection, ContextMenuCommandInteraction, ForumChannel, GuildForumTag, GuildForumThreadCreateOptions, ThreadChannel } from 'discord.js';
+import type {
+	Collection,
+	ContextMenuCommandInteraction,
+	ForumChannel,
+	GuildForumTag,
+	GuildForumThreadCreateOptions,
+	ThreadChannel,
+} from 'discord.js';
 import {
 	ComponentType,
 	SelectMenuBuilder,
@@ -21,7 +28,10 @@ import i18next from 'i18next';
 import { container } from 'tsyringe';
 import { getSortedMemberRolesString } from './getSortedMemberRoles';
 
-const promptTags = async (input: ChatInputCommandInteraction | ContextMenuCommandInteraction | Message, tags: GuildForumTag[]): Promise<GuildForumTag | null> => {
+const promptTags = async (
+	input: ChatInputCommandInteraction | ContextMenuCommandInteraction | Message,
+	tags: GuildForumTag[],
+): Promise<GuildForumTag | null> => {
 	const actionRow = new ActionRowBuilder<SelectMenuBuilder>().setComponents(
 		new SelectMenuBuilder().setCustomId('user-tag-selector').addOptions(
 			[...tags.values()].map((tag) =>
