@@ -1,5 +1,5 @@
 import { PrismaClient, type Snippet } from '@prisma/client';
-import type { ButtonBuilder } from 'discord.js';
+import type { ButtonBuilder, PermissionResolvable } from 'discord.js';
 import {
 	type APIApplicationCommandSubcommandOption,
 	type ChatInputCommandInteraction,
@@ -20,6 +20,8 @@ export default class implements Subcommand {
 		...getLocalizedProp('name', 'commands.snippets.list.name'),
 		...getLocalizedProp('description', 'commands.snippets.list.description'),
 	};
+
+	public requiredClientPermissions: PermissionResolvable = ['SendMessages', 'EmbedLinks'];
 
 	public constructor(private readonly prisma: PrismaClient) {}
 

@@ -1,3 +1,4 @@
+import type { PermissionResolvable } from 'discord.js';
 import {
 	type ApplicationCommandOptionChoiceData,
 	type ApplicationCommandType,
@@ -27,12 +28,14 @@ export type Command<Type extends ApplicationCommandType = ApplicationCommandType
 	handle(interaction: InteractionTypeMapping[Type]): Awaitable<unknown>;
 	handleAutocomplete?(interaction: AutocompleteInteraction<any>): Awaitable<ApplicationCommandOptionChoiceData[]>;
 	readonly interactionOptions: CommandBody<Type>;
+	readonly requiredClientPermissions?: PermissionResolvable;
 };
 
 export type CommandWithSubcommands = {
 	readonly containsSubcommands: true;
 	handleAutocomplete?(interaction: AutocompleteInteraction<any>): Awaitable<ApplicationCommandOptionChoiceData[]>;
 	readonly interactionOptions: Omit<CommandBody<ApplicationCommandType.ChatInput>, 'options' | 'type'>;
+	readonly requiredClientPermissions?: PermissionResolvable;
 };
 
 export type Subcommand = Omit<
@@ -49,7 +52,7 @@ export type CommandConstructor = new (...args: any[]) => Command | CommandWithSu
 type PropAsIndexSignature<T extends string> = {
 	[P in T]: string;
 };
-// This needs to be is own type, otherwise TS does not allow applying this within an index signature
+// This needs to be its own type, otherwise TS does not allow applying this within an index signature
 type StringAsLocalizations<T extends string> = `${T}_localizations`;
 type PropAsIndexSignatureLocalizations<T extends string> = {
 	[P in StringAsLocalizations<T>]: Record<Locale, string>;

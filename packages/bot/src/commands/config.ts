@@ -1,7 +1,7 @@
 import type { GuildSettings } from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
 import { stripIndents } from 'common-tags';
-import type { TextChannel } from 'discord.js';
+import type { PermissionResolvable, TextChannel } from 'discord.js';
 import {
 	ApplicationCommandOptionType,
 	ApplicationCommandType,
@@ -49,6 +49,8 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			},
 		],
 	};
+
+	public requiredClientPermissions: PermissionResolvable = 'SendMessages';
 
 	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
 

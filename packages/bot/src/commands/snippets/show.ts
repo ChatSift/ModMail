@@ -1,5 +1,5 @@
 import { PrismaClient, type Snippet, type SnippetUpdates } from '@prisma/client';
-import type { APIEmbedField } from 'discord.js';
+import type { APIEmbedField, PermissionResolvable } from 'discord.js';
 import {
 	type APIApplicationCommandSubcommandOption,
 	ApplicationCommandOptionType,
@@ -37,6 +37,8 @@ export default class implements Subcommand {
 			},
 		],
 	};
+
+	public requiredClientPermissions: PermissionResolvable = ['SendMessages', 'EmbedLinks'];
 
 	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
 

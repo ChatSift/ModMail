@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import type { MessageContextMenuCommandInteraction, ThreadChannel } from 'discord.js';
+import type { MessageContextMenuCommandInteraction, PermissionResolvable, ThreadChannel } from 'discord.js';
 import { ApplicationCommandType } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
@@ -14,6 +14,8 @@ export default class implements Command<ApplicationCommandType.Message> {
 		default_member_permissions: '0',
 		dm_permission: false,
 	};
+
+	public requiredClientPermissions: PermissionResolvable = ['SendMessagesInThreads', 'EmbedLinks'];
 
 	public constructor(private readonly prisma: PrismaClient) {}
 

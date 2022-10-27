@@ -1,6 +1,6 @@
 import { ms } from '@naval-base/ms';
 import { PrismaClient } from '@prisma/client';
-import type { ThreadChannel } from 'discord.js';
+import type { PermissionResolvable, ThreadChannel } from 'discord.js';
 import { ApplicationCommandOptionType, ApplicationCommandType, type ChatInputCommandInteraction } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
@@ -35,6 +35,8 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			},
 		],
 	};
+
+	public requiredClientPermissions: PermissionResolvable = ['SendMessagesInThreads', 'ManageThreads', 'EmbedLinks'];
 
 	public constructor(private readonly prisma: PrismaClient) {}
 

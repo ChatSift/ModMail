@@ -1,5 +1,6 @@
 import { ms } from '@naval-base/ms';
 import { PrismaClient } from '@prisma/client';
+import type { PermissionResolvable } from 'discord.js';
 import {
 	ApplicationCommandOptionType,
 	ApplicationCommandType,
@@ -28,6 +29,8 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			},
 		],
 	};
+
+	public requiredClientPermissions: PermissionResolvable = 'SendMessagesInThreads';
 
 	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
 

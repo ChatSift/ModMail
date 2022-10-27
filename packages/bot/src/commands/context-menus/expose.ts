@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import type { MessageContextMenuCommandInteraction } from 'discord.js';
+import type { MessageContextMenuCommandInteraction, PermissionResolvable } from 'discord.js';
 import { ApplicationCommandType, Client } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
@@ -13,6 +13,8 @@ export default class implements Command<ApplicationCommandType.Message> {
 		default_member_permissions: '0',
 		dm_permission: false,
 	};
+
+	public requiredClientPermissions: PermissionResolvable = 'SendMessages';
 
 	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
 

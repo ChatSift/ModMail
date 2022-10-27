@@ -4,6 +4,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readdirRecurse } from '@chatsift/readdir';
 import { REST } from '@discordjs/rest';
 import { PrismaClient } from '@prisma/client';
+import type { PermissionResolvable } from 'discord.js';
 import {
 	ApplicationCommandOptionType,
 	ApplicationCommandType,
@@ -15,6 +16,7 @@ import {
 	type RESTPutAPIApplicationCommandsJSONBody,
 	Routes,
 	type ThreadChannel,
+	PermissionsBitField,
 } from 'discord.js';
 import i18next from 'i18next';
 import { container, singleton } from 'tsyringe';
@@ -122,6 +124,21 @@ export class CommandHandler {
 
 		try {
 			if (!command.containsSubcommands) {
+				if (!command.interactionOptions.dm_permission && command.requiredClientPermissions) {
+					const missingRequiredClientPermissions = this.checkForMissingClientPermissions(
+						interaction.appPermissions!,
+						command.requiredClientPermissions,
+					);
+					if (missingRequiredClientPermissions.length) {
+						return await interaction.reply({
+							content: `The bot is missing the following permissions to run this command: ${inlineCode(
+								missingRequiredClientPermissions.join(', '),
+							)}`,
+							ephemeral: true,
+						});
+					}
+				}
+
 				// eslint-disable-next-line @typescript-eslint/return-await
 				return await command.handle(interaction as ChatInputCommandInteraction<'cached'>);
 			}
@@ -140,6 +157,21 @@ export class CommandHandler {
 				return;
 			}
 
+			if (!command.interactionOptions.dm_permission && subcommand.requiredClientPermissions) {
+				const missingRequiredClientPermissions = this.checkForMissingClientPermissions(
+					interaction.appPermissions!,
+					subcommand.requiredClientPermissions,
+				);
+				if (missingRequiredClientPermissions.length) {
+					return await interaction.reply({
+						content: `The bot is missing the following permissions to run this command: ${inlineCode(
+							missingRequiredClientPermissions.join(', '),
+						)}`,
+						ephemeral: true,
+					});
+				}
+			}
+
 			// eslint-disable-next-line @typescript-eslint/return-await
 			return await subcommand.handle(interaction as ChatInputCommandInteraction<'cached'>);
 		} catch (error) {
@@ -156,13 +188,33 @@ export class CommandHandler {
 			)}`;
 
 			// Try to display something to the user.
-			await interaction.reply({ content }).catch(() => null);
+			if (interaction.replied) {
+				await interaction.followUp({ content, ephemeral: true });
+				return;
+			}
+
+			await interaction.reply({ content, ephemeral: true });
 		}
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 	public async init(): Promise<void[]> {
 		return Promise.all([this.registerCommands(), this.registerComponents()]);
+	}
+
+	public checkForMissingClientPermissions(
+		clientPermissions: PermissionsBitField,
+		requiredClientPermissions: PermissionResolvable,
+	) {
+		const requiredClientPermissionsBitField = new PermissionsBitField(clientPermissions);
+		if (requiredClientPermissionsBitField.bitfield) {
+			const missingClientPermissions = clientPermissions.missing(requiredClientPermissions);
+			if (missingClientPermissions.length) {
+				return missingClientPermissions;
+			}
+		}
+
+		return [];
 	}
 
 	public async registerInteractions(): Promise<void> {
