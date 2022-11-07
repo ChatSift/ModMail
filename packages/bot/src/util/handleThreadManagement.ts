@@ -37,17 +37,19 @@ const promptTags = async (
 ): Promise<GuildForumTag | null> => {
 	const actionRow = new ActionRowBuilder<SelectMenuBuilder>().setComponents(
 		new SelectMenuBuilder().setCustomId('user-tag-selector').addOptions(
-			[...tags.values()].map((tag) =>
-				new SelectMenuOptionBuilder()
+			[...tags.values()].map((tag) => {
+				const selectMenuOption = new SelectMenuOptionBuilder()
 					.setLabel(tag.name)
-					// this looks a bit quirky, but oh well
-					.setEmoji({ name: tag.emoji?.name as string, id: tag.emoji?.id as string })
-					.setValue(tag.id),
-			),
+					.setValue(tag.id);
+				if (tag.emoji) {
+					selectMenuOption.setEmoji({ name: tag.emoji.name ?? undefined, id: tag.emoji.id ?? undefined });
+				}
+
+				return selectMenuOption;
+			}),
 		),
 	);
 
-	const isMessage = input instanceof Message;
 	const options = {
 		content: i18next.t('thread.tag_prompt'),
 		components: [actionRow],
