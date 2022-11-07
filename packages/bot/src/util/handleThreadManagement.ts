@@ -38,9 +38,7 @@ const promptTags = async (
 	const actionRow = new ActionRowBuilder<SelectMenuBuilder>().setComponents(
 		new SelectMenuBuilder().setCustomId('user-tag-selector').addOptions(
 			[...tags.values()].map((tag) => {
-				const selectMenuOption = new SelectMenuOptionBuilder()
-					.setLabel(tag.name)
-					.setValue(tag.id);
+				const selectMenuOption = new SelectMenuOptionBuilder().setLabel(tag.name).setValue(tag.id);
 				if (tag.emoji) {
 					selectMenuOption.setEmoji({ name: tag.emoji.name ?? undefined, id: tag.emoji.id ?? undefined });
 				}
