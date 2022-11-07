@@ -1,7 +1,7 @@
 import { setTimeout } from 'node:timers';
 import { PrismaClient } from '@prisma/client';
 import { AsyncQueue } from '@sapphire/async-queue';
-import type { Collection, ComponentType, Guild, Message, MessageOptions, SelectMenuBuilder } from 'discord.js';
+import type { Collection, ComponentType, Guild, Message, MessageCreateOptions, SelectMenuBuilder } from 'discord.js';
 import { ActionRowBuilder, bold, Client, Colors, EmbedBuilder, Events, SelectMenuOptionBuilder } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
@@ -46,8 +46,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 				options.push(pageRightOption);
 			}
 
-			// Shouldn't need to map - waiting for upstream fix https://github.com/discordjs/discord.js/pull/8174
-			selectMenu.setMaxValues(1).setOptions(options.map((opt) => opt.toJSON()));
+			selectMenu.setMaxValues(1).setOptions(options);
 			actionRow.setComponents([selectMenu]);
 		};
 
@@ -163,7 +162,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 			}
 
 			if (settings.greetingMessage) {
-				const options: MessageOptions = { allowedMentions: { roles: [] } };
+				const options: MessageCreateOptions = { allowedMentions: { roles: [] } };
 				const templateData = templateDataFromMember(member);
 				if (settings.simpleMode) {
 					options.content = `⚙️ ${bold(`${guild.name} Staff:`)} ${templateString(

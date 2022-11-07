@@ -1,16 +1,28 @@
 /* eslint-disable no-redeclare */
 import { type GuildSettings, PrismaClient, type Thread } from '@prisma/client';
-import type { ThreadChannel } from 'discord.js';
+import type {
+	AnyThreadChannel,
+	ContextMenuCommandInteraction,
+	ForumChannel,
+	GuildForumTag,
+	GuildForumThreadCreateOptions,
+	MessageCreateOptions,
+	TextChannel,
+	ThreadChannel,
+} from 'discord.js';
 import {
+	ComponentType,
+	ChannelType,
+	SelectMenuBuilder,
+	ActionRowBuilder,
+	SelectMenuOptionBuilder,
 	type ChatInputCommandInteraction,
 	Colors,
 	EmbedBuilder,
-	type TextChannel,
 	time,
 	TimestampStyles,
 	type UserContextMenuCommandInteraction,
 	Message,
-	type MessageOptions,
 	type Guild,
 	type GuildMember,
 	Client,
@@ -18,6 +30,50 @@ import {
 import i18next from 'i18next';
 import { container } from 'tsyringe';
 import { getSortedMemberRolesString } from './getSortedMemberRoles';
+
+const promptTags = async (
+	input: ChatInputCommandInteraction | ContextMenuCommandInteraction | Message,
+	tags: GuildForumTag[],
+): Promise<GuildForumTag | null> => {
+	const actionRow = new ActionRowBuilder<SelectMenuBuilder>().setComponents(
+		new SelectMenuBuilder().setCustomId('user-tag-selector').addOptions(
+			[...tags.values()].map((tag) => {
+				const selectMenuOption = new SelectMenuOptionBuilder().setLabel(tag.name).setValue(tag.id);
+				if (tag.emoji) {
+					selectMenuOption.setEmoji({ name: tag.emoji.name ?? undefined, id: tag.emoji.id ?? undefined });
+				}
+
+				return selectMenuOption;
+			}),
+		),
+	);
+
+	const options = {
+		content: i18next.t('thread.tag_prompt'),
+		components: [actionRow],
+	};
+
+	const prompt = await input.channel?.send(options);
+
+	if (!prompt) {
+		return null;
+	}
+
+	const selectMenu = await prompt.awaitMessageComponent({ idle: 30_000, componentType: ComponentType.SelectMenu });
+
+	if (!selectMenu) {
+		await prompt.edit({
+			content: 'Timed out...',
+			embeds: [],
+			components: [],
+		});
+		return null;
+	}
+
+	await prompt.delete();
+
+	return tags.find((tag) => tag.id === selectMenu.values.at(0)) ?? null;
+};
 
 export type MessageOpenThreadReturn = {
 	existing: boolean;
@@ -53,7 +109,7 @@ export async function openThread(
 		return send('common.errors.thread_creation');
 	}
 
-	const modmail = guild.channels.cache.get(settings.modmailChannelId) as TextChannel;
+	const modmail = guild.channels.cache.get(settings.modmailChannelId) as ForumChannel | TextChannel;
 	const existingThread = await prisma.thread.findFirst({
 		where: {
 			guildId: guild.id,
@@ -142,7 +198,22 @@ export async function openThread(
 		});
 	}
 
-	const startMessageOptions: MessageOptions = { embeds: [embed] };
+	let startMessageOptions: GuildForumThreadCreateOptions | MessageCreateOptions;
+	if (modmail.type === ChannelType.GuildForum) {
+		const tags = modmail.availableTags.filter((tag) => !tag.moderated);
+		let tag: GuildForumTag | null = null;
+		if (tags.length > 0) {
+			tag = await promptTags(input, tags);
+		}
+
+		startMessageOptions = {
+			name: `${member.user.username}-${member.user.discriminator}`,
+			message: { embeds: [embed] },
+			appliedTags: tag ? [tag.id] : [],
+		};
+	} else {
+		startMessageOptions = { embeds: [embed] };
+	}
 
 	if (isMessage) {
 		embed.spliceFields(3, 1);
@@ -158,16 +229,29 @@ export async function openThread(
 			alert = alerts.length ? `Alerts: ${alerts.map((a) => `<@${a.userId}>`).join(' ')}` : null;
 		}
 
-		startMessageOptions.content = `${member.toString()}${alert ? `\n${alert}` : ''}`;
+		if (modmail.type === ChannelType.GuildForum) {
+			// @ts-expect-error - I don't know what drugs this thing is taking, but it's acting like content isn't supposed to be here
+			startMessageOptions.message.content = `${member.toString()}${alert ? `\n${alert}` : ''}`;
+		} else {
+			(startMessageOptions as MessageCreateOptions).content = `${member.toString()}${alert ? `\n${alert}` : ''}`;
+		}
+	} else if (modmail.type === ChannelType.GuildForum) {
+		// @ts-expect-error - I don't know what drugs this thing is taking, but it's acting like content isn't supposed to be here
+		startMessageOptions.message.content = member.toString();
 	} else {
-		startMessageOptions.content = member.toString();
+		(startMessageOptions as MessageCreateOptions).content = member.toString();
 	}
 
-	const startMessage = await modmail.send(startMessageOptions);
+	let threadChannel: AnyThreadChannel | ThreadChannel;
+	if (modmail.type === ChannelType.GuildForum) {
+		threadChannel = await modmail.threads.create(startMessageOptions as GuildForumThreadCreateOptions);
+	} else {
+		const startMessage = await modmail.send(startMessageOptions as MessageCreateOptions);
 
-	const threadChannel = await startMessage.startThread({
-		name: `${member.user.username}-${member.user.discriminator}`,
-	});
+		threadChannel = await startMessage.startThread({
+			name: `${member.user.username}-${member.user.discriminator}`,
+		});
+	}
 
 	const thread = await prisma.thread.create({
 		data: {
