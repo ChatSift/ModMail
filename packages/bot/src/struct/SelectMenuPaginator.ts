@@ -1,7 +1,5 @@
-/* eslint-disable no-extra-parens */
-import { ButtonBuilder, SelectMenuBuilder } from '@discordjs/builders';
 import type { If } from 'discord.js';
-import { ButtonStyle, SelectMenuOptionBuilder } from 'discord.js';
+import { ButtonStyle, SelectMenuOptionBuilder, ButtonBuilder, SelectMenuBuilder } from 'discord.js';
 
 export type SelectMenuPaginatorState<T> = {
 	currentPage: number;
