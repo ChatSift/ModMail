@@ -5,6 +5,7 @@ import type { Collection, ComponentType, Guild, Message, MessageCreateOptions, S
 import { ActionRowBuilder, bold, Client, Colors, EmbedBuilder, Events, SelectMenuOptionBuilder } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
+import { logger } from '../../util/logger';
 import type { Event } from '#struct/Event';
 import type { SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
 import { SelectMenuPaginator } from '#struct/SelectMenuPaginator';
@@ -46,6 +47,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 				options.push(pageRightOption);
 			}
 
+			logger.debug(options);
 			selectMenu.setMaxValues(1).setOptions(options);
 			actionRow.setComponents([selectMenu]);
 		};
