@@ -1,4 +1,10 @@
-import type { InferRoutePath, InferRouteMethod, InferRouteBody, InferRouteResult } from '@chatsift/rest-utils';
+import type {
+	InferRoutePath,
+	InferRouteMethod,
+	InferRouteBody,
+	InferRouteResult,
+	RouteMethod,
+} from '@chatsift/rest-utils';
 import type * as routes from './routes/index';
 
 type Narrow<T, U> = T extends U ? T : never;
@@ -13,9 +19,20 @@ type RoutesByPaths = {
 	>;
 };
 
+type RouteMethodMap = {
+	[RouteMethod.get]: 'get';
+	[RouteMethod.post]: 'post';
+	[RouteMethod.put]: 'put';
+	[RouteMethod.delete]: 'delete';
+	[RouteMethod.patch]: 'patch';
+};
+
 export type ModmailRoutes = {
 	[Path in keyof RoutesByPaths]: {
-		[Method in InferRouteMethod<RoutesByPaths[Path]>]: Narrow<RoutesByPaths[Path], { info: { method: Method } }>;
+		[Method in RouteMethodMap[InferRouteMethod<RoutesByPaths[Path]>]]: Narrow<
+			RoutesByPaths[Path],
+			{ info: { method: Method } }
+		>;
 	};
 };
 
