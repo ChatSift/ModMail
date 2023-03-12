@@ -70,12 +70,12 @@
 		},
 		"greeting": {
 			"embed": {
-				"author": "{{ guild }} Team - Greeting"
+				"author": "{{- guild }} Team - Greeting"
 			}
 		},
 		"farewell": {
 			"embed": {
-				"author": "{{ guild }} Team - Farewell"
+				"author": "{{- guild }} Team - Farewell"
 			}
 		}
 	},
@@ -146,7 +146,7 @@
 				},
 				"history": {
 					"embed": {
-						"footer": "Update done by: {{ user }}"
+						"footer": "Update done by: {{- user }}"
 					}
 				}
 			},
