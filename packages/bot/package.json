@@ -34,7 +34,7 @@
 		"@sapphire/async-queue": "^1.5.0",
 		"bree": "^9.1.2",
 		"common-tags": "^1.8.2",
-		"discord.js": "^14.5.0",
+		"discord.js": "^14.8.0",
 		"i18next": "^21.9.0",
 		"i18next-fs-backend": "^1.1.5",
 		"nanoid": "^4.0.0",
