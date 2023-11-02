@@ -1,8 +1,8 @@
 import type { MessageContextMenuCommandInteraction, PermissionResolvable } from 'discord.js';
 import { ApplicationCommandType } from 'discord.js';
 import { singleton } from 'tsyringe';
-import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
-import ReplyContextMenu from './reply';
+import { getLocalizedProp, type CommandBody, type Command } from '../../struct/Command.js';
+import ReplyContextMenu from './reply.js';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.Message> {

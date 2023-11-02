@@ -37,7 +37,7 @@
 		"@typescript-eslint/parser": "^6.9.1",
 		"dotenv-cli": "^7.3.0",
 		"eslint": "^8.52.0",
-		"eslint-config-neon": "0.1.56",
+		"eslint-config-neon": "0.1.54",
 		"husky": "^8.0.3",
 		"is-ci": "^3.0.1",
 		"prettier": "^3.0.3",

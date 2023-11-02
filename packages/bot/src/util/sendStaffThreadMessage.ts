@@ -13,8 +13,8 @@ import type {
 import { Colors, EmbedBuilder, bold, inlineCode } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
-import { templateDataFromMember, templateString } from '#util/templateString';
-import { logger } from './logger';
+import { templateDataFromMember, templateString } from '../util/templateString.js';
+import { logger } from './logger.js';
 
 export interface SendStaffThreadMessageOptions {
 	anon: boolean;

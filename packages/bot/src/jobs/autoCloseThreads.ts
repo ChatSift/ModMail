@@ -4,10 +4,10 @@ import process from 'node:process';
 import { parentPort } from 'node:worker_threads';
 import type { ScheduledThreadClose, Thread } from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
-import type { Payload } from '#struct/JobManager';
-import { PayloadOpCode } from '#struct/JobManager';
-import type { InferArrayT } from '#util/InferArrayT';
-import { i18nInit } from '#util/i18nInit';
+import type { Payload } from '../struct/JobManager.js';
+import { PayloadOpCode } from '../struct/JobManager.js';
+import type { InferArrayT } from '../util/InferArrayT';
+import { i18nInit } from '../util/i18nInit.js';
 
 if (!parentPort) {
 	console.warn('Something went wrong. This script should only be ran in a worker thread.');

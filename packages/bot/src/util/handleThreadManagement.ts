@@ -29,7 +29,7 @@ import {
 } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
-import { getSortedMemberRolesString } from './getSortedMemberRoles';
+import { getSortedMemberRolesString } from './getSortedMemberRoles.js';
 
 const promptTags = async (
 	input: ChatInputCommandInteraction | ContextMenuCommandInteraction | Message,

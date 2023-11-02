@@ -2,8 +2,8 @@ import { PrismaClient } from '@prisma/client';
 import type { ApplicationCommandType } from 'discord.js';
 import { PermissionsBitField, type ApplicationCommandOptionChoiceData, type AutocompleteInteraction } from 'discord.js';
 import { singleton } from 'tsyringe';
-import type { CommandWithSubcommands } from '#struct/Command';
-import { getLocalizedProp, type CommandBody } from '#struct/Command';
+import type { CommandWithSubcommands } from '../../struct/Command.js';
+import { getLocalizedProp, type CommandBody } from '../../struct/Command.js';
 
 @singleton()
 export default class implements CommandWithSubcommands {

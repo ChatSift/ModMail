@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import type { Message, PartialMessage, ThreadChannel } from 'discord.js';
 import { Client, Events } from 'discord.js';
 import { singleton } from 'tsyringe';
-import type { Event } from '#struct/Event';
+import type { Event } from '../../struct/Event.js';
 
 @singleton()
 export default class implements Event<typeof Events.MessageDelete> {

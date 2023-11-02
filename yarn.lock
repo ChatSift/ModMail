@@ -341,7 +341,7 @@ __metadata:
     "@typescript-eslint/parser": "npm:^6.9.1"
     dotenv-cli: "npm:^7.3.0"
     eslint: "npm:^8.52.0"
-    eslint-config-neon: "npm:0.1.56"
+    eslint-config-neon: "npm:0.1.54"
     husky: "npm:^8.0.3"
     is-ci: "npm:^3.0.1"
     prettier: "npm:^3.0.3"
@@ -2994,9 +2994,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-neon@npm:0.1.56":
-  version: 0.1.56
-  resolution: "eslint-config-neon@npm:0.1.56"
+"eslint-config-neon@npm:0.1.54":
+  version: 0.1.54
+  resolution: "eslint-config-neon@npm:0.1.54"
   dependencies:
     "@angular-eslint/eslint-plugin": "npm:^16.1.1"
     "@angular-eslint/eslint-plugin-template": "npm:^16.1.1"
@@ -3029,7 +3029,7 @@ __metadata:
     eslint-plugin-vue: "npm:^9.17.0"
     globals: "npm:^13.21.0"
     vue-eslint-parser: "npm:^9.3.1"
-  checksum: 76c7a6d5f0f6ea60bafa97959931826ca98d02e8dcc9cba3963a2e51e9142806b2a5f642aa52cb94aac02f18fc1a86f0c4d9d01a3fbe5ff55986ef2cc325252c
+  checksum: 74523263b97030f2ee1458dd905a7e32f8ad62cef9d51443856cc93dde346304e701f65f61aa4a6906fa9c4b72fd53b777f5d40ec99eea8accf861d60f22b3a8
   languageName: node
   linkType: hard
 

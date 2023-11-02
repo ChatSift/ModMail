@@ -4,8 +4,8 @@ import { readdirRecurse } from '@chatsift/readdir';
 import type { ClientEvents } from 'discord.js';
 import { Client } from 'discord.js';
 import { container, singleton } from 'tsyringe';
-import type { EventConstructor } from '#struct/Event';
-import { getEventInfo } from '#struct/Event';
+import type { EventConstructor } from '../struct/Event.js';
+import { getEventInfo } from '../struct/Event.js';
 
 @singleton()
 export class EventHandler {

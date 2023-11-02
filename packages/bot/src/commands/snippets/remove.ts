@@ -7,7 +7,7 @@ import {
 } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
-import { getLocalizedProp, type Subcommand } from '#struct/Command';
+import { getLocalizedProp, type Subcommand } from '../../struct/Command.js';
 
 @singleton()
 export default class implements Subcommand {

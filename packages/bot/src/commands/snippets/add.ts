@@ -4,8 +4,8 @@ import type {
 	PermissionResolvable,
 } from 'discord.js';
 import { singleton } from 'tsyringe';
-import { getLocalizedProp, type Subcommand } from '#struct/Command';
-import promptSnippetAdd from '../../modals/snippets/add';
+import promptSnippetAdd from '../../modals/snippets/add.js';
+import { getLocalizedProp, type Subcommand } from '../../struct/Command.js';
 
 @singleton()
 export default class implements Subcommand {

@@ -1,6 +1,6 @@
 import type { GuildMember } from 'discord.js';
 import { TimestampStyles, time } from 'discord.js';
-import { getSortedMemberRolesString } from '#util/getSortedMemberRoles';
+import { getSortedMemberRolesString } from '../util/getSortedMemberRoles.js';
 
 export interface TemplateData {
 	guildName: string;

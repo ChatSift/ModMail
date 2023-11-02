@@ -6,7 +6,7 @@ import { s } from '@sapphire/shapeshift';
 import type { Response } from 'polka';
 import { singleton } from 'tsyringe';
 import type { GuildSettings } from '../util/models';
-import { snowflakeSchema } from '../util/snowflakeSchema';
+import { snowflakeSchema } from '../util/snowflakeSchema.js';
 
 const schema = s.object({
 	modmailChannelId: snowflakeSchema.nullish,

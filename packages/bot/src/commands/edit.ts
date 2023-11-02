@@ -1,8 +1,8 @@
 import type { PermissionResolvable } from 'discord.js';
 import { ApplicationCommandOptionType, ApplicationCommandType, type ChatInputCommandInteraction } from 'discord.js';
 import { singleton } from 'tsyringe';
-import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
-import { handleStaffThreadMessage, HandleStaffThreadMessageAction } from '#util/handleStaffThreadMessage';
+import { getLocalizedProp, type CommandBody, type Command } from '../struct/Command.js';
+import { handleStaffThreadMessage, HandleStaffThreadMessageAction } from '../util/handleStaffThreadMessage.js';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {

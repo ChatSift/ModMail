@@ -5,7 +5,7 @@ import Bree from 'bree';
 import type { ThreadChannel } from 'discord.js';
 import { Client } from 'discord.js';
 import { singleton } from 'tsyringe';
-import { closeThread } from '#util/closeThread';
+import { closeThread } from '../util/closeThread.js';
 
 // eslint-disable-next-line no-shadow
 export enum PayloadOpCode {

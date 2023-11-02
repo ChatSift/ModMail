@@ -3,8 +3,8 @@ import { on } from 'node:events';
 import process from 'node:process';
 import { parentPort } from 'node:worker_threads';
 import { PrismaClient } from '@prisma/client';
-import type { Payload } from '#struct/JobManager';
-import { PayloadOpCode } from '#struct/JobManager';
+import type { Payload } from '../struct/JobManager.js';
+import { PayloadOpCode } from '../struct/JobManager.js';
 
 if (!parentPort) {
 	console.warn('Something went wrong. This script should only be ran in a worker thread.');

@@ -9,8 +9,8 @@ import {
 } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
-import { getLocalizedProp } from '#struct/Command';
-import { CommandHandler } from '#struct/CommandHandler';
+import { getLocalizedProp } from '../../struct/Command.js';
+import { CommandHandler } from '../../struct/CommandHandler.js';
 
 const customId = 'snippet-modal';
 

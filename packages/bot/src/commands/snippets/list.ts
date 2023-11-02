@@ -10,9 +10,9 @@ import {
 } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
-import { getLocalizedProp, type Subcommand } from '#struct/Command';
-import { SelectMenuPaginator, type SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
-import { ellipsis } from '#util/ellipsis';
+import { getLocalizedProp, type Subcommand } from '../../struct/Command.js';
+import { SelectMenuPaginator, type SelectMenuPaginatorConsumers } from '../../struct/SelectMenuPaginator.js';
+import { ellipsis } from '../../util/ellipsis.js';
 
 @singleton()
 export default class implements Subcommand {

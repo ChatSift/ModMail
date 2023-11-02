@@ -3,8 +3,8 @@ import type { MessageContextMenuCommandInteraction, PermissionResolvable, Thread
 import { ApplicationCommandType } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
-import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
-import { sendStaffThreadMessage } from '#util/sendStaffThreadMessage';
+import { getLocalizedProp, type CommandBody, type Command } from '../../struct/Command.js';
+import { sendStaffThreadMessage } from '../../util/sendStaffThreadMessage.js';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.Message> {

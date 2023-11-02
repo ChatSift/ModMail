@@ -16,9 +16,9 @@ import {
 } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
-import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
-import type { SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
-import { SelectMenuPaginator } from '#struct/SelectMenuPaginator';
+import { getLocalizedProp, type CommandBody, type Command } from '../struct/Command.js';
+import type { SelectMenuPaginatorConsumers } from '../struct/SelectMenuPaginator.js';
+import { SelectMenuPaginator } from '../struct/SelectMenuPaginator.js';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {

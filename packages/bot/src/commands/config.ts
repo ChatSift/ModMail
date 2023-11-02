@@ -10,7 +10,7 @@ import {
 	type ChatInputCommandInteraction,
 } from 'discord.js';
 import { singleton } from 'tsyringe';
-import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
+import { getLocalizedProp, type CommandBody, type Command } from '../struct/Command.js';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
@@ -101,7 +101,7 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 		return interaction.reply({
 			content: stripIndents`
-				• **modmail channel**: ${configured.modmailChannelId ? `<#${configured.modmailChannelId}>` : 'none'}
+				• **modmail channel**: ${configured.modmailChannelId ? `<../${configured.modmailChannelId}>` : 'none'}
 				• **greeting message**: ${configured.greetingMessage ? configured.greetingMessage : 'none'}
 				• **farewell message**: ${configured.farewellMessage ? configured.farewellMessage : 'none'}
 				• **simple mode**: ${configured.simpleMode ? 'enabled' : 'disabled'}

@@ -8,9 +8,9 @@ import { s } from '@sapphire/shapeshift';
 import { Routes } from 'discord-api-types/v10';
 import type { NextHandler, Request, Response } from 'polka';
 import { singleton } from 'tsyringe';
-import { Env } from '../util/env';
+import { Env } from '../util/env.js';
 import type { Snippet } from '../util/models';
-import { snowflakeSchema } from '../util/snowflakeSchema';
+import { snowflakeSchema } from '../util/snowflakeSchema.js';
 
 @singleton()
 export default class extends Route<Snippet, never> {

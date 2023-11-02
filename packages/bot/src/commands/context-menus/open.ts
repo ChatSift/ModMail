@@ -1,8 +1,8 @@
 import type { PermissionResolvable } from 'discord.js';
 import { ApplicationCommandType, type UserContextMenuCommandInteraction } from 'discord.js';
 import { singleton } from 'tsyringe';
-import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
-import { openThread } from '#util/handleThreadManagement';
+import { getLocalizedProp, type CommandBody, type Command } from '../../struct/Command.js';
+import { openThread } from '../../util/handleThreadManagement.js';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.User> {

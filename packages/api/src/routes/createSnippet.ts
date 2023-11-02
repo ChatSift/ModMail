@@ -12,9 +12,9 @@ import type {
 import { ApplicationCommandOptionType, Routes } from 'discord-api-types/v10';
 import type { NextHandler, Response } from 'polka';
 import { singleton } from 'tsyringe';
-import { Env } from '../util/env';
+import { Env } from '../util/env.js';
 import type { Snippet } from '../util/models';
-import { snowflakeSchema } from '../util/snowflakeSchema';
+import { snowflakeSchema } from '../util/snowflakeSchema.js';
 
 const schema = s.object({
 	name: s.string.lengthGreaterThan(0).lengthLessThanOrEqual(32),

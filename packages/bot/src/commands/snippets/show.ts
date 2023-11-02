@@ -17,10 +17,10 @@ import {
 } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
-import { getLocalizedProp, type Subcommand } from '#struct/Command';
-import { SelectMenuPaginator, type SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
-import { diff } from '#util/diff';
-import { ellipsis } from '#util/ellipsis';
+import { getLocalizedProp, type Subcommand } from '../../struct/Command.js';
+import { SelectMenuPaginator, type SelectMenuPaginatorConsumers } from '../../struct/SelectMenuPaginator.js';
+import { diff } from '../../util/diff.js';
+import { ellipsis } from '../../util/ellipsis.js';
 
 @singleton()
 export default class implements Subcommand {
@@ -156,7 +156,7 @@ export default class implements Subcommand {
 					.setFooter({
 						text: i18next.t('commands.snippets.show.history.embed.footer', {
 							lng: interaction.locale,
-							user: updatedBy?.tag ?? 'Unknown User#0000',
+							user: updatedBy?.tag ?? 'Unknown User../0000',
 						}),
 						iconURL: updatedBy?.displayAvatarURL(),
 					})

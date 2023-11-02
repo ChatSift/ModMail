@@ -1,9 +1,9 @@
 import type { Client } from 'discord.js';
 import { Events } from 'discord.js';
 import { singleton } from 'tsyringe';
-import type { Event } from '#struct/Event';
-import { JobManager } from '#struct/JobManager';
-import { logger } from '#util/logger';
+import type { Event } from '../struct/Event.js';
+import { JobManager } from '../struct/JobManager.js';
+import { logger } from '../util/logger.js';
 
 @singleton()
 export default class implements Event<typeof Events.ClientReady> {

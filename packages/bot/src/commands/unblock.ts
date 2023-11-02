@@ -9,7 +9,7 @@ import {
 import i18next from 'i18next';
 import { PrismaError } from 'prisma-error-enum';
 import { singleton } from 'tsyringe';
-import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
+import { getLocalizedProp, type CommandBody, type Command } from '../struct/Command.js';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {

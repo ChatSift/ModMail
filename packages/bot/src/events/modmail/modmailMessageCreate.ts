@@ -5,14 +5,14 @@ import type { Collection, ComponentType, Guild, Message, MessageCreateOptions, S
 import { ActionRowBuilder, bold, Client, Colors, EmbedBuilder, Events, SelectMenuOptionBuilder } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
-import type { Event } from '#struct/Event';
-import type { SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
-import { SelectMenuPaginator } from '#struct/SelectMenuPaginator';
-import { getUserGuilds } from '#util/getUserGuilds';
-import { openThread } from '#util/handleThreadManagement';
-import { sendMemberThreadMessage } from '#util/sendMemberThreadMessage';
-import { templateDataFromMember, templateString } from '#util/templateString';
-import { logger } from '../../util/logger';
+import type { Event } from '../../struct/Event.js';
+import type { SelectMenuPaginatorConsumers } from '../../struct/SelectMenuPaginator.js';
+import { SelectMenuPaginator } from '../../struct/SelectMenuPaginator.js';
+import { getUserGuilds } from '../../util/getUserGuilds.js';
+import { openThread } from '../../util/handleThreadManagement.js';
+import { logger } from '../../util/logger.js';
+import { sendMemberThreadMessage } from '../../util/sendMemberThreadMessage.js';
+import { templateDataFromMember, templateString } from '../../util/templateString.js';
 
 @singleton()
 export default class implements Event<typeof Events.MessageCreate> {

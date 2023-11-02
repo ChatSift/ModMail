@@ -9,8 +9,8 @@ import {
 } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
-import { getLocalizedProp, type CommandBody, type Command } from '#struct/Command';
-import { durationAutoComplete } from '#util/durationAutoComplete';
+import { getLocalizedProp, type CommandBody, type Command } from '../struct/Command.js';
+import { durationAutoComplete } from '../util/durationAutoComplete.js';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {

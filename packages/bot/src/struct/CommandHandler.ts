@@ -20,11 +20,11 @@ import {
 } from 'discord.js';
 import i18next from 'i18next';
 import { container, singleton } from 'tsyringe';
-import type { Command, CommandConstructor, CommandWithSubcommands, Subcommand } from '#struct/Command';
-import { type Component, type ComponentConstructor, getComponentInfo } from '#struct/Component';
-import { Env } from '#struct/Env';
-import { logger } from '#util/logger';
-import { sendStaffThreadMessage } from '#util/sendStaffThreadMessage';
+import type { Command, CommandConstructor, CommandWithSubcommands, Subcommand } from '../struct/Command.js';
+import { type Component, type ComponentConstructor, getComponentInfo } from '../struct/Component.js';
+import { Env } from '../struct/Env.js';
+import { logger } from '../util/logger.js';
+import { sendStaffThreadMessage } from '../util/sendStaffThreadMessage.js';
 
 @singleton()
 export class CommandHandler {

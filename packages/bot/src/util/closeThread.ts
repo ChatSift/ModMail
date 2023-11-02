@@ -4,7 +4,7 @@ import type { MessageCreateOptions, ThreadChannel } from 'discord.js';
 import { Colors, EmbedBuilder, bold } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
-import { templateDataFromMember, templateString } from '#util/templateString';
+import { templateDataFromMember, templateString } from '../util/templateString.js';
 
 export interface CloseThreadOptions {
 	channel: ThreadChannel;

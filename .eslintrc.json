@@ -14,7 +14,6 @@
 		"curly": ["error", "all"],
 		"eqeqeq": ["error", "always", { "null": "ignore" }],
 		"no-eq-null": "off",
-		"@typescript-eslint/consistent-type-definitions": ["error", "interface"],
-		"import/extensions": ["error", { ".js": "always" }]
+		"@typescript-eslint/consistent-type-definitions": ["error", "interface"]
 	}
 }

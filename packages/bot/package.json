@@ -4,10 +4,6 @@
 	"private": true,
 	"version": "1.0.0-dev",
 	"type": "module",
-	"imports": {
-		"#struct/*": "./dist/struct/*.js",
-		"#util/*": "./dist/util/*.js"
-	},
 	"scripts": {
 		"lint": "eslint src --ext .ts",
 		"build": "tsc",

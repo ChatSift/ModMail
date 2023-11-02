@@ -31,14 +31,7 @@ services:
       - ./logs:/usr/modmail/logs
     depends_on:
       - postgres
-    command:
-      [
-        'node',
-        '--es-module-specifier-resolution=node',
-        '--enable-source-maps',
-        '--no-warnings',
-        './packages/bot/dist/index.js',
-      ]
+    command: ['node', '--enable-source-maps', '--no-warnings', './packages/bot/dist/index.js']
 
 volumes:
   postgres-data:
