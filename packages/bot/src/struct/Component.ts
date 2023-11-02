@@ -1,14 +1,14 @@
 import { basename, extname } from 'node:path';
 import type { Awaitable, MessageComponentInteraction } from 'discord.js';
 
-export type ComponentInfo = {
+export interface ComponentInfo {
 	name: string;
-};
+}
 
-export type Component<Type extends MessageComponentInteraction<'cached'> = MessageComponentInteraction<'cached'>> = {
+export interface Component<Type extends MessageComponentInteraction<'cached'> = MessageComponentInteraction<'cached'>> {
 	handle(interaction: Type, ...args: any[]): Awaitable<unknown>;
 	readonly name?: string;
-};
+}
 
 export type ComponentConstructor = new (...args: any[]) => Component;
 

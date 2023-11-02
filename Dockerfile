@@ -1,4 +1,4 @@
-FROM node:16-alpine
+FROM node:20-alpine
 LABEL name "modmail"
 
 WORKDIR /usr/modmail

@@ -1,5 +1,4 @@
 import { setTimeout } from 'node:timers';
-import { EmbedBuilder, bold, inlineCode } from '@discordjs/builders';
 import { PrismaClient } from '@prisma/client';
 import type {
 	Attachment,
@@ -11,13 +10,13 @@ import type {
 	MessageContextMenuCommandInteraction,
 	MessageCreateOptions,
 } from 'discord.js';
-import { Colors } from 'discord.js';
+import { Colors, EmbedBuilder, bold, inlineCode } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
-import { logger } from './logger';
 import { templateDataFromMember, templateString } from '#util/templateString';
+import { logger } from './logger';
 
-export type SendStaffThreadMessageOptions = {
+export interface SendStaffThreadMessageOptions {
 	anon: boolean;
 	attachment?: Attachment | null;
 	channel: ThreadChannel;
@@ -28,7 +27,7 @@ export type SendStaffThreadMessageOptions = {
 	simpleMode: boolean;
 	staff: GuildMember;
 	threadId: number;
-};
+}
 
 export async function sendStaffThreadMessage({
 	content,

@@ -16,7 +16,10 @@ export default class implements Command<ApplicationCommandType.Message> {
 
 	public requiredClientPermissions: PermissionResolvable = 'SendMessages';
 
-	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
+	public constructor(
+		private readonly prisma: PrismaClient,
+		private readonly client: Client,
+	) {}
 
 	public async handle(interaction: MessageContextMenuCommandInteraction<'cached'>) {
 		const thread = await this.prisma.thread.findFirst({

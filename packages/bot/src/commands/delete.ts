@@ -30,7 +30,10 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 	public requiredClientPermissions: PermissionResolvable = ['ManageThreads'];
 
-	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
+	public constructor(
+		private readonly prisma: PrismaClient,
+		private readonly client: Client,
+	) {}
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		const thread = await this.prisma.thread.findFirst({

@@ -1,17 +1,17 @@
 import type { If } from 'discord.js';
 import { ButtonStyle, SelectMenuOptionBuilder, ButtonBuilder, SelectMenuBuilder } from 'discord.js';
 
-export type SelectMenuPaginatorState<T> = {
+export interface SelectMenuPaginatorState<T> {
 	currentPage: number;
 	readonly data: T;
-};
+}
 
-export type SelectMenuPaginatorOptions<T = unknown> = {
+export interface SelectMenuPaginatorOptions<T = unknown> {
 	data?: T;
 	key: string;
 	maxPageLength?: number;
 	store?: Map<string, SelectMenuPaginatorState<T>>;
-};
+}
 
 type BaseSelectMenuPaginatorData<T = unknown> = SelectMenuPaginatorState<T> & {
 	selectMenu: SelectMenuBuilder;
@@ -27,10 +27,10 @@ type ButtonsSelectMenuPaginatorData<T = unknown> = BaseSelectMenuPaginatorData<T
 	pageRightButton: ButtonBuilder;
 };
 
-export type SelectMenuPaginatorConsumers<T = unknown> = {
+export interface SelectMenuPaginatorConsumers<T = unknown> {
 	asButtons(): ButtonsSelectMenuPaginatorData<T>;
 	asSelectMenu(): SelectMenuOptionsSelectMenuPaginatorData<T>;
-};
+}
 
 export class SelectMenuPaginator<Data extends unknown[], Asserted extends boolean = false> {
 	private readonly key: string;

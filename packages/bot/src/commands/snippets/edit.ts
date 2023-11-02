@@ -40,12 +40,11 @@ export default class implements Subcommand {
 		const content = interaction.options.getString('content', true);
 
 		try {
-			const snippet = await this.prisma.snippet.findFirst({
+			const snippet = await this.prisma.snippet.findFirstOrThrow({
 				where: {
 					guildId: interaction.guildId,
 					name,
 				},
-				rejectOnNotFound: true,
 			});
 			await this.prisma.snippet.update({
 				where: {

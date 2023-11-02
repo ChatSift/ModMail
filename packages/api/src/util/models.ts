@@ -4,24 +4,24 @@
 // Because otherwise we would need to somehow share our prisma.schema (and 2 others) with the frontend
 // Which would NOT work. Absolutely make sure to use the types below and to cast away any types from @prsisma/client
 
-export type GuildSettings = {
+export interface GuildSettings {
 	alertRoleId: string | null;
 	farewellMessage: string | null;
 	greetingMessage: string | null;
 	guildId: string;
 	modmailChannelId: string | null;
 	simpleMode: boolean;
-};
+}
 
-export type SnippetUpdates = {
+export interface SnippetUpdates {
 	oldContent: string;
 	snippetId: number;
 	snippetUpdateId: number;
 	updatedAt: Date;
 	updatedBy: string;
-};
+}
 
-export type Snippet = {
+export interface Snippet {
 	commandId: string;
 	content: string;
 	createdAt: Date;
@@ -32,16 +32,16 @@ export type Snippet = {
 	name: string;
 	snippetId: number;
 	timesUsed: number;
-};
+}
 
-export type ScheduledThreadClose = {
+export interface ScheduledThreadClose {
 	closeAt: Date;
 	scheduledById: string;
 	silent: boolean;
 	threadId: number;
-};
+}
 
-export type ThreadMessage = {
+export interface ThreadMessage {
 	anon: boolean;
 	guildId: string;
 	guildMessageId: string;
@@ -51,9 +51,9 @@ export type ThreadMessage = {
 	threadMessageId: number;
 	userId: string;
 	userMessageId: string;
-};
+}
 
-export type Thread = {
+export interface Thread {
 	channelId: string;
 	closedAt: Date | null;
 	closedById: string | null;
@@ -63,20 +63,20 @@ export type Thread = {
 	lastLocalThreadMessageId: number;
 	threadId: number;
 	userId: string;
-};
+}
 
-export type Block = {
+export interface Block {
 	expiresAt: Date | null;
 	guildId: string;
 	userId: string;
-};
+}
 
-export type ThreadOpenAlert = {
+export interface ThreadOpenAlert {
 	guildId: string;
 	userId: string;
-};
+}
 
-export type ThreadReplyAlert = {
+export interface ThreadReplyAlert {
 	threadId: number;
 	userId: string;
-};
+}

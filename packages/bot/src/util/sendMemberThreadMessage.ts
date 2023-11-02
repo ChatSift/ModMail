@@ -1,13 +1,12 @@
 import { setTimeout } from 'node:timers';
-import { EmbedBuilder, bold } from '@discordjs/builders';
 import { PrismaClient } from '@prisma/client';
 import type { GuildMember, Message, MessageCreateOptions, ThreadChannel } from 'discord.js';
-import { Colors } from 'discord.js';
+import { Colors, EmbedBuilder, bold } from 'discord.js';
 import { container } from 'tsyringe';
 
 const RECENTLY_ALERTED = new Map<number, Set<string>>();
 
-export type SendMemberThreadMessageOptions = {
+export interface SendMemberThreadMessageOptions {
 	channel: ThreadChannel;
 	existing?: Message;
 	member: GuildMember;
@@ -15,7 +14,7 @@ export type SendMemberThreadMessageOptions = {
 	simpleMode: boolean;
 	threadId: number;
 	userMessage: Message;
-};
+}
 
 export async function sendMemberThreadMessage({
 	userMessage,

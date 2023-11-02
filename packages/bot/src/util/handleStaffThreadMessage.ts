@@ -11,7 +11,6 @@ export enum HandleStaffThreadMessageAction {
 }
 
 /**
- *
  * @param interaction - A received interaction from the edit and reply commands.
  * @param action - Which command was used to call this function.
  */

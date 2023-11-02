@@ -1,15 +1,14 @@
-import { time } from '@discordjs/builders';
 import type { GuildMember } from 'discord.js';
-import { TimestampStyles } from 'discord.js';
+import { TimestampStyles, time } from 'discord.js';
 import { getSortedMemberRolesString } from '#util/getSortedMemberRoles';
 
-export type TemplateData = {
+export interface TemplateData {
 	guildName: string;
 	joinDate: string;
 	roles: string;
 	userId: string;
 	username: string;
-};
+}
 
 export function templateDataFromMember(member: GuildMember): TemplateData {
 	return {
@@ -22,7 +21,7 @@ export function templateDataFromMember(member: GuildMember): TemplateData {
 }
 
 export function templateString(content: string, data: TemplateData) {
-	return content.replace(/{{ (?<template>\w+?) }}/gm, (_, template: string) =>
+	return content.replaceAll(/{{ (?<template>\w+?) }}/gm, (_, template: string) =>
 		Object.hasOwn(data, template) ? data[template as keyof TemplateData] : `[unknown template ${template}]`,
 	);
 }

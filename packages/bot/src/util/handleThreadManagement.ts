@@ -13,7 +13,7 @@ import type {
 import {
 	ComponentType,
 	ChannelType,
-	SelectMenuBuilder,
+	StringSelectMenuBuilder,
 	ActionRowBuilder,
 	SelectMenuOptionBuilder,
 	type ChatInputCommandInteraction,
@@ -35,8 +35,8 @@ const promptTags = async (
 	input: ChatInputCommandInteraction | ContextMenuCommandInteraction | Message,
 	tags: GuildForumTag[],
 ): Promise<GuildForumTag | null> => {
-	const actionRow = new ActionRowBuilder<SelectMenuBuilder>().setComponents(
-		new SelectMenuBuilder().setCustomId('user-tag-selector').addOptions(
+	const actionRow = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(
+		new StringSelectMenuBuilder().setCustomId('user-tag-selector').addOptions(
 			[...tags.values()].map((tag) => {
 				const selectMenuOption = new SelectMenuOptionBuilder().setLabel(tag.name).setValue(tag.id);
 				if (tag.emoji) {
@@ -75,13 +75,13 @@ const promptTags = async (
 	return tags.find((tag) => tag.id === selectMenu.values.at(0)) ?? null;
 };
 
-export type MessageOpenThreadReturn = {
+export interface MessageOpenThreadReturn {
 	existing: boolean;
 	member: GuildMember;
 	settings: GuildSettings;
 	thread: Thread;
 	threadChannel: ThreadChannel;
-};
+}
 
 export function openThread(
 	input: ChatInputCommandInteraction<'cached'> | UserContextMenuCommandInteraction<'cached'>,
@@ -100,7 +100,7 @@ export async function openThread(
 
 	const send = isMessage
 		? async (key: string) => input.channel.send(i18next.t(key, { lng: guild.preferredLocale }))
-		: async (key: string) => input.reply(i18next.t(key, { lng: input.locale }));
+		: async (key: string) => input.reply({ content: i18next.t(key, { lng: input.locale }), fetchReply: true });
 	const user =
 		'targetUser' in input ? input.targetUser : isMessage ? input.author : input.options.getUser('user', true);
 

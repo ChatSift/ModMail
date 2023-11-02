@@ -8,7 +8,10 @@ import type { Event } from '#struct/Event';
 export default class implements Event<typeof Events.MessageDelete> {
 	public readonly name = Events.MessageDelete;
 
-	public constructor(private readonly prisma: PrismaClient, private readonly client: Client<true>) {}
+	public constructor(
+		private readonly prisma: PrismaClient,
+		private readonly client: Client<true>,
+	) {}
 
 	public async handle(message: Message | PartialMessage) {
 		if (message.inGuild() || message.author?.bot) {

@@ -40,7 +40,10 @@ export default class implements Subcommand {
 
 	public requiredClientPermissions: PermissionResolvable = ['SendMessages', 'EmbedLinks'];
 
-	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
+	public constructor(
+		private readonly prisma: PrismaClient,
+		private readonly client: Client,
+	) {}
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		const name = interaction.options.getString('name', true);

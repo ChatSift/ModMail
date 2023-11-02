@@ -4,11 +4,11 @@ import { PrismaClient } from '@prisma/client';
 import Bree from 'bree';
 import { Client, IntentsBitField, Options, Partials } from 'discord.js';
 import { container } from 'tsyringe';
-import { deploySlashCommands } from './deploy';
 import { CommandHandler } from '#struct/CommandHandler';
 import { Env } from '#struct/Env';
 import { EventHandler } from '#struct/EventHandler';
 import { i18nInit } from '#util/i18nInit';
+import { deploySlashCommands } from './deploy';
 
 const env = container.resolve(Env);
 

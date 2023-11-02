@@ -32,7 +32,10 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 	public requiredClientPermissions: PermissionResolvable = 'SendMessagesInThreads';
 
-	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
+	public constructor(
+		private readonly prisma: PrismaClient,
+		private readonly client: Client,
+	) {}
 
 	public handleAutocomplete = durationAutoComplete;
 

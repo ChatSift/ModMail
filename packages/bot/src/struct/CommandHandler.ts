@@ -32,7 +32,10 @@ export class CommandHandler {
 
 	public readonly components = new Map<string, Component>();
 
-	public constructor(private readonly env: Env, private readonly prisma: PrismaClient) {}
+	public constructor(
+		private readonly env: Env,
+		private readonly prisma: PrismaClient,
+	) {}
 
 	public async handleAutocomplete(interaction: AutocompleteInteraction) {
 		const command = this.commands.get(interaction.commandName) as Command | CommandWithSubcommands | undefined;
@@ -57,7 +60,6 @@ export class CommandHandler {
 			}
 
 			await interaction.respond(options.slice(0, 25));
-			return;
 		} catch (error) {
 			logger.error(
 				{

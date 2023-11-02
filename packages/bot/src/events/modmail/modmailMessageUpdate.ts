@@ -9,7 +9,10 @@ import { sendMemberThreadMessage } from '#util/sendMemberThreadMessage';
 export default class implements Event<typeof Events.MessageUpdate> {
 	public readonly name = Events.MessageUpdate;
 
-	public constructor(private readonly prisma: PrismaClient, private readonly client: Client<true>) {}
+	public constructor(
+		private readonly prisma: PrismaClient,
+		private readonly client: Client<true>,
+	) {}
 
 	public async handle(old: Message | PartialMessage, message: Message | PartialMessage) {
 		// eslint-disable-next-line no-param-reassign

@@ -1,17 +1,16 @@
-import { EmbedBuilder, bold } from '@discordjs/builders';
 import type { Thread } from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
 import type { MessageCreateOptions, ThreadChannel } from 'discord.js';
-import { Colors } from 'discord.js';
+import { Colors, EmbedBuilder, bold } from 'discord.js';
 import i18next from 'i18next';
 import { container } from 'tsyringe';
 import { templateDataFromMember, templateString } from '#util/templateString';
 
-export type CloseThreadOptions = {
+export interface CloseThreadOptions {
 	channel: ThreadChannel;
 	silent: boolean;
 	thread: Thread;
-};
+}
 
 export async function closeThread({ thread, channel, silent }: CloseThreadOptions) {
 	const prisma = container.resolve(PrismaClient);

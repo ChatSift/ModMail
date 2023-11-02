@@ -39,7 +39,10 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 
 	public requiredClientPermissions: PermissionResolvable = ['SendMessages', 'EmbedLinks'];
 
-	public constructor(private readonly prisma: PrismaClient, private readonly client: Client) {}
+	public constructor(
+		private readonly prisma: PrismaClient,
+		private readonly client: Client,
+	) {}
 
 	public async handle(interaction: ChatInputCommandInteraction<'cached'>) {
 		let user = interaction.options.getUser('user');

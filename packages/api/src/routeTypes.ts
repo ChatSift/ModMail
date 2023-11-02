@@ -10,7 +10,7 @@ import type * as routes from './routes/index';
 type Narrow<T, U> = T extends U ? T : never;
 type ConstructorToType<TConstructor> = TConstructor extends new (...args: any[]) => infer T ? T : never;
 type RoutesByClassNames = {
-	[K in keyof typeof routes]: ConstructorToType<typeof routes[K]>;
+	[K in keyof typeof routes]: ConstructorToType<(typeof routes)[K]>;
 };
 type RoutesByPaths = {
 	[Path in InferRoutePath<RoutesByClassNames[keyof RoutesByClassNames]>]: Narrow<
@@ -19,13 +19,13 @@ type RoutesByPaths = {
 	>;
 };
 
-type RouteMethodMap = {
+interface RouteMethodMap {
 	[RouteMethod.get]: 'get';
 	[RouteMethod.post]: 'post';
 	[RouteMethod.put]: 'put';
 	[RouteMethod.delete]: 'delete';
 	[RouteMethod.patch]: 'patch';
-};
+}
 
 export type ModmailRoutes = {
 	[Path in keyof RoutesByPaths]: {

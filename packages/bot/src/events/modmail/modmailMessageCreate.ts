@@ -5,7 +5,6 @@ import type { Collection, ComponentType, Guild, Message, MessageCreateOptions, S
 import { ActionRowBuilder, bold, Client, Colors, EmbedBuilder, Events, SelectMenuOptionBuilder } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
-import { logger } from '../../util/logger';
 import type { Event } from '#struct/Event';
 import type { SelectMenuPaginatorConsumers } from '#struct/SelectMenuPaginator';
 import { SelectMenuPaginator } from '#struct/SelectMenuPaginator';
@@ -13,6 +12,7 @@ import { getUserGuilds } from '#util/getUserGuilds';
 import { openThread } from '#util/handleThreadManagement';
 import { sendMemberThreadMessage } from '#util/sendMemberThreadMessage';
 import { templateDataFromMember, templateString } from '#util/templateString';
+import { logger } from '../../util/logger';
 
 @singleton()
 export default class implements Event<typeof Events.MessageCreate> {
@@ -22,7 +22,10 @@ export default class implements Event<typeof Events.MessageCreate> {
 
 	public readonly name = Events.MessageCreate;
 
-	public constructor(private readonly prisma: PrismaClient, private readonly client: Client<true>) {}
+	public constructor(
+		private readonly prisma: PrismaClient,
+		private readonly client: Client<true>,
+	) {}
 
 	private async promptUser(message: Message, guilds: Collection<string, Guild>): Promise<Guild | null> {
 		const paginator = new SelectMenuPaginator({
