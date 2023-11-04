@@ -23,6 +23,7 @@
 	"dependencies": {
 		"@chatsift/pino-rotate-file": "^0.2.0",
 		"@chatsift/readdir": "^0.3.0",
+		"@chatsift/utils": "^0.3.0",
 		"@discordjs/rest": "^2.0.1",
 		"@naval-base/ms": "^3.1.0",
 		"@prisma/client": "^5.5.2",

@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
@@ -17,6 +16,7 @@ model GuildSettings {
   alertRoleId      String?
 }
 
+// TODO: Fix this; not plural
 model SnippetUpdates {
   snippetUpdateId Int      @id @default(autoincrement())
   snippetId       Int

@@ -7,7 +7,7 @@ import { openThread } from '../../util/handleThreadManagement.js';
 @singleton()
 export default class implements Command<ApplicationCommandType.User> {
 	public readonly interactionOptions: CommandBody<ApplicationCommandType.User> = {
-		...getLocalizedProp('name', 'context-menus.open.name'),
+		...getLocalizedProp('name', 'context_menus.open.name'),
 		type: ApplicationCommandType.User,
 		default_member_permissions: '0',
 		dm_permission: false,

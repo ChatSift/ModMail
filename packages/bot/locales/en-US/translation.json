@@ -1,5 +1,7 @@
 {
 	"common": {
+		"yes": "Yes",
+		"no": "No",
 		"success": {
 			"resource_creation": "Successfully created {{ resource }}",
 			"resource_deletion": "Successfully deleted the given {{ resource }}",
@@ -39,7 +41,9 @@
 			"resource_limit_reached": "You have reached the limit of {{ limit }} {{ resource }}s",
 			"no_args": "You need to provide at least {{ count }} arguments to use this command",
 			"arg_conflict": "You cannot provide both {{ first }} and {{ second }}",
-			"bad_snippet_name": "The name of your snippet cannot be used for slash command creation. Please try a different name"
+			"bad_snippet_name": "The name of your snippet cannot be used for slash command creation. Please try a different name",
+			"timed_out": "Timed out. Please try again",
+			"no_embeds": "The target message has no embeds"
 		}
 	},
 	"snippet_command": {
@@ -313,11 +317,11 @@
 			}
 		}
 	},
-	"context-menus": {
+	"context_menus": {
 		"open": {
 			"name": "Open"
 		},
-		"create-snippet": {
+		"create_snippet": {
 			"name": "Create Snippet"
 		},
 		"expose": {
@@ -326,8 +330,15 @@
 		"reply": {
 			"name": "Reply w/ Message"
 		},
-		"reply-anon": {
+		"reply_anon": {
 			"name": "Reply Anon w/ Message"
+		},
+		"setup_prompt": {
+			"name": "Setup Prompt",
+			"select_channel": "Select the forum channel to use for this prompt",
+			"confirm_want_tags": "Do you want to have individual buttons for each tag?",
+			"creating": "Creating prompt...",
+			"success": "Successfully created prompt"
 		}
 	}
 }

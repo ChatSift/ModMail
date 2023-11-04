@@ -306,6 +306,7 @@ __metadata:
   dependencies:
     "@chatsift/pino-rotate-file": "npm:^0.2.0"
     "@chatsift/readdir": "npm:^0.3.0"
+    "@chatsift/utils": "npm:^0.3.0"
     "@discordjs/rest": "npm:^2.0.1"
     "@naval-base/ms": "npm:^3.1.0"
     "@prisma/client": "npm:^5.5.2"
@@ -385,6 +386,15 @@ __metadata:
     tsyringe: "npm:^4.7.0"
     undici: "npm:^5.21.2"
   checksum: a756697a9bf0e2f93e61dea59c0824d34ddfa03acb6c60be9826b2d581566ffafac274410d97adef38b16e2f93b9e40a942c5aab5021823bcf05ee0ab7be5a27
+  languageName: node
+  linkType: hard
+
+"@chatsift/utils@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@chatsift/utils@npm:0.3.0"
+  dependencies:
+    tslib: "npm:^2.5.0"
+  checksum: 33a5767d2d0677fa9078138ca4b564c40d7c8d94d0cdccfa016c99a09b9a2a1dfff5cde98b205b9e6fe9adab7d5e61d88bdf87100fbc1ad3dfc141fc82ce79f5
   languageName: node
   linkType: hard
 

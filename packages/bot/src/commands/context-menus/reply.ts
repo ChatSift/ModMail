@@ -9,7 +9,7 @@ import { sendStaffThreadMessage } from '../../util/sendStaffThreadMessage.js';
 @singleton()
 export default class implements Command<ApplicationCommandType.Message> {
 	public readonly interactionOptions: CommandBody<ApplicationCommandType.Message> = {
-		...getLocalizedProp('name', 'context-menus.reply.name'),
+		...getLocalizedProp('name', 'context_menus.reply.name'),
 		type: ApplicationCommandType.Message,
 		default_member_permissions: '0',
 		dm_permission: false,
