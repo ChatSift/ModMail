@@ -36,6 +36,13 @@ export default class implements Command<ApplicationCommandType.Message> {
 			});
 		}
 
+		if (interaction.channel!.type !== ChannelType.GuildText) {
+			return interaction.reply({
+				content: i18next.t('common.errors.must_be_text_channel'),
+				ephemeral: true,
+			});
+		}
+
 		const selectionInteraction = await interaction.reply({
 			content: i18next.t('context_menus.setup_prompt.select_channel'),
 			components: [

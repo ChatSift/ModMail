@@ -80,6 +80,18 @@ model Thread {
   alerts                   ThreadReplyAlert[]
 }
 
+model Threadv2 {
+  threadId        Int     @id @default(autoincrement())
+  guildId         String
+  promptChannelId String
+  promptMessageId String
+  userEndThreadId String
+  modForumId      String
+  modEndThreadId  String
+  userId          String
+  closed          Boolean @default(false)
+}
+
 model Block {
   userId    String
   guildId   String

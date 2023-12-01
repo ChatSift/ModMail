@@ -14,7 +14,10 @@
 			"alert_thread": "You will now be alerted when the user replies to this thread",
 			"no_alert_thread": "You will no longer be alerted when the user replies to this thread",
 			"opened_thread": "Successfully opened thread",
-			"reply_deleted": "Successfully deleted your reply"
+			"reply_deleted": "Successfully deleted your reply",
+			"setting_up_notifcation": "{{- user }}, your thread is being set up...",
+			"thread_created_notification": "{{- user }}, your thread has been created! All future messages in this channel will be sent to the staff team, and you can see their replies here. If you would like to be notified of incoming replies, click the button below.",
+			"thread_created": ""
 		},
 		"errors": {
 			"resource_exists": "A {{ resource }} with that name already exists",
@@ -43,7 +46,8 @@
 			"arg_conflict": "You cannot provide both {{ first }} and {{ second }}",
 			"bad_snippet_name": "The name of your snippet cannot be used for slash command creation. Please try a different name",
 			"timed_out": "Timed out. Please try again",
-			"no_embeds": "The target message has no embeds"
+			"no_embeds": "The target message has no embeds",
+			"must_be_text_channel": "The target message must be a regular text channel"
 		}
 	},
 	"snippet_command": {

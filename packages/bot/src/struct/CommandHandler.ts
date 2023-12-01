@@ -30,7 +30,7 @@ import { sendStaffThreadMessage } from '../util/sendStaffThreadMessage.js';
 export class CommandHandler {
 	public readonly commands = new Map<string, Command | CommandWithSubcommands | Subcommand>();
 
-	public readonly components = new Map<string, Component>();
+	public readonly components = new Map<string, Component<MessageComponentInteraction<'cached'>>>();
 
 	public constructor(
 		private readonly env: Env,

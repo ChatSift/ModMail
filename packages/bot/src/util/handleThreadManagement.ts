@@ -101,6 +101,7 @@ export async function openThread(
 	const send = isMessage
 		? async (key: string) => input.channel.send(i18next.t(key, { lng: guild.preferredLocale }))
 		: async (key: string) => input.reply({ content: i18next.t(key, { lng: input.locale }), fetchReply: true });
+
 	const user =
 		'targetUser' in input ? input.targetUser : isMessage ? input.author : input.options.getUser('user', true);
 
