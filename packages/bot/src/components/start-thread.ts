@@ -85,8 +85,7 @@ export default class implements Component<ButtonInteraction<'cached'>> {
 		const modForum = interaction.guild.channels.cache.get(channelId) as ForumChannel | undefined;
 		if (!modForum) {
 			return interaction.reply({
-				// TODO: i18n
-				content: 'The intended channel for your message no longer exists; please inform a staff member.',
+				content: i18next.t('common.errors.forum_not_found'),
 				ephemeral: true,
 			});
 		}
@@ -96,8 +95,7 @@ export default class implements Component<ButtonInteraction<'cached'>> {
 			tag = modForum.availableTags.find((tag) => tag.id === tagId);
 			if (!tag) {
 				return interaction.reply({
-					// TODO: i18n
-					content: 'The intended tag for your message no longer exists; please inform a staff member.',
+					content: i18next.t('common.errors.tag_not_found'),
 					ephemeral: true,
 				});
 			}
@@ -156,7 +154,7 @@ export default class implements Component<ButtonInteraction<'cached'>> {
 				new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
 					new ButtonBuilder()
 						.setCustomId('user-toggle-notifications|true')
-						.setLabel('common.enable_notifications')
+						.setLabel(i18next.t('common.enable_notifications'))
 						.setStyle(ButtonStyle.Success),
 				),
 			],

@@ -30,6 +30,7 @@ import {
 import i18next from 'i18next';
 import { container } from 'tsyringe';
 import { getSortedMemberRolesString } from './getSortedMemberRoles.js';
+import type { TranslationKey } from './i18nInit.js';
 
 const promptTags = async (
 	input: ChatInputCommandInteraction | ContextMenuCommandInteraction | Message,
@@ -99,8 +100,10 @@ export async function openThread(
 	const guild = isMessage ? definedGuild! : input.guild;
 
 	const send = isMessage
-		? async (key: string) => input.channel.send(i18next.t(key, { lng: guild.preferredLocale }))
-		: async (key: string) => input.reply({ content: i18next.t(key, { lng: input.locale }), fetchReply: true });
+		? // @ts-expect-error - Type madness when using dynamic translation key types
+		  async (key: TranslationKey) => input.channel.send(i18next.t(key, { lng: guild.preferredLocale }))
+		: // @ts-expect-error - Type madness when using dynamic translation key types
+		  async (key: TranslationKey) => input.reply({ content: i18next.t(key, { lng: input.locale }), fetchReply: true });
 
 	const user =
 		'targetUser' in input ? input.targetUser : isMessage ? input.author : input.options.getUser('user', true);
