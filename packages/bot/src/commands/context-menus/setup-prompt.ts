@@ -127,13 +127,13 @@ export default class implements Command<ApplicationCommandType.Message> {
 					}
 
 					return button;
-			  })
+				})
 			: [
 					new ButtonBuilder()
 						.setCustomId(`start-thread|${channel.id}`)
 						.setLabel(i18next.t('context_menus.setup_prompt.start_thread'))
 						.setStyle(ButtonStyle.Primary),
-			  ];
+				];
 
 		const chunks = chunkArray(buttons, 5);
 		const rows = chunks.map((chunk) => new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(chunk));

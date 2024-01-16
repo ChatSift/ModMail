@@ -13,13 +13,17 @@ import {
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
 import type { Component } from '../struct/Component';
+import { ModMailHandler } from '../struct/ModMailHandler.js';
 import { logger } from '../util/logger.js';
 
 @singleton()
 export default class implements Component<ButtonInteraction<'cached'>> {
 	public readonly name = 'start-thread';
 
-	public constructor(private readonly prisma: PrismaClient) {}
+	public constructor(
+		private readonly prisma: PrismaClient,
+		private readonly modMailHandler: ModMailHandler,
+	) {}
 
 	private async createUserThreadChannel(
 		interaction: ButtonInteraction<'cached'>,
@@ -58,10 +62,7 @@ export default class implements Component<ButtonInteraction<'cached'>> {
 		try {
 			const thread = await forum.threads.create({
 				name: interaction.user.username,
-				// TODO
-				message: {
-					content: 'hehe :3 TODO',
-				},
+				message: await this.modMailHandler.getStarterMessageData({ member: interaction.member }),
 				appliedTags: tag ? [tag.id] : [],
 				reason: 'User opened a ModMail thread',
 				autoArchiveDuration: ThreadAutoArchiveDuration.OneWeek,

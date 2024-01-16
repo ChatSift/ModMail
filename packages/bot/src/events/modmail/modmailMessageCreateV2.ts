@@ -22,6 +22,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 		const thread = await this.prisma.threadv2.findFirst({
 			where: {
 				userEndThreadId: message.channel.id,
+				closed: false,
 			},
 		});
 

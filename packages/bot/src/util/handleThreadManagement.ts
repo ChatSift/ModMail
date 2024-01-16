@@ -101,9 +101,9 @@ export async function openThread(
 
 	const send = isMessage
 		? // @ts-expect-error - Type madness when using dynamic translation key types
-		  async (key: TranslationKey) => input.channel.send(i18next.t(key, { lng: guild.preferredLocale }))
+			async (key: TranslationKey) => input.channel.send(i18next.t(key, { lng: guild.preferredLocale }))
 		: // @ts-expect-error - Type madness when using dynamic translation key types
-		  async (key: TranslationKey) => input.reply({ content: i18next.t(key, { lng: input.locale }), fetchReply: true });
+			async (key: TranslationKey) => input.reply({ content: i18next.t(key, { lng: input.locale }), fetchReply: true });
 
 	const user =
 		'targetUser' in input ? input.targetUser : isMessage ? input.author : input.options.getUser('user', true);
