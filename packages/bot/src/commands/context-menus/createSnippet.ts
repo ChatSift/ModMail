@@ -8,7 +8,7 @@ import { getLocalizedProp } from '../../struct/Command.js';
 @singleton()
 export default class implements Command<ApplicationCommandType.Message> {
 	public readonly interactionOptions: CommandBody<ApplicationCommandType.Message> = {
-		...getLocalizedProp('name', 'context-menus.create-snippet.name'),
+		...getLocalizedProp('name', 'context_menus.create_snippet.name'),
 		type: ApplicationCommandType.Message,
 		default_member_permissions: '0',
 		dm_permission: false,

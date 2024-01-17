@@ -121,7 +121,7 @@ export default class implements Subcommand {
 								.setLabel(i18next.t('commands.snippets.show.buttons.view_history', { lng: interaction.locale }))
 								.setCustomId('snippet-history'),
 						]),
-				  ]
+					]
 				: undefined,
 			fetchReply: true,
 		});

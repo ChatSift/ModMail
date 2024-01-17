@@ -12,6 +12,7 @@ import {
 	type APIApplicationCommandSubcommandOption,
 } from 'discord.js';
 import i18next from 'i18next';
+import type { TranslationKey } from '../util/i18nInit';
 
 interface InteractionTypeMapping {
 	[ApplicationCommandType.ChatInput]: ChatInputCommandInteraction<'cached'>;
@@ -60,11 +61,12 @@ type PropAsIndexSignatureLocalizations<T extends string> = {
 
 type LocalizedProp<T extends string> = PropAsIndexSignature<T> & PropAsIndexSignatureLocalizations<T>;
 
-export function getLocalizedProp<Prop extends string>(prop: Prop, key: string) {
+export function getLocalizedProp<Prop extends string>(prop: Prop, key: TranslationKey) {
 	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 	return {
 		[prop]: i18next.t(key),
 		[`${prop}_localizations`]: Object.fromEntries(
+			// @ts-expect-error - Type madness when using dynamic translation key types
 			Object.values(Locale).map((locale) => [locale, i18next.t(key, { lng: locale })]),
 		),
 	} as LocalizedProp<Prop>;

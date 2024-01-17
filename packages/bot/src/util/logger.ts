@@ -22,7 +22,7 @@ const pinoRotateFileOptions: PinoRotateFileOptions = {
 
 export const logger = createLogger(
 	{
-		name: 'API',
+		name: 'BOT',
 		level: 'trace',
 	},
 	multistream([

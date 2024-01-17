@@ -17,6 +17,8 @@ const client = new Client({
 		IntentsBitField.Flags.Guilds,
 		IntentsBitField.Flags.DirectMessages,
 		IntentsBitField.Flags.DirectMessageTyping,
+		IntentsBitField.Flags.GuildMessages,
+		IntentsBitField.Flags.MessageContent,
 	],
 	partials: [Partials.Channel, Partials.Message],
 	makeCache: Options.cacheWithLimits({ MessageManager: 100 }),

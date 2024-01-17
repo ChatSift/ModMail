@@ -23,7 +23,6 @@ export default class implements Event<typeof Events.InteractionCreate> {
 					await this.commandHandler.handleMessageComponent(interaction);
 				}
 
-				logger.warn(interaction, 'Message component interaction in non-cached guild');
 				break;
 			}
 

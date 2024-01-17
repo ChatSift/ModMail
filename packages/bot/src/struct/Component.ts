@@ -5,12 +5,12 @@ export interface ComponentInfo {
 	name: string;
 }
 
-export interface Component<Type extends MessageComponentInteraction<'cached'> = MessageComponentInteraction<'cached'>> {
+export interface Component<Type extends MessageComponentInteraction<'cached'>> {
 	handle(interaction: Type, ...args: any[]): Awaitable<unknown>;
 	readonly name?: string;
 }
 
-export type ComponentConstructor = new (...args: any[]) => Component;
+export type ComponentConstructor = new (...args: any[]) => Component<MessageComponentInteraction<'cached'>>;
 
 export function getComponentInfo(path: string): ComponentInfo | null {
 	if (extname(path) !== '.js') {

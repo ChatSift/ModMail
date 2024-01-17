@@ -7,7 +7,7 @@ import ReplyContextMenu from './reply.js';
 @singleton()
 export default class implements Command<ApplicationCommandType.Message> {
 	public readonly interactionOptions: CommandBody<ApplicationCommandType.Message> = {
-		...getLocalizedProp('name', 'context-menus.reply-anon.name'),
+		...getLocalizedProp('name', 'context_menus.reply_anon.name'),
 		type: ApplicationCommandType.Message,
 		default_member_permissions: '0',
 		dm_permission: false,

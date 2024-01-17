@@ -15,28 +15,28 @@
 		"node": ">=16.9.0"
 	},
 	"devDependencies": {
-		"@types/cors": "^2.8.15",
-		"@types/node": "^20.8.10",
+		"@types/cors": "^2.8.17",
+		"@types/node": "^20.11.4",
 		"@types/pino": "^7.0.5",
-		"prisma": "^5.5.2",
-		"typescript": "^5.2.2"
+		"prisma": "^5.8.1",
+		"typescript": "^5.3.3"
 	},
 	"dependencies": {
-		"@chatsift/pino-rotate-file": "^0.2.0",
-		"@chatsift/readdir": "^0.3.0",
-		"@chatsift/rest-utils": "^0.7.0",
-		"@discordjs/rest": "^2.0.1",
+		"@chatsift/pino-rotate-file": "^0.3.0",
+		"@chatsift/readdir": "^0.4.0",
+		"@chatsift/rest-utils": "^0.8.0",
+		"@discordjs/rest": "^2.2.0",
 		"@hapi/boom": "^10.0.1",
-		"@prisma/client": "^5.5.2",
-		"@sapphire/shapeshift": "^3.9.3",
+		"@prisma/client": "^5.8.1",
+		"@sapphire/shapeshift": "^3.9.5",
 		"cors": "^2.8.5",
-		"discord-api-types": "^0.37.62",
-		"helmet": "^7.0.0",
-		"pino": "^8.16.1",
-		"pino-pretty": "^10.2.3",
+		"discord-api-types": "^0.37.67",
+		"helmet": "^7.1.0",
+		"pino": "^8.17.2",
+		"pino-pretty": "^10.3.1",
 		"polka": "^1.0.0-next.22",
 		"prisma-error-enum": "^0.1.3",
-		"reflect-metadata": "^0.1.13",
+		"reflect-metadata": "^0.2.1",
 		"tslib": "^2.6.2",
 		"tsyringe": "^4.8.0"
 	}

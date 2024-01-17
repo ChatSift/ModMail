@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
@@ -17,6 +16,7 @@ model GuildSettings {
   alertRoleId      String?
 }
 
+// TODO: Fix this; not plural
 model SnippetUpdates {
   snippetUpdateId Int      @id @default(autoincrement())
   snippetId       Int
@@ -78,6 +78,18 @@ model Thread {
   lastLocalThreadMessageId Int                   @default(0)
   messages                 ThreadMessage[]
   alerts                   ThreadReplyAlert[]
+}
+
+model Threadv2 {
+  threadId        Int     @id @default(autoincrement())
+  guildId         String
+  promptChannelId String
+  promptMessageId String
+  userEndThreadId String
+  modForumId      String
+  modEndThreadId  String
+  userId          String
+  closed          Boolean @default(false)
 }
 
 model Block {
