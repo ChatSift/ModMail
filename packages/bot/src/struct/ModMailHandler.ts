@@ -1,7 +1,7 @@
 import { EventEmitter, on } from 'node:events';
 import { setTimeout } from 'node:timers';
 import { PrismaClient, type GuildSettings, type Threadv2 } from '@prisma/client';
-import type { User } from 'discord.js';
+import type { MessageCreateOptions, ThreadChannel, User } from 'discord.js';
 import {
 	type Message,
 	type BaseMessageOptions,
@@ -10,6 +10,8 @@ import {
 	TimestampStyles,
 	time,
 	EmbedBuilder,
+	bold,
+	quote,
 } from 'discord.js';
 import i18next from 'i18next';
 import { singleton } from 'tsyringe';
@@ -17,16 +19,16 @@ import { getSortedMemberRolesString } from '../util/getSortedMemberRoles.js';
 import { logger } from '../util/logger.js';
 
 interface ModMailChannelEmitter extends EventEmitter {
-	emit(event: 'message', message: Message, thread: Threadv2): boolean;
-	on(event: 'message', listener: (message: Message, thread: Threadv2) => void): this;
+	emit(event: 'messageCreate', message: Message<true>, thread: Threadv2): boolean;
+	on(event: 'messageCreate', listener: (message: Message<true>, thread: Threadv2) => void): this;
 }
 
 declare module 'node:events' {
 	class EventEmitter {
 		public static on(
 			eventEmitter: ModMailChannelEmitter,
-			eventName: 'message',
-		): AsyncIterableIterator<[Message, Threadv2]>;
+			eventName: 'messageCreate',
+		): AsyncIterableIterator<[Message<true>, Threadv2]>;
 	}
 }
 
@@ -36,9 +38,104 @@ export class ModMailHandler {
 
 	public constructor(private readonly prisma: PrismaClient) {}
 
-	public handle(message: Message, thread: Threadv2): void {
+	// Efectively a glorified caller for the next 2 methods
+	public handle(message: Message<true>, thread: Threadv2): void {
 		const emitter = this.assertEmitter(message);
-		emitter.emit('message', message, thread);
+		emitter.emit('messageCreate', message, thread);
+	}
+
+	private async handleUserMessageCreate(message: Message<true>, thread: Threadv2): Promise<void> {
+		logger.debug('Handling user message', { message, thread });
+
+		if (message.content.length > 3_800) {
+			await message.reply({
+				content: i18next.t('common.errors.message_too_long'),
+				allowedMentions: { repliedUser: false },
+			});
+
+			return;
+		}
+
+		const settings = await this.prisma.guildSettings.findFirst({
+			where: {
+				guildId: thread.guildId,
+			},
+		});
+
+		const targetChannel = (await message.guild.channels.fetch(thread.modEndThreadId).catch((error) => {
+			logger.error('No target channel found for ModMailHandler->handleUserMessageCreate', {
+				err: error,
+				message,
+				thread,
+			});
+			return null;
+		})) as ThreadChannel | null;
+
+		if (!targetChannel) {
+			await message.reply({
+				content: i18next.t('common.errors.message_forward'),
+				allowedMentions: { repliedUser: false },
+			});
+
+			return;
+		}
+
+		const sentMessage = await targetChannel
+			.send(
+				settings?.simpleMode ?? false
+					? this.getSimpleModeMessageData({ message })
+					: this.getEmbedModeMessageData({ message }),
+			)
+			.catch((error) => {
+				logger.error('Failed to forward user message in ModMailHandler->handleUserMessageCreate', {
+					err: error,
+					message,
+					thread,
+				});
+
+				return null;
+			});
+	}
+
+	private getSimpleModeMessageData({ message }: { message: Message }): MessageCreateOptions {
+		const options: MessageCreateOptions = {};
+
+		if (message.content.length) {
+			options.content = `${bold(`${message.author.tag}:`)} ${message.content}`;
+		}
+
+		if (message.attachments.size) {
+			options.files = [...message.attachments.values()];
+		}
+
+		if (message.stickers.size) {
+			options.content += `\n\n${quote(i18next.t('common.has_stickers'))}`;
+		}
+
+		return options;
+	}
+
+	private getEmbedModeMessageData({ message }: { message: Message<true> }): MessageCreateOptions {
+		const embed = new EmbedBuilder()
+			.setColor(Colors.Green)
+			.setDescription(message.content.length ? message.content : null)
+			.setImage(message.attachments.first()?.url ?? null)
+			.setFooter({
+				text: `${message.member!.user.tag} (${message.member!.user.id})`,
+				iconURL: message.member!.user.displayAvatarURL(),
+			});
+
+		if (message.member!.nickname) {
+			embed.setAuthor({
+				name: message.member!.nickname,
+				iconURL: message.member!.displayAvatarURL(),
+			});
+		}
+
+		return {
+			content: message.stickers.size ? quote(i18next.t('common.has_stickers')) : undefined,
+			embeds: [embed],
+		};
 	}
 
 	public async getStarterMessageData({
@@ -123,13 +220,9 @@ export class ModMailHandler {
 	}
 
 	private async setupHandler(emitter: ModMailChannelEmitter, timeout: NodeJS.Timeout): Promise<void> {
-		for await (const [message, thread] of on(emitter, 'message')) {
+		for await (const [message, thread] of on(emitter, 'messageCreate')) {
 			timeout.refresh();
-			await this.handleUserMessage(message, thread);
+			await this.handleUserMessageCreate(message, thread);
 		}
-	}
-
-	private async handleUserMessage(message: Message, thread: Threadv2): Promise<void> {
-		logger.debug('Handling user message', { message, thread });
 	}
 }

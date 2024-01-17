@@ -3,6 +3,7 @@ export const enUS = {
 		yes: 'Yes',
 		no: 'No',
 		enable_notifications: 'Enable notifications',
+		has_stickers: 'This message also included a sticker',
 		success: {
 			resource_creation: 'Successfully created {{ resource }}',
 			resource_deletion: 'Successfully deleted the given {{ resource }}',
@@ -56,10 +57,12 @@ export const enUS = {
 			must_be_text_channel: 'The target message must be a regular text channel',
 			already_open_thread: 'You already have an open thread for this ModMail',
 			could_not_create_internal_thread:
-				'Soemthing went wrong while trying to create a thread for the staff team. Please inform them of this error',
+				'Something went wrong while trying to create a thread for the staff team. Please inform them of this error',
 			could_not_create_thread: 'Something went wrong while creating your thread. ',
 			forum_not_found: 'The intended channel for your message no longer exists; please inform a staff member.',
 			tag_not_found: 'The intended tag for your message no longer exists; please inform a staff member.',
+			message_forward: 'Something went wrong while forwarding your message/edit. Please contact a server admin.',
+			message_too_long: 'Sorry! I cannot forward messages longer than 3800 characters at this time.',
 		},
 	},
 	snippet_command: {

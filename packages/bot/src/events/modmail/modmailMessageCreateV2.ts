@@ -15,7 +15,7 @@ export default class implements Event<typeof Events.MessageCreate> {
 	) {}
 
 	public async handle(message: Message) {
-		if (!message.channel.isThread()) {
+		if (!message.inGuild() || !message.channel.isThread() || message.author.bot) {
 			return;
 		}
 
