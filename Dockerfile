@@ -5,7 +5,7 @@ WORKDIR /usr/modmail
 
 RUN apk add --update \
 && apk add --no-cache ca-certificates \
-&& apk add --no-cache --virtual .build-deps curl git python3 alpine-sdk openssl1.1-compat
+&& apk add --no-cache --virtual .build-deps curl git python3 alpine-sdk
 
 COPY turbo.json package.json tsconfig.json yarn.lock .yarnrc.yml ./
 COPY .yarn ./.yarn
