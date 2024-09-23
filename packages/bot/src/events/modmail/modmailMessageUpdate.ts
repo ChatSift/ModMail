@@ -15,8 +15,13 @@ export default class implements Event<typeof Events.MessageUpdate> {
 	) {}
 
 	public async handle(old: Message | PartialMessage, message: Message | PartialMessage) {
-		// eslint-disable-next-line no-param-reassign
-		message = await message.fetch();
+		// There's cases where this fails, such as the bot updating its interaction response
+		try {
+			// eslint-disable-next-line no-param-reassign
+			message = await message.fetch();
+		} catch {
+			return;
+		}
 
 		if (message.inGuild() || message.author.bot || old.content === message.content) {
 			return;

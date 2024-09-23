@@ -4,7 +4,6 @@ import i18next from 'i18next';
 import { container } from 'tsyringe';
 import { sendStaffThreadMessage, type SendStaffThreadMessageOptions } from './sendStaffThreadMessage.js';
 
-// eslint-disable-next-line no-shadow
 export enum HandleStaffThreadMessageAction {
 	Reply,
 	Edit,
