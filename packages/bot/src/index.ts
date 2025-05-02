@@ -19,7 +19,10 @@ const client = new Client({
 		IntentsBitField.Flags.DirectMessageTyping,
 	],
 	partials: [Partials.Channel, Partials.Message],
-	makeCache: Options.cacheWithLimits({ MessageManager: 100 }),
+	makeCache: Options.cacheWithLimits({
+		MessageManager: 100,
+		GuildMemberManager: { maxSize: 10_000 },
+	}),
 }).setMaxListeners(20);
 container.register(Client, { useValue: client });
 container.register(PrismaClient, { useValue: new PrismaClient() });
