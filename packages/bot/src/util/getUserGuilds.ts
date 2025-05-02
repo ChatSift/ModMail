@@ -1,7 +1,9 @@
 import { PrismaClient } from '@prisma/client';
-import type { Guild } from 'discord.js';
+import type { Guild, Snowflake } from 'discord.js';
 import { Client, Collection } from 'discord.js';
 import { container } from 'tsyringe';
+
+const CACHED = new Set<Snowflake>();
 
 export async function getUserGuilds(userId: string): Promise<Collection<string, Guild>> {
 	const client = container.resolve(Client);
@@ -12,8 +14,13 @@ export async function getUserGuilds(userId: string): Promise<Collection<string, 
 			guild.members
 				.fetch(userId)
 				.then(async () => {
+					if (CACHED.has(guild.id)) {
+						return [guild.id, guild];
+					}
+
 					const settings = await prisma.guildSettings.findFirst({ where: { guildId: guild.id } });
 					if (settings?.modmailChannelId) {
+						CACHED.add(guild.id);
 						return [guild.id, guild];
 					}
 
