@@ -101,7 +101,7 @@ export async function sendStaffThreadMessage({
 	}
 
 	if (existing) {
-		await interaction?.reply({ content: 'Successfully edited your message' });
+		await interaction?.editReply({ content: 'Successfully edited your message' });
 		setTimeout(async () => {
 			try {
 				await interaction?.deleteReply();
@@ -114,7 +114,7 @@ export async function sendStaffThreadMessage({
 	}
 
 	const guildMessage = await channel.send(options as MessageCreateOptions);
-	await interaction?.reply({ content: 'Successfully posted your message' });
+	await interaction?.editReply({ content: 'Successfully posted your message' });
 	setTimeout(async () => {
 		try {
 			await interaction?.deleteReply();

@@ -18,8 +18,9 @@ export async function handleStaffThreadMessage(
 	interaction: ChatInputCommandInteraction<'cached'>,
 	action: HandleStaffThreadMessageAction,
 ) {
-	const prisma = container.resolve(PrismaClient);
+	await interaction.deferReply({ ephemeral: true });
 
+	const prisma = container.resolve(PrismaClient);
 	const thread = await prisma.thread.findFirst({
 		where: {
 			channelId: interaction.channelId,
@@ -27,7 +28,7 @@ export async function handleStaffThreadMessage(
 		},
 	});
 	if (!thread) {
-		return interaction.reply(i18next.t('common.errors.no_thread'));
+		return interaction.editReply(i18next.t('common.errors.no_thread'));
 	}
 
 	let options: Partial<SendStaffThreadMessageOptions> = {
@@ -42,7 +43,7 @@ export async function handleStaffThreadMessage(
 
 	const member = await interaction.guild.members.fetch(thread.userId).catch(() => null);
 	if (!member) {
-		return interaction.reply(i18next.t('common.errors.no_member', { lng: interaction.locale }));
+		return interaction.editReply(i18next.t('common.errors.no_member', { lng: interaction.locale }));
 	}
 
 	options.member = member;
@@ -59,7 +60,7 @@ export async function handleStaffThreadMessage(
 			},
 		});
 		if (!threadMessage) {
-			return interaction.reply(
+			return interaction.editReply(
 				i18next.t('common.errors.resource_not_found', {
 					resource: 'message',
 					lng: interaction.locale,
@@ -68,13 +69,13 @@ export async function handleStaffThreadMessage(
 		}
 
 		if (threadMessage.staffId !== interaction.user.id) {
-			return interaction.reply(i18next.t('common.errors.not_own_message', { lng: interaction.locale }));
+			return interaction.editReply(i18next.t('common.errors.not_own_message', { lng: interaction.locale }));
 		}
 
 		const clearAttachment = interaction.options.getBoolean('clear-attachment');
 
 		if (attachment && clearAttachment) {
-			return interaction.reply(
+			return interaction.editReply(
 				i18next.t('common.errors.arg_conflict', {
 					first: 'attachment',
 					second: 'clear-attachment',

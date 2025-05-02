@@ -94,7 +94,7 @@ export class JobManager {
 							.catch(() => null)) as ThreadChannel | null;
 
 						if (channel?.archived) {
-							await channel.setArchived(false);
+							await channel.setArchived(false).catch(() => null);
 						}
 
 						const payload: Payload = { op: PayloadOpCode.Done };
