@@ -11,6 +11,7 @@ import {
 } from 'discord.js';
 import { singleton } from 'tsyringe';
 import { getLocalizedProp, type CommandBody, type Command } from '../struct/Command.js';
+import { ENABLED_CACHED_GUILDS } from '../util/getUserGuilds.js';
 
 @singleton()
 export default class implements Command<ApplicationCommandType.ChatInput> {
@@ -98,6 +99,10 @@ export default class implements Command<ApplicationCommandType.ChatInput> {
 			update: settings,
 			where: { guildId: interaction.guild.id },
 		});
+
+		if (configured.modmailChannelId) {
+			ENABLED_CACHED_GUILDS.set(interaction.guild.id, true);
+		}
 
 		return interaction.reply({
 			content: stripIndents`
