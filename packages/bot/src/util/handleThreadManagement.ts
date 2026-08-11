@@ -30,6 +30,7 @@ import {
 import i18next from 'i18next';
 import { container } from 'tsyringe';
 import { getSortedMemberRolesString } from './getSortedMemberRoles.js';
+import { buildMigrationNoticeEmbed } from './migrationNotice.js';
 
 const promptTags = async (
 	input: ChatInputCommandInteraction | ContextMenuCommandInteraction | Message,
@@ -198,6 +199,11 @@ export async function openThread(
 		});
 	}
 
+	// The cutover notice leads, so it's the first thing staff see on opening a brand new thread -- the owner
+	// announcement DMs never reach the moderators actually working the queue. Temporary; delete this line (and
+	// `util/migrationNotice.ts`) once the new bot is live. See ChatSift/ChatSift#313.
+	const embeds = [buildMigrationNoticeEmbed(), embed];
+
 	let startMessageOptions: GuildForumThreadCreateOptions | MessageCreateOptions;
 	if (modmail.type === ChannelType.GuildForum) {
 		const tags = modmail.availableTags.filter((tag) => !tag.moderated);
@@ -208,11 +214,11 @@ export async function openThread(
 
 		startMessageOptions = {
 			name: `${member.user.username}-${member.user.discriminator}`,
-			message: { embeds: [embed] },
+			message: { embeds },
 			appliedTags: tag ? [tag.id] : [],
 		};
 	} else {
-		startMessageOptions = { embeds: [embed] };
+		startMessageOptions = { embeds };
 	}
 
 	if (isMessage) {
