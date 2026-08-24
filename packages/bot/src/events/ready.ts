@@ -5,7 +5,7 @@ import { singleton } from 'tsyringe';
 import type { Event } from '../struct/Event.js';
 import { JobManager } from '../struct/JobManager.js';
 import { logger } from '../util/logger.js';
-import { MIGRATION_STATUS_TEXT } from '../util/migrationNotice.js';
+import { migrationStatusText } from '../util/migrationNotice.js';
 
 const PRESENCE_REFRESH_INTERVAL = 60 * 60 * 1_000;
 
@@ -34,7 +34,7 @@ export default class implements Event<typeof Events.ClientReady> {
 
 	private applyMigrationPresence(client: Client<true>): void {
 		client.user.setPresence({
-			activities: [{ name: 'Custom Status', type: ActivityType.Custom, state: MIGRATION_STATUS_TEXT }],
+			activities: [{ name: 'Custom Status', type: ActivityType.Custom, state: migrationStatusText() }],
 		});
 	}
 }

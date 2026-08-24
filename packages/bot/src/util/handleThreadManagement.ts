@@ -30,7 +30,12 @@ import {
 import i18next from 'i18next';
 import { container } from 'tsyringe';
 import { getSortedMemberRolesString } from './getSortedMemberRoles.js';
-import { buildMigrationNoticeEmbed } from './migrationNotice.js';
+import {
+	buildMigrationNoticeEmbed,
+	buildStaffFreezeEmbed,
+	isThreadFreezeActive,
+	userFreezeMessage,
+} from './migrationNotice.js';
 
 const promptTags = async (
 	input: ChatInputCommandInteraction | ContextMenuCommandInteraction | Message,
@@ -102,6 +107,9 @@ export async function openThread(
 	const send = isMessage
 		? async (key: string) => input.channel.send(i18next.t(key, { lng: guild.preferredLocale }))
 		: async (key: string) => input.reply({ content: i18next.t(key, { lng: input.locale }), fetchReply: true });
+	const sendFreezeNotice = isMessage
+		? async () => input.channel.send(userFreezeMessage(guild.name))
+		: async () => input.reply({ embeds: [buildStaffFreezeEmbed()], fetchReply: true });
 	const user =
 		'targetUser' in input ? input.targetUser : isMessage ? input.author : input.options.getUser('user', true);
 
@@ -144,7 +152,15 @@ export async function openThread(
 			return send('common.errors.thread_exists');
 		}
 
+		if (isThreadFreezeActive()) {
+			return sendFreezeNotice();
+		}
+
 		await prisma.thread.delete({ where: { threadId: existingThread.threadId } });
+	}
+
+	if (isThreadFreezeActive()) {
+		return sendFreezeNotice();
 	}
 
 	const pastModmails = await prisma.thread.findMany({
