@@ -30,12 +30,6 @@ import {
 import i18next from 'i18next';
 import { container } from 'tsyringe';
 import { getSortedMemberRolesString } from './getSortedMemberRoles.js';
-import {
-	buildMigrationNoticeEmbed,
-	buildStaffFreezeEmbed,
-	isThreadFreezeActive,
-	userFreezeMessage,
-} from './migrationNotice.js';
 
 const promptTags = async (
 	input: ChatInputCommandInteraction | ContextMenuCommandInteraction | Message,
@@ -107,9 +101,6 @@ export async function openThread(
 	const send = isMessage
 		? async (key: string) => input.channel.send(i18next.t(key, { lng: guild.preferredLocale }))
 		: async (key: string) => input.reply({ content: i18next.t(key, { lng: input.locale }), fetchReply: true });
-	const sendFreezeNotice = isMessage
-		? async () => input.channel.send(userFreezeMessage(guild.name))
-		: async () => input.reply({ embeds: [buildStaffFreezeEmbed()], fetchReply: true });
 	const user =
 		'targetUser' in input ? input.targetUser : isMessage ? input.author : input.options.getUser('user', true);
 
@@ -152,15 +143,7 @@ export async function openThread(
 			return send('common.errors.thread_exists');
 		}
 
-		if (isThreadFreezeActive()) {
-			return sendFreezeNotice();
-		}
-
 		await prisma.thread.delete({ where: { threadId: existingThread.threadId } });
-	}
-
-	if (isThreadFreezeActive()) {
-		return sendFreezeNotice();
 	}
 
 	const pastModmails = await prisma.thread.findMany({
@@ -215,11 +198,6 @@ export async function openThread(
 		});
 	}
 
-	// The cutover notice leads, so it's the first thing staff see on opening a brand new thread -- the owner
-	// announcement DMs never reach the moderators actually working the queue. Temporary; delete this line (and
-	// `util/migrationNotice.ts`) once the new bot is live. See ChatSift/ChatSift#313.
-	const embeds = [buildMigrationNoticeEmbed(), embed];
-
 	let startMessageOptions: GuildForumThreadCreateOptions | MessageCreateOptions;
 	if (modmail.type === ChannelType.GuildForum) {
 		const tags = modmail.availableTags.filter((tag) => !tag.moderated);
@@ -230,11 +208,11 @@ export async function openThread(
 
 		startMessageOptions = {
 			name: `${member.user.username}-${member.user.discriminator}`,
-			message: { embeds },
+			message: { embeds: [embed] },
 			appliedTags: tag ? [tag.id] : [],
 		};
 	} else {
-		startMessageOptions = { embeds };
+		startMessageOptions = { embeds: [embed] };
 	}
 
 	if (isMessage) {
